@@ -1,10 +1,10 @@
-#coding=utf-8
-#test purpose : verify the main features on iPhone
-#os: iOS
-#device: iPhone7 Plus
-#version:iOS12.1.4
-#author: Sam Wang
-#update date: created by Sam [2019-01-21]
+# coding=utf-8
+# test purpose : verify the main features on iPhone
+# os: iOS
+# device: iPhone7 Plus
+# version:iOS12.1.4
+# author: Sam Wang
+# update date: created by Sam [2019-01-21]
 
 import unittest
 import time
@@ -31,8 +31,11 @@ from common_iPhone7p_ios12_stg import bp_is_publishnowexist
 from common_iPhone7p_ios12_stg import bp_is_openmultichatexist
 from common_iPhone7p_ios12_stg import fun_findui_check
 from common_iPhone7p_ios12_stg import fun_personalinfoui_check
+from common_iPhone7p_ios12_stg import fun_personalinfouiv_check
 from common_iPhone7p_ios12_stg import fun_scoredetailui_check
 from common_iPhone7p_ios12_stg import fun_giftui_check
+from common_iPhone7p_ios12_stg import fun_giftdetailui_check
+from common_iPhone7p_ios12_stg import fun_giftdetailfloatui_check
 from common_iPhone7p_ios12_stg import fun_articleui_check
 from common_iPhone7p_ios12_stg import fun_cartui_check
 from common_iPhone7p_ios12_stg import fun_pgcui_check
@@ -41,17 +44,20 @@ from common_iPhone7p_ios12_stg import fun_pgcui_check
 from common_iPhone7p_ios12_stg import fun_mygiftorderdetailui_check
 from common_iPhone7p_ios12_stg import fun_getjingxiloginmenu
 from common_iPhone7p_ios12_stg import bp_deleteaddress
-#from common_iPhone7p_ios12_stg import fun_pinch
-#from common_iPhone7p_ios12_stg import fun_zoom
 #from common_iPhone7p_ios12_stg import bp_is_initpicexist
 from common_iPhone7p_ios12_stg import fun_lightedui_check
 from common_iPhone7p_ios12_stg import fun_notlightedui_check
+from common_iPhone7p_ios12_stg import fun_notlightedui4carowner_check
 from common_iPhone7p_ios12_stg import fun_mostsiteui_check
 from common_iPhone7p_ios12_stg import fun_activityui_check
 from common_iPhone7p_ios12_stg import fun_livecastui_check
 from common_iPhone7p_ios12_stg import bp_normalloginmp_carowner
 from common_iPhone7p_ios12_stg import bp_normalloginmp_notenoughscore
 from common_iPhone7p_ios12_stg import bp_normalloginmp_zeroscore
+from common_iPhone7p_ios12_stg import bp_canceldeletewait2payorder
+from common_iPhone7p_ios12_stg import bp_normalloginmp_onekey
+from common_iPhone7p_ios12_stg import bp_normalloginmp_testerb
+from common_iPhone7p_ios12_stg import bp_normalloginmp_testera
 
 # Returns abs path relative to this file and not cwd
 PATH = lambda p: os.path.abspath(
@@ -66,16 +72,17 @@ class Weilai_test(unittest.TestCase):
         desired_caps['platformName'] = 'iOS'
         desired_caps['browserName']=''
         desired_caps['automationName'] = 'XCUITest'
-        desired_caps['platformVersion'] = '12.1'
+        desired_caps['platformVersion'] = '12.2'
         desired_caps['deviceName'] = 'iPhone7P'
-        desired_caps['app'] = os.path.abspath('../../test_data/app/ios_package/NextevCarInhouseQA.ipa')
+        #desired_caps['app'] = os.path.abspath('../../test_data/app/ios_package/NextevCarInhouseQA.ipa')
+        desired_caps['bundleId'] = 'com.do1.WeiLaiApp.inhouse'
         desired_caps['udid'] = '08feda8b7b9e76e22a244d8f90de2f9d01e178de'
         desired_caps['noReset'] = True
-        #desired_caps['clearSystemFiles'] = True
+        desired_caps['clearSystemFiles'] = True
         desired_caps['xcodeOrgId'] = 'L8MRL9B64V'
         desired_caps['xcodeSigning'] = 'iPhone Developer'
         #desired_caps['newCommandTimeout'] = '180'
-        #desired_caps['wdaLocalPort'] = '8100'
+        desired_caps['wdaLocalPort'] = 8100
 
         self.driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', desired_caps)
         #self.driver.implicitly_wait(15)
@@ -85,7 +92,7 @@ class Weilai_test(unittest.TestCase):
         # end the session
         self.driver.quit()
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_fans_tc001
 #Purpose:检查我的页面点击粉丝后弹出页面的各项功能
 #OS:iOS
@@ -93,7 +100,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/13]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_fans_tc001(self):
         driver=self.driver
         print('TC_检查用户模式打开APP，检查点:我的_粉丝功能----step1检查我的页面点击粉丝后页面各个元素是否存在')
@@ -101,20 +108,25 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_粉丝页面元素检查和取消互相关注/+关注功能检查----开始:'+now)
         sleep(1)
-        """
-        ret=driver.find_elements_by_accessibility_id('返回')
-        if len(ret) != 0:
-            driver.find_element_by_accessibility_id('返回').click()
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]')
+        if len(name) != 0:
+            print('非车主用户已登录')
+            sleep(0.5)
+        else:
+            print('非主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
         sleep(1)
-        bp_is_initpicexist(self)
-        sleep(1)
-        """
         #我的
         driver.find_element_by_accessibility_id('我的').click()
         sleep(3)
         #粉丝
-        #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[5]').click()
-        driver.find_element_by_accessibility_id('粉丝').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[5]').click()
+        ###driver.find_element_by_accessibility_id('粉丝').click()
         sleep(3)
         #检查粉丝面的各个元素是否存在
         c1=fun_myfansui_check(self)
@@ -164,7 +176,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_粉丝页面元素检查和取消互相关注/+关注功能检查----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_watch_tc002
 #Purpose:检查我的页面点击关注后弹出页面的各项功能
 #OS:iOS
@@ -172,7 +184,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/10]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_watch_tc002(self):
         driver=self.driver
         print('TC_检查用户模式打开APP，检查点:我的_关注功能----step1检查我的页面点击发布后页面各个元素是否存在')
@@ -184,17 +196,17 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('我的').click()
         sleep(3)
         #关注
-        driver.find_element_by_accessibility_id('关注').click()
-        #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[4]').click()
+        ###driver.find_element_by_accessibility_id('关注').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[4]').click()
         sleep(3)
         #检查发布关注面的各个元素是否存在
         c1=fun_mywatchui_check(self)
-        sleep(2)
+        sleep(1)
         if c1==True:
             print('关注页面上各个被检查元素都正常显示.')
             sleep(2)
             #取消关注
-            driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam")]')[0].click()
+            driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "Sam"')[0].click()
             sleep(4)
             #...
             driver.find_element_by_accessibility_id('icon more white').click()
@@ -205,12 +217,12 @@ class Weilai_test(unittest.TestCase):
             n=driver.find_elements_by_accessibility_id('取消成功')
             if len(n) != 0:
                 print('取消互相关注的功能检查通过--聊天-->关注')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('取消互相关注的功能检查失败，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorCancelMuCare_R_stg_tc002.png'
+                sf1='../../test_report/ios/'+now+'_errCancelMuCare_R_stg_tc002.png'
                 driver.get_screenshot_as_file(sf1)
             sleep(2)
             driver.find_element_by_accessibility_id('full screen back icon').click()
@@ -221,36 +233,20 @@ class Weilai_test(unittest.TestCase):
             m=driver.find_elements_by_accessibility_id('关注成功')
             if len(m) != 0:
                 print('+关注的功能检查通过--关注-->聊天')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('+关注的功能检查失败，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorAddCare_R_stg_tc002.png'
+                sf1='../../test_report/ios/'+now+'_errAddCare_R_stg_tc002.png'
                 driver.get_screenshot_as_file(sf1)
             sleep(2)
-            """
-            #-关注
-            driver.find_element_by_accessibility_id('已关注').click()
-            sleep(1)
-            m2=driver.find_elements_by_accessibility_id('取消成功')
-            if len(m2) != 0:
-                print('取消关注的功能检查通过--已关注-->关注')
-                sleep(1)
-            else:
-                print('取消关注的功能检查失败，请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorCancelCare_R_tc002.png'
-                driver.get_screenshot_as_file(sf1)
-            sleep(1)
-            """
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
         sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_关注页面元素检查和取消关注和加关注的功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_publish_tc003
 #Purpose:检查我的页面点击发布后弹出页面的各项功能
 #OS:iOS
@@ -258,7 +254,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/10]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_publish_tc003(self):
         driver=self.driver
         print('TC_检查用户模式打开APP，检查点:我的_发布功能----step1检查我的页面点击发布后页面各个元素是否存在')
@@ -270,8 +266,8 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         #发布
-        driver.find_element_by_accessibility_id('发布').click()
-        #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[3]').click()
+        ###driver.find_element_by_accessibility_id('发布').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[3]').click()
         sleep(3)
         #检查发布页面的各个元素是否存在
         c1=fun_mypublishui_check(self)
@@ -344,10 +340,12 @@ class Weilai_test(unittest.TestCase):
             t1='发布降序_'+now0
             sleep(1)
             driver.find_element_by_accessibility_id('发布').click()
-            sleep(1)
-            title0=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeTextView')
-            sleep(1)
+            sleep(4)
+            title0=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeTextView[1]')
+            sleep(1.5)
             tl0=title0.get_attribute('value')
+            print(tl0)
+            sleep(0.5)
             if t1 in tl0:
                 print('发布降序排列验证检查通过')
                 sleep(1)
@@ -363,7 +361,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_发布页面元素检查和发布功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_loginmp_tc004
 #Purpose:检查用户用手机号+验证码重新登录app的功能
 #OS:iOS
@@ -371,7 +369,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app/未登录
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/13]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_loginmp_tc004(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:我的页面里用手机号码重新登录，如果已登录先退出账号----step1检查用户是否已经登录')
@@ -409,19 +407,19 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="SamSTG"]')
         if len(name) != 0:
-            print('登录成功！')
-            sleep(1)
+            print('用户SamSTG登录成功')
+            sleep(0.5)
         else:
-            print('登录失败！')
-            sleep(1)
+            print('用户SamSTG登录失败')
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf='../../test_report/ios/'+now+'_errornormalLogin_R_stg_tc004.png'
+            sf='../../test_report/ios/'+now+'_errnormalLogin_R_stg_tc004.png'
             driver.get_screenshot_as_file(sf)
         sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_客户重新登录账号----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_visitor_tc005
 #Purpose:检查访客模式点击我的页面各个菜单的预期动作
 #OS:iOS
@@ -429,7 +427,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app/未登录
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/13]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_visitor_tc005(self):
         driver=self.driver
         print('TC_访客模式点击我的页面各个菜单，检查点:点击我的页面各个菜单是否跳转到用户登录页面----step1检查用户是否已经登录')
@@ -449,7 +447,7 @@ class Weilai_test(unittest.TestCase):
         driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":500,"toX":50,"toY":420,"duration":1.0})
         sleep(2)
         #check the menu by turn
-        for j in range(0,10):
+        for j in range(0,9):
             menu=driver.find_element_by_accessibility_id(menu_name[j])
             menu.click()
             sleep(1)
@@ -460,10 +458,10 @@ class Weilai_test(unittest.TestCase):
         sleep(2)
         driver.execute_script("mobile: scroll", {"direction": "down"})
         sleep(2)
-        menuX=driver.find_element_by_accessibility_id(menu_name[10])
+        menuX=driver.find_element_by_accessibility_id(menu_name[9])
         menuX.click()
         sleep(1)
-        print('检查的菜单名称：'+menu_name[10])
+        print('检查的菜单名称：'+menu_name[9])
         bp_is_loginshow(self)
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
         sleep(2)
@@ -510,7 +508,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_访客模式点击我的页面各个菜单跳转页面----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_publishnow_tc006
 #Purpose:检查发现页面的发布功能
 #OS:iOS
@@ -518,12 +516,14 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/17]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_publishnow_tc006(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_发布此刻功能----step1检查发现首页右上角+号是否存在')
         print('step2检查发布此刻按钮是否存在；step3发布功能是否正常；step4检查发布内容里是否可以一次最大上传9张图片')
-        print('step5检查发布文字是否正确;step6检查点赞功能是否正常;step7检查评论功能是否正常')
+        print('step5点击所在位置,选择上海国际汽车城科技创新港,最后再发布')
+        print('step6检查发布文字是否正确;step7检查发布内容的所在位置')
+        print('step8检查点赞功能是否正常;step9检查评论功能是否正常')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_发布此刻----开始:'+now)
         sleep(1)
@@ -532,7 +532,7 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         c1=bp_is_plusexist(self)
         if c1 == True:
-            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="addPopMenu"]').click()
+            driver.find_element_by_accessibility_id('addPopMenu').click()
             sleep(2)
             #发此刻
             c2=bp_is_publishnowexist(self)
@@ -541,7 +541,7 @@ class Weilai_test(unittest.TestCase):
                 sleep(2)
                 #driver.find_element_by_xpath('//xxxx').click()
                 driver.execute_script('mobile: tap', {'touchCount':'1', 'x':57, "y":266})
-                sleep(3)
+                sleep(2)
                 #好
                 allow=driver.find_elements_by_accessibility_id('好')
                 if len(allow) != 0:
@@ -549,97 +549,111 @@ class Weilai_test(unittest.TestCase):
                 sleep(2)
                 for i in range(9):
                     driver.find_elements_by_ios_predicate('name=="compose guide check box defaul"')[i].click()
-                    sleep(1)
                 sleep(1)
                 driver.find_element_by_accessibility_id('完成(9/9)').click()
                 sleep(3)
-                words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTextView')
+                words=driver.find_elements_by_class_name('XCUIElementTypeTextView')
                 sleep(2)
                 if len(words) != 0:
                     words[0].click()
-                    sleep(1)
+                    sleep(0.5)
                     now0=time.strftime('%Y%m%d_%H%M%S')
-                    words[0].send_keys('I love Shanghai:'+now0)
+                    driver.find_element_by_class_name('XCUIElementTypeTextView').send_keys('I love Shanghai:'+now0)
                     t0='I love Shanghai:'+now0
-                    sleep(1)
-                    #print(t0)
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('keyboard btn').click()
+                    sleep(2)
+                    #所在位置
+                    driver.find_element_by_xpath('//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeButton').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('上海国际汽车城科技创新港').click()
+                    sleep(2)
                     driver.find_element_by_accessibility_id('发布').click()
                     sleep(2)
                     #check numbers of pictures and published text here
                     title=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeTextView').get_attribute('value')
-                    sleep(1)
                     #print(title)
                     if t0 in title:
                         print('发布内容的文字检查通过')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('发布内容的文字检查失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorText_R_stg_tc006.png'
+                        sf1='../../test_report/ios/'+now+'_errText_R_stg_tc006.png'
                         driver.get_screenshot_as_file(sf1)
                     sleep(2)
                     number=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="9"]')
                     if len(number) != 0:
                         print('发布内容的上传9张图片检查通过')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('发布内容的上传9张图片检查失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorPic9_R_stg_tc006.png'
+                        sf2='../../test_report/ios/'+now+'_errPic9_R_stg_tc006.png'
                         driver.get_screenshot_as_file(sf2)
                     sleep(2)
+                    #location
+                    loc=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "上海国际汽车城科技创新港"')
+                    if len(loc) != 0:
+                        print('发布内容的所在位置检查通过')
+                        sleep(0.5)
+                    else:
+                        print('发布内容的所在位置检查失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf4='../../test_report/ios/'+now+'_errLocation_R_stg_tc006.png'
+                        driver.get_screenshot_as_file(sf4)
+                    sleep(2)
                     #点赞
-                    driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]').click()
+                    ##driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':379, "y":600})
                     sleep(2)
                     praise=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeStaticText[3]').get_attribute('value')
                     if praise == '1':
                         print('点赞功能检查通过')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('点赞功能检查失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorPraise_R_stg_tc006.png'
+                        sf3='../../test_report/ios/'+now+'_errPraise_R_stg_tc006.png'
                         driver.get_screenshot_as_file(sf3)
                     sleep(2)
                     #评论
-                    driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[3]').click()
+                    ##driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[3]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':328, "y":600})
                     sleep(1)
                     driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我也来说~")]').click()
-                    sleep(2)
-                    combtn=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTextView')
-                    combtn.click()
                     sleep(1)
                     now06=time.strftime('%Y%m%d_%H%M%S')
-                    combtn.send_keys('自己评论自己:'+now06)
+                    driver.find_element_by_class_name('XCUIElementTypeTextView').send_keys('自己评论自己:'+now06)
                     sleep(1)
                     t06='自己评论自己:'+now0
                     driver.find_element_by_xpath('//XCUIElementTypeButton[@name="Send"]').click()
                     sleep(3)
                     #check published text here
                     title=driver.find_elements_by_xpath('//XCUIElementTypeTextView[contains(@value,t06)]')
-                    #print(len(title))
                     if len(title) != 0:
                         print('评论的文字检查通过')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('评论的文字检查失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorComment_R_stg_tc006.png'
-                        driver.get_screenshot_as_file(sf1)
+                        sf0='../../test_report/ios/'+now+'_errComment_R_stg_tc006.png'
+                        driver.get_screenshot_as_file(sf0)
                     sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="all page back grey icon"]').click()
-                    sleep(2)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
                 else:
                     print('发布文字框没有获取，请重新尝试')
-                    sleep(2)
+                    sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
             print('TC_发现_发布此刻----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_deletepublished_tc007
 #Purpose:检查我的页面的删除已发布内容的功能
 #OS:iOS
@@ -647,7 +661,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/17]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_deletepublished_tc007(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:我的——删除已发布的内容---step1点击我的页面发布;step2检查是否有已发布的内容,')
@@ -658,8 +672,8 @@ class Weilai_test(unittest.TestCase):
         #我的
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
-        driver.find_element_by_accessibility_id('发布').click()
-        #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[3]').click()
+        ###driver.find_element_by_accessibility_id('发布').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[3]').click()
         sleep(3)
         p=driver.find_elements_by_class_name('XCUIElementTypeCell')
         if len(p) != 0:
@@ -707,37 +721,39 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_客户用微信登录账号----开始:'+now)
         sleep(1)
-        g=bp_is_loggedin(self)
+        bp_is_loggedin(self)
         sleep(1)
         #登录页面
-        driver.find_element_by_accessibility_id('注册/登录').click()
+        #driver.find_element_by_accessibility_id('注册/登录').click()
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":169, "y":105})
         sleep(1)
         #微信登录
         btn=driver.find_elements_by_accessibility_id('log in wechat icon')
         if len(btn) != 0:
             print('微信登录按钮存在')
+            sleep(1)
             driver.find_element_by_accessibility_id('log in wechat icon').click()
             sleep(3)
-            oo=driver.find_elements_by_accessibility_id('确认登录')
+            oo=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeButton" AND name CONTAINS "确认登录"')
             if len(oo) != 0:
-                driver.find_element_by_accessibility_id('确认登录').click()
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name CONTAINS "确认登录"').click()
             sleep(4)
-            name=driver.find_elements_by_accessibility_id('SamSTG')
+            name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
             if len(name) != 0:
-                print('微信登录成功！')
-                sleep(1)
+                print('微信登录成功')
+                sleep(0.5)
             else:
-                print('微信登录失败！')
-                sleep(1)
+                print('微信登录失败')
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf0='../../test_report/ios/'+now+'_errorLoginWechat_R_stg_tc008.png'
                 driver.get_screenshot_as_file(sf0)
             sleep(1)
         else:
             print('微信登录按钮不存在，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_errorNoButton_R_stg_tc008.png'
+            sf1='../../test_report/ios/'+now+'_errNoButton_R_stg_tc008.png'
             driver.get_screenshot_as_file(sf1)
         sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
@@ -759,37 +775,40 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_客户用微博登录账号----开始:'+now)
         sleep(1)
-        g=bp_is_loggedin(self)
-        sleep(2)
+        bp_is_loggedin(self)
+        sleep(1)
         #登录页面
-        driver.find_element_by_accessibility_id('注册/登录').click()
+        #driver.find_element_by_accessibility_id('注册/登录').click()
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":169, "y":105})
         sleep(1)
         #微博登录
         btn=driver.find_elements_by_accessibility_id('log in microblog icon')
         if len(btn) != 0:
             print('微博登录按钮存在')
+            sleep(1)
             driver.find_element_by_accessibility_id('log in microblog icon').click()
-            sleep(8)
+            sleep(7)
             oh=driver.find_elements_by_accessibility_id('确认')
             if len(oh) != 0:
                 driver.find_element_by_accessibility_id('确认').click()
-                sleep(2)
+            sleep(2)
             name=driver.find_elements_by_accessibility_id('SamSTG')
             if len(name) != 0:
-                print('微博登录成功！')
-                sleep(1)
+                print('微博登录成功')
+                sleep(0.5)
             else:
-                print('微博登录失败！')
-                sleep(1)
+                print('微博登录失败')
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf0='../../test_report/ios/'+now+'_errorLoginWebo_R_stg_tc009.png'
+                sf0='../../test_report/ios/'+now+'_errLoginWebo_R_stg_tc009.png'
                 driver.get_screenshot_as_file(sf0)
         else:
             print('微博登录按钮不存在，请检查原因')
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_errorNoButton_R_stg_tc009.png'
+            sf1='../../test_report/ios/'+now+'_errNoButton_R_stg_tc009.png'
             driver.get_screenshot_as_file(sf1)
-        sleep(2)
+        sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_客户用微博登录账号----结束:'+now)
 
@@ -809,7 +828,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_tab上元素和推荐、此刻、资讯子tab页上元素检查----开始:'+now)
         sleep(1)
-        for i in range(3):
+        for i in range(5):
             driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(1)
         #driver.execute_script('mobile: dragFromToForDuration',{'fromX':5,'fromY':250,'toX':5,'toY':482,'duration':1.0})
@@ -823,10 +842,10 @@ class Weilai_test(unittest.TestCase):
         sleep(2)
         driver.find_element_by_accessibility_id('资讯').click()
         sleep(3)
-        for i in range(15):
+        for i in range(5):
             driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(1)
-        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':440,'toX':50,'toY':240,'duration':1.0})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':440,'toX':50,'toY':240,'duration':1.0})
         sleep(2)
         #检查发现页面资讯tab下的pgc的的各个元素是否存在
         fun_pgcui_check(self)
@@ -864,7 +883,7 @@ class Weilai_test(unittest.TestCase):
         c1=fun_personalinfoui_check(self)
         sleep(2)
         if c1 == True:
-            print('个人信息页面上各个被检查元素都检查完毕')
+            print('未认证用户个人信息页面上各个被检查元素都检查完毕')
             sleep(1)
             #点击头像
             head=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeButton')
@@ -980,7 +999,7 @@ class Weilai_test(unittest.TestCase):
                 print('用户性别可以从女改变成男')
             sleep(2)
             #地区
-            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="地区"]').click()
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="用车城市"]').click()
             sleep(3)
             ct=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="天津市"]')
             if len(ct) != 0:
@@ -1004,7 +1023,7 @@ class Weilai_test(unittest.TestCase):
             #保存
             #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="保存"]').click()
             driver.find_element_by_accessibility_id('保存').click()
-            sleep(1)
+            sleep(1.5)
             save=driver.find_elements_by_accessibility_id('保存成功')
             if len(save) != 0:
                 print('----修改的个人信息可以保存成功')
@@ -1039,7 +1058,7 @@ class Weilai_test(unittest.TestCase):
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(6)
-        for i in range(8):
+        for i in range(9):
             driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(1)
         #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
@@ -1237,16 +1256,16 @@ class Weilai_test(unittest.TestCase):
                     print('直播评论发布检查失败，请检查原因')
                     sleep(1)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf1='../../test_report/ios/'+now+'_errorCommentSent_R_stg_tc017.png'
+                    sf1='../../test_report/ios/'+now+'_errCommentSent_R_stg_tc017.png'
                     driver.get_screenshot_as_file(sf1)
                 else:
                     print('直播评论发布检查成功')
                 sleep(1)
             driver.find_element_by_xpath('//XCUIElementTypeButton[@name="all page back black icon"]').click()
-            sleep(2)
+            sleep(1)
         else:
             print('自动化专题未找到,请检查原因')
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现——资讯tab里直播功能流程及UI检查----结束:'+now)
 
@@ -1268,8 +1287,8 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         #朋友
         driver.find_element_by_accessibility_id('朋友').click()
-        sleep(5)
-        driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="朋友"]/XCUIElementTypeButton').click()
+        sleep(4)
+        driver.find_element_by_accessibility_id('friends go friendlist').click()
         sleep(2)
         f=driver.find_elements_by_class_name('XCUIElementTypeCell')
         sleep(2)
@@ -1300,10 +1319,10 @@ class Weilai_test(unittest.TestCase):
                 sleep(2)
                 if len(cc) != 0:
                     print('好友的备注设置已经生效')
-                    sleep(1)
+                    sleep(0.5)
                 else:
                     print('好友的备注设置没有生效，请检查原因')
-                    sleep(1)
+                    sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
                     sf1='../../test_report/ios/'+now+'_errorRemark_R_stg_tc018.png'
                     driver.get_screenshot_as_file(sf1)
@@ -1350,26 +1369,25 @@ class Weilai_test(unittest.TestCase):
         #发现
         #driver.find_element_by_accessibility_id('发现').click()
         #sleep(2)
-        for i in range(7):
+        for i in range(5):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        driver.execute_script('mobile: dragFromToForDuration',{'fromX':5,'fromY':600,'toX':5,'toY':100,'duration':1.0})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':5,'fromY':600,'toX':5,'toY':300,'duration':1.0})
         sleep(2)
         #检查文章的各个元素是否存在
         c1=fun_articleui_check(self)
-        sleep(2)
+        sleep(1)
         if c1 == True:
             print('推荐tab里文章各个被检查元素都检查完毕')
             sleep(2)
             #点击评论
-            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[11]/XCUIElementTypeButton[3]').click()
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[10]/XCUIElementTypeButton[3]').click()
             sleep(3)
             #driver.find_element_by_accessibility_id('写评论').click()
             driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我也来说~")]').click()
-            sleep(2)
-            combtn=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTextView')
-            combtn.click()
             sleep(1)
+            combtn=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTextView')
+            combtn.click()
+            sleep(0.5)
             now0=time.strftime('%Y%m%d_%H%M%S')
             combtn.send_keys('我用Python评论文章:'+now0)
             sleep(1)
@@ -1381,10 +1399,10 @@ class Weilai_test(unittest.TestCase):
             #print(len(title))
             if len(title) != 0:
                 print('评论的文字检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('评论的文字检查失败，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf1='../../test_report/ios/'+now+'_errorComment_R_stg_tc019.png'
                 driver.get_screenshot_as_file(sf1)
@@ -1394,7 +1412,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现——推荐tab里文章元素UI检查和评论的功能检查----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_openmultichat_tc020
 #Purpose:发现页面发起群聊功能的功能检查
 #OS:iOS
@@ -1402,7 +1420,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/20]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_openmultichat_tc020(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:已登录账号发现首页_发起群聊功能---step1检查发现首页右上角+号是否存在；')
@@ -1424,17 +1442,16 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('建群聊').click()
                 sleep(3)
                 #cb=driver.find_elements_by_xpath('//XCUIElementTypeImage[@name="chat_unslected_icon"]')
-                cb=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam")]')
-                sleep(2)
+                cb=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "Sam"')
+                sleep(1)
                 for i in range(3):
-                    driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam")]')[i].click()
-                    sleep(1)
+                    driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "Sam"')[i].click()
                 #确定    
                 driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"确定")]').click()
-                sleep(2)
+                sleep(4)
                 msg=driver.find_element_by_id('chat_input_textView')
                 msg.click()
-                sleep(1)
+                sleep(0.5)
                 now0=time.strftime('%Y%m%d_%H%M%S')
                 msg.send_keys('我用Python群聊:'+now0)
                 sleep(1)
@@ -1452,12 +1469,12 @@ class Weilai_test(unittest.TestCase):
                 #print(len(t))
                 if len(t) != 0:
                     print('群聊的发送内容正确')
-                    sleep(1)
+                    sleep(0.5)
                 else:
                     print('群聊的发送内容不正确，请检查')
-                    sleep(1)
+                    sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf2='../../test_report/ios/'+now+'_errorMultiChatText_R_stg_tc020.png'
+                    sf2='../../test_report/ios/'+now+'_errMultiChatText_R_stg_tc020.png'
                     driver.get_screenshot_as_file(sf2)
                 sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
@@ -1514,7 +1531,7 @@ class Weilai_test(unittest.TestCase):
                 print('踢人出群聊的功能检查没有通过，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorKickoff_R_stg_tc021.png'
+                sf1='../../test_report/ios/'+now+'_errKickoff_R_stg_tc021.png'
                 driver.get_screenshot_as_file(sf1)
             sleep(2)
             #...
@@ -1544,7 +1561,7 @@ class Weilai_test(unittest.TestCase):
                 print('邀请朋友加入群聊的功能检查没有通过，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorJoin_R_stg_tc021.png'
+                sf2='../../test_report/ios/'+now+'_errJoin_R_stg_tc021.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             driver.find_element_by_accessibility_id('im btn more').click()
@@ -1598,59 +1615,58 @@ class Weilai_test(unittest.TestCase):
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(6)
-        for i in range(7):
+        for i in range(8):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
         sleep(2)
-        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]')
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
         if len(u1) != 0:
-            print('需要兑换的商品存在，检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]').click()
-            sleep(9)
-            #page=driver.page_source
-            #sleep(2)
-            #加入购物车
-            add2b=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]')
-            sleep(2)
-            if len(add2b) != 0:
-                print('加入购物车按钮存在，检查通过')
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品存在，检查通过')
                 sleep(2)
-                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
-                sleep(3)
-                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
-                sleep(3)
-                #点击购物车图标
-                ###driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"])').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
-                sleep(6)
-                #检查购物车页面ui
-                chk=fun_cartui_check(self)
-                if chk == True:
-                    print('购物车页面UI检查成功')
-                    sleep(1)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(9)
+                #加入购物车
+                add2b=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]')
+                sleep(2)
+                if len(add2b) != 0:
+                    print('加入购物车按钮存在，检查通过')
+                    sleep(2)
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                    sleep(3)
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                    sleep(3)
+                    #点击购物车图标
+                    ###driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"])').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
+                    sleep(6)
+                    #检查购物车页面ui
+                    chk=fun_cartui_check(self)
+                    if chk == True:
+                        print('购物车页面UI检查成功')
+                        sleep(1)
+                    else:
+                        print('购物车页面UI检查失败，请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errorCartUI_R_stg_tc022.png'
+                        driver.get_screenshot_as_file(sf1)
+                    sleep(2)
+                    #37,41
+                    ###driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeOther').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':41})
+                    sleep(2)
                 else:
-                    print('购物车页面UI检查失败，请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf1='../../test_report/ios/'+now+'_errorCartUI_R_stg_tc022.png'
-                    driver.get_screenshot_as_file(sf1)
+                    print('加入购物车按钮不存在，请检查原因')
+                    sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
                 sleep(2)
-                #37,41
-                ###driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeOther').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':41})
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
                 sleep(2)
             else:
-                print('加入购物车按钮不存在，请检查原因')
+                print('需要兑换的商品不存在，请重新挑选')
                 sleep(2)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
-            sleep(2)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
-            sleep(2)
-        else:
-            print('需要兑换的商品不存在，请重新挑选')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_惊喜页面用户添加商品到购物车的功能----结束:'+now)
 
@@ -1678,9 +1694,6 @@ class Weilai_test(unittest.TestCase):
         #driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther').click()
         driver.execute_script('mobile: tap', {'touchCount':'1', 'x':371, 'y':41})
         sleep(6)
-        #refresh
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':100,'toX':50,'toY':500,'duration':1.0})
-        #sleep(2)
         chk0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"去添加点什么吧")]')
         sleep(2)
         if len(chk0) != 0:
@@ -1692,64 +1705,67 @@ class Weilai_test(unittest.TestCase):
             #检查购物车页面ui
             chk=fun_cartui_check(self)
             if chk == True:
-                print('购物车页面UI检查成功')
+                print('购物车页面UI检查完毕')
                 sleep(2)
                 #285,43
                 driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="编辑"]')[4].click()
                 sleep(6)
-                try:
-                    #改变商品数量
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':372, 'y':314})
-                    sleep(3)
-                    #完成
-                    driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="完成"]')[4].click()
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('立即购买').click()
-                    sleep(3)
-                    #改变收货地址
-                    ###driver.find_element_by_xpath('//XCUIElementTypeOther[contains(@name,"赵子龙")]').click()
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':374, 'y':160})
-                    sleep(2)
-                    #第二个地址
+                #改变商品数量
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':372, 'y':314})
+                sleep(3)
+                #完成
+                driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="完成"]')[4].click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('立即购买').click()
+                sleep(3)
+                #改变收货地址
+                ###driver.find_element_by_xpath('//XCUIElementTypeOther[contains(@name,"赵子龙")]').click()
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':374, 'y':160})
+                sleep(2)
+                #第二个地址
+                two=driver.find_elements_by_xpath('//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[2]')
+                if len(two) != 0:
+                    print('第二个地址存在')
+                    sleep(1)
                     driver.find_element_by_xpath('//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[2]').click()
+                else:
+                    print('第二个地址不存在')
+                    sleep(1)
+                    driver.find_element_by_xpath('//XCUIElementTypeOther[contains(@name,"默认地址")]').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('立即下单').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(5)
+                chk=driver.find_elements_by_xpath('//*[contains(@name,"支付成功")]')
+                sleep(1)
+                if len(chk) == 0:
+                    print('支付成功检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errorGiftOrder_R_stg_tc023.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(0.5)
+                else:
+                    print('支付成功检查通过')
                     sleep(2)
-                    driver.find_element_by_accessibility_id('立即下单').click()
+                    #查看订单
+                    driver.find_element_by_accessibility_id('查看订单').click()
+                    sleep(6)
+                    #检查商品状态
+                    chk1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"cake")]')
+                    chk2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"已付款")]')
                     sleep(1)
-                    driver.find_element_by_accessibility_id('确定').click()
-                    sleep(4)
-                    chk=driver.find_elements_by_xpath('//*[contains(@name,"订单已提交")]')
-                    sleep(1)
-                    if len(chk) == 0:
-                        print('订单已提交检查失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorGiftOrder_R_stg_tc023.png'
-                        driver.get_screenshot_as_file(sf1)
-                        sleep(2)
+                    if len(chk1) != 0 and len(chk2) != 0:
+                        print('订单里商品状态检查通过')
+                        sleep(0.5)
                     else:
-                        print('订单已提交检查通过')
-                        sleep(2)
-                        #查看订单
-                        driver.find_element_by_accessibility_id('查看订单').click()
-                        sleep(6)
-                        #检查商品状态
-                        chk1=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"cake")]')
-                        chk2=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"已付款")]')
-                        sleep(1)
-                        if len(chk1) != 0 and len(chk2) != 0:
-                            print('订单里商品状态检查通过')
-                            sleep(1)
-                        else:
-                            print('订单里商品状态检查失败，请检查原因')
-                            sleep(1)
-                            now=time.strftime('%Y%m%d_%H%M%S')
-                            sf1='../../test_report/ios/'+now+'_errorGiftStatus_R_stg_tc023.png'
-                            driver.get_screenshot_as_file(sf1)
-                        sleep(2)
-                except Exception as e:
-                    print('发生异常：'+str(e))
+                        print('订单里商品状态检查失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errorGiftStatus_R_stg_tc023.png'
+                        driver.get_screenshot_as_file(sf1)
                     sleep(2)
-                    pass
             else:
                 print('购物车页面UI检查失败，请检查原因')
                 sleep(1)
@@ -1829,7 +1845,7 @@ class Weilai_test(unittest.TestCase):
                         sleep(1)
                         now0=time.strftime('%Y%m%d_%H%M%S')
                         driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('我用Python_直播微信好友:'+now0)
-                        sleep(1)
+                    sleep(1)
                     #发送
                     driver.find_element_by_accessibility_id('发送').click()
                     sleep(1)
@@ -1839,11 +1855,12 @@ class Weilai_test(unittest.TestCase):
                     save1=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save1) != 0:
                         print('分享微信成功')
+                        sleep(0.5)
                     else:
                         print('分享微信失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorsharewechat_R_stg_tc024.png'
+                        sf1='../../test_report/ios/'+now+'_errsharewechat_R_stg_tc024.png'
                         driver.get_screenshot_as_file(sf1)
                     sleep(1)
                 else:
@@ -1883,11 +1900,12 @@ class Weilai_test(unittest.TestCase):
                     save2=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save2) != 0:
                         print('分享微信朋友圈成功')
+                        sleep(0.5)
                     else:
                         print('分享微信朋友圈失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorsharewechatpyq_R_stg_tc024.png'
+                        sf2='../../test_report/ios/'+now+'_errsharewechatpyq_R_stg_tc024.png'
                         driver.get_screenshot_as_file(sf2)
                     sleep(2)
                 else:
@@ -1902,7 +1920,7 @@ class Weilai_test(unittest.TestCase):
                     print('分享到新浪微博按钮存在，检查通过')
                     sleep(2)
                     driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther[3]/XCUIElementTypeOther/XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[3]/XCUIElementTypeButton').click()
-                    sleep(6)
+                    sleep(7)
                     ad=driver.find_elements_by_accessibility_id('确定')
                     if len(ad) != 0:
                         driver.find_element_by_accessibility_id('确定').click()
@@ -1920,11 +1938,12 @@ class Weilai_test(unittest.TestCase):
                     save3=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save3) != 0:
                         print('分享微博成功')
+                        sleep(0.5)
                     else:
                         print('分享微博失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorsharewebo_R_stg_tc024.png'
+                        sf3='../../test_report/ios/'+now+'_errsharewebo_R_stg_tc024.png'
                         driver.get_screenshot_as_file(sf3)
                     sleep(2)
                 else:
@@ -1950,11 +1969,12 @@ class Weilai_test(unittest.TestCase):
                     save4=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save4) != 0:
                         print('分享我的朋友成功')
+                        sleep(0.5)
                     else:
                         print('分享我的朋友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios'+now+'_errorsharemyfriend_R_stg_tc024.png'
+                        sf4='../../test_report/ios/'+now+'_errsharemyfriend_R_stg_tc024.png'
                         driver.get_screenshot_as_file(sf4)
                     sleep(2)
                 else:
@@ -1998,7 +2018,7 @@ class Weilai_test(unittest.TestCase):
         chk=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="点击签到"]')
         if len(chk) != 0:
             driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="点击签到"]').click()
-            sleep(2)
+            sleep(1)
         else:
             print('今日已经签到过，请明日再来')
         sleep(2)
@@ -2017,11 +2037,11 @@ class Weilai_test(unittest.TestCase):
             print('每日签到获取积分功能检查失败，请检查原因')
             sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf2='../../test_report/ios/'+now+'_errorCheckinScore_R_stg_tc025.png'
+            sf2='../../test_report/ios/'+now+'_errCheckinScore_R_stg_tc025.png'
             driver.get_screenshot_as_file(sf2)
         sleep(1)
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-        sleep(2)
+        sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('我的_点击签到及检查当日签到积分是否能正常获得的功能----结束:'+now)
 
@@ -2043,16 +2063,18 @@ class Weilai_test(unittest.TestCase):
         #我的
         driver.find_element_by_accessibility_id('我的').click()
         sleep(3)
-        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-        sleep(2)
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+        #sleep(2)
         #我的活动
         driver.find_element_by_accessibility_id('我的活动').click()
         sleep(3)
-        ch=driver.find_elements_by_accessibility_id('小龙自动化3（请勿报名）')
-        if len(ch) != 0:
-            print('活动存在，检查通过')
-            sleep(1)
-            driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
+        ch=driver.find_elements_by_accessibility_id('小龙自动化4（报名之后记得取消）')
+        ch1v=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeStaticText[1]').get_attribute('value')
+        sleep(2)
+        if len(ch) != 0 and '小龙自动化4（报名之后记得取消）' in ch1v:
+            print('活动存在，活动记录降序排序检查通过')
+            sleep(2)
+            driver.find_element_by_accessibility_id('小龙自动化4（报名之后记得取消）').click()
             sleep(8)
             #UI checking
             c1=fun_activityui_check(self)
@@ -2070,7 +2092,7 @@ class Weilai_test(unittest.TestCase):
             print('活动不存在，请检查原因')
             sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf2='../../test_report/ios/'+now+'_errorNoJoinActivity_R_stg_tc026.png'
+            sf2='../../test_report/ios/'+now+'_errNoJoinActivity_R_stg_tc026.png'
             driver.get_screenshot_as_file(sf2)
             sleep(2)
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
@@ -2282,10 +2304,10 @@ class Weilai_test(unittest.TestCase):
         #朋友
         driver.find_element_by_accessibility_id('朋友').click()
         sleep(6)
-        driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="朋友"]/XCUIElementTypeButton').click()
+        driver.find_element_by_accessibility_id('friends go friendlist').click()
         sleep(2)
         #点+号
-        driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="朋友列表"]/XCUIElementTypeButton[2]').click()
+        driver.find_element_by_accessibility_id('addPopMenu').click()
         sleep(1)
         add=driver.find_elements_by_accessibility_id('加朋友')
         if len(add) != 0:
@@ -2374,12 +2396,16 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('设置').click()
         sleep(2)
         driver.find_element_by_accessibility_id('安全管理').click()
-        sleep(2)
+        sleep(3)
         #服务安全密码
-        driver.find_element_by_accessibility_id('设置服务安全密码').click()
+        ###driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"设置服务安全密码")]').click()
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":143, "y":166}) 
+        #>
+        ###driver.find_element_by_accessibility_id('icon_right_arrow_gray').click()
         sleep(3)
         code=driver.find_element_by_class_name('XCUIElementTypeTextField')
         code.click()
+        sleep(0.5)
         code.send_keys('867129')
         sleep(1)
         driver.find_element_by_accessibility_id('下一步').click()
@@ -2410,7 +2436,6 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         for j in range(6):
             driver.find_element_by_accessibility_id(p[j]).click()
-        sleep(1)
         sleep(2)
         chk=driver.find_elements_by_accessibility_id('重置成功')
         if len(chk) != 0:
@@ -2501,8 +2526,10 @@ class Weilai_test(unittest.TestCase):
             save1=driver.find_elements_by_accessibility_id('保存成功')
             if len(save1) != 0:
                 print('新增地址成功')
+                sleep(0.5)
             else:
                 print('新增地址失败，请检查原因')
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf2='../../test_report/ios/'+now+'_errorAddnewaddr_R_stg_tc031.png'
                 driver.get_screenshot_as_file(sf2)
@@ -2535,8 +2562,10 @@ class Weilai_test(unittest.TestCase):
             save2=driver.find_elements_by_accessibility_id('修改成功')
             if len(save2) != 0:
                 print('编辑地址成功')
+                sleep(0.5)
             else:
                 print('编辑地址失败，请检查原因')
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf1='../../test_report/ios/'+now+'_errorEditaddr_R_stg_tc031.png'
                 driver.get_screenshot_as_file(sf1)
@@ -2581,8 +2610,9 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('蔚来中心丨上海太古汇店1112121312').click()
         sleep(3)
         """
-        driver.find_element_by_accessibility_id('NIO DAY 选座活动之最后一版').click()
-        sleep(4)
+        #driver.find_element_by_accessibility_id('NIO DAY 选座活动之最后一版').click()
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":207, "y":360})
+        sleep(6)
         #晒图
         #driver.execute_script("mobile: tap", {"touchCount":"1", "x":330, "y":620})
         show=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="晒图"]')
@@ -2613,8 +2643,16 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             driver.find_element_by_accessibility_id('发布').click()
             sleep(9)
-            #driver.execute_script("mobile: scroll", {"direction": "down"})
-            #sleep(2)
+            #用户晒图页面
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+            sleep(1)
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+            sleep(1)
+            driver.find_element_by_accessibility_id('此刻').click()
+            sleep(5)
+            #refresh
+            driver.execute_script("mobile: scroll", {"direction": "up"})
+            sleep(2)
             #check numbers of pictures and published text here
             title=driver.find_elements_by_xpath('//XCUIElementTypeTextView[contains(@value,"人生苦短体验晒图:")]')
             sleep(2)
@@ -2639,15 +2677,15 @@ class Weilai_test(unittest.TestCase):
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf2='../../test_report/ios/'+now+'_errorPic9_R_stg_tc032.png'
                 driver.get_screenshot_as_file(sf2)
-            sleep(4)
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
             sleep(2)
+            #driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+            #sleep(2)
         else:
             print('晒图按钮不存在/找不到，请检查原因')
             sleep(2)
-        driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
-        #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[1]').click()
-        sleep(2)
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[1]').click()
+            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现——体验tab活动的晒图功能----结束:'+now)
 
@@ -2689,8 +2727,7 @@ class Weilai_test(unittest.TestCase):
                 allow=driver.find_elements_by_accessibility_id('好')
                 if len(allow) != 0:
                     driver.find_element_by_accessibility_id('好').click()
-                    sleep(1)
-                sleep(2)
+                sleep(3)
                 for i in range(1,10):
                     driver.find_elements_by_ios_predicate('name=="compose guide check box defaul"')[i].click()
                     sleep(1)
@@ -2841,7 +2878,7 @@ class Weilai_test(unittest.TestCase):
                     sleep(1)
                     now0=time.strftime('%Y%m%d_%H%M%S')
                     driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('我用Python_UGC微信好友:'+now0)
-                    sleep(1)
+                sleep(1)
                 #发送
                 driver.find_element_by_accessibility_id('发送').click()
                 sleep(1)
@@ -2851,11 +2888,12 @@ class Weilai_test(unittest.TestCase):
                 save1=driver.find_elements_by_accessibility_id('分享成功')
                 if len(save1) != 0:
                     print('分享微信成功')
+                    sleep(0.5)
                 else:
                     print('分享微信失败，请检查原因')
-                    sleep(1)
+                    sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf1='../../test_report/ios/'+now+'_errorsharewechat_R_stg_tc034.png'
+                    sf1='../../test_report/ios/'+now+'_errsharewechat_R_stg_tc034.png'
                     driver.get_screenshot_as_file(sf1)
                 sleep(1)
             else:
@@ -2871,9 +2909,9 @@ class Weilai_test(unittest.TestCase):
                 sleep(2)
                 driver.find_element_by_accessibility_id('朋友圈').click()
                 sleep(8)
-                word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                word2=driver.find_element_by_class_name('XCUIElementTypeTextView')
                 word2.click()
-                sleep(1)
+                sleep(0.5)
                 now2=time.strftime('%Y%m%d_%H%M%S')
                 word2.send_keys('我用Python_UGC朋友圈:'+now2)
                 sleep(1)
@@ -2895,11 +2933,12 @@ class Weilai_test(unittest.TestCase):
                 save2=driver.find_elements_by_accessibility_id('分享成功')
                 if len(save2) != 0:
                     print('分享朋友圈成功')
+                    sleep(0.5)
                 else:
                     print('分享朋友圈失败，请检查原因')
-                    sleep(1)
+                    sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf2='../../test_report/ios/'+now+'_errorsharewechatpyq_R_stg_tc034.png'
+                    sf2='../../test_report/ios/'+now+'_errsharewechatpyq_R_stg_tc034.png'
                     driver.get_screenshot_as_file(sf2)
                 sleep(2)
             else:
@@ -2914,7 +2953,7 @@ class Weilai_test(unittest.TestCase):
                 print('分享到微博按钮存在，检查通过')
                 sleep(2)
                 driver.find_element_by_accessibility_id('微博').click()
-                sleep(5)
+                sleep(6)
                 ad=driver.find_elements_by_accessibility_id('确定')
                 if len(ad) != 0:
                     driver.find_element_by_accessibility_id('确定').click()
@@ -2932,11 +2971,12 @@ class Weilai_test(unittest.TestCase):
                 save3=driver.find_elements_by_accessibility_id('分享成功')
                 if len(save3) != 0:
                     print('分享微博成功')
+                    sleep(0.5)
                 else:
                     print('分享微博失败，请检查原因')
-                    sleep(1)
+                    sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf3='../../test_report/ios/'+now+'_errorsharewebo_R_stg_tc034.png'
+                    sf3='../../test_report/ios/'+now+'_errsharewebo_R_stg_tc034.png'
                     driver.get_screenshot_as_file(sf3)
                 sleep(2)
             else:
@@ -2961,17 +3001,18 @@ class Weilai_test(unittest.TestCase):
                 save4=driver.find_elements_by_accessibility_id('分享成功')
                 if len(save4) != 0:
                     print('分享我的朋友成功')
+                    sleep(0.5)
                 else:
                     print('分享我的朋友失败，请检查原因')
-                    sleep(1)
+                    sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf4='../../test_report/ios'+now+'_errorsharemyfriend_R_stg_tc034.png'
+                    sf4='../../test_report/ios/'+now+'_errsharemyfriend_R_stg_tc034.png'
                     driver.get_screenshot_as_file(sf4)
                 sleep(2)
             else:
                 print('分享到我的朋友按钮不存在，请检查原因')
                 sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="all page back grey icon"]').click()
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_此刻tab下的ugc的分享功能----结束:'+now)
@@ -3219,7 +3260,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_朋友_IM聊天信息复制、删除、撤回、转发功能----结束:'+now)
     
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_infopgcshare_tc037
 #Purpose:检查发现页面资讯tab下的pgc的分享功能
 #OS:iOS
@@ -3227,7 +3268,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/08/29]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_infopgcshare_tc037(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_发现页面资讯tab下的pgc的分享功能----step1进入发现页面资讯tab')
@@ -3238,195 +3279,195 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         driver.find_element_by_accessibility_id('资讯').click()
         sleep(3)
-        for i in range(17):
+        for i in range(5):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        driver.execute_script('mobile: dragFromToForDuration',{'fromX':5,'fromY':650,'toX':5,'toY':150,'duration':1.0})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':5,'fromY':650,'toX':5,'toY':150,'duration':1.0})
         sleep(2)
         #检查发现页面资讯tab下的pgc的的各个元素是否存在
         c=fun_pgcui_check(self)
         if c == True:
             print('发现页面资讯tab下的pgc的各个被检查元素都检查完毕')
-            sleep(1)
-        u=driver.find_elements_by_accessibility_id('小龙投票stg')
-        ch0=driver.find_element_by_accessibility_id('小龙投票stg').get_attribute('visible')
-        if len(u) != 0 and ch0 == 'true':
-            print('PGC:小龙投票stg存在，检查通过')
-            sleep(2)
-            driver.find_element_by_accessibility_id('小龙投票stg').click()
-            sleep(6)
-            #左上角按钮
-            sh=driver.find_elements_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]')
-            if len(sh) != 0:
-                print('分享按钮存在，检查通过')
+        sleep(2)
+        u=driver.find_elements_by_accessibility_id('看完 「斌哥给道服同事内部信」 不吐不快')
+        if len(u) != 0:
+            ch0v=driver.find_element_by_accessibility_id('看完 「斌哥给道服同事内部信」 不吐不快').get_attribute('visible')
+            if ch0v == 'true':
+                print('PGC:看完 「斌哥给道服同事内部信」 不吐不快存在，检查通过')
                 sleep(2)
-                #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                sleep(2)
-                #微信
-                wh=driver.find_elements_by_accessibility_id('微信')
-                if len(wh) != 0:
-                    print('分享到微信按钮存在，检查通过')
+                driver.find_element_by_accessibility_id('看完 「斌哥给道服同事内部信」 不吐不快').click()
+                sleep(6)
+                #左上角按钮
+                sh=driver.find_elements_by_xpath('(//XCUIElementTypeOther[@name="看完 「斌哥给道服同事内部信」 不吐不快"])[1]/XCUIElementTypeOther[2]')
+                if len(sh) != 0:
+                    print('分享按钮存在，检查通过')
                     sleep(2)
-                    driver.find_element_by_accessibility_id('微信').click()
-                    sleep(7)
-                    driver.find_element_by_accessibility_id('王小龙').click()
-                    sleep(3)
-                    words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                    #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
                     sleep(2)
-                    if len(words) != 0:
-                        words[0].click()
+                    #微信
+                    wh=driver.find_elements_by_accessibility_id('微信')
+                    if len(wh) != 0:
+                        print('分享到微信按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微信').click()
+                        sleep(7)
+                        driver.find_element_by_accessibility_id('王小龙').click()
+                        sleep(3)
+                        words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                        sleep(2)
+                        if len(words) != 0:
+                            words[0].click()
+                            sleep(1)
+                            now0=time.strftime('%Y%m%d_%H%M%S')
+                            driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('人生苦短PGC微信好友:'+now0)
+                            sleep(1)
+                        #发送
+                        driver.find_element_by_accessibility_id('发送').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('返回蔚来').click()
                         sleep(1)
-                        now0=time.strftime('%Y%m%d_%H%M%S')
-                        driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('人生苦短PGC微信好友:'+now0)
-                        sleep(1)
-                    #发送
-                    driver.find_element_by_accessibility_id('发送').click()
+                        #检查toast
+                        save1=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save1) != 0:
+                            print('分享微信好友成功')
+                            sleep(0.5)
+                        else:
+                            print('分享微信好友失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf1='../../test_report/ios/'+now+'_errPGCsharewechat_R_stg_tc037.png'
+                            driver.get_screenshot_as_file(sf1)
+                        sleep(2)
+                    else:
+                        print('分享到微信好友按钮不存在，请检查原因')
                     sleep(2)
-                    driver.find_element_by_accessibility_id('返回蔚来').click()
-                    sleep(0.6)
-                    #检查toast
-                    save1=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save1) != 0:
-                        print('分享微信好友成功')
+                    #share
+                    #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
+                    sleep(2)
+                    #朋友圈
+                    pyq=driver.find_elements_by_accessibility_id('朋友圈')
+                    if len(pyq) != 0:
+                        print('分享到朋友圈按钮存在，检查通过')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('朋友圈').click()
+                        sleep(8)
+                        word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                        word2.click()
+                        sleep(1)
+                        now2=time.strftime('%Y%m%d_%H%M%S')
+                        word2.send_keys('人生苦短PGC朋友圈:'+now2)
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('表情').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                        sleep(1)
+                        #私密, 仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        #发表
+                        driver.find_element_by_accessibility_id('发表').click()
+                        sleep(1)
+                        #检查toast
+                        save2=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save2) != 0:
+                            print('分享朋友圈成功')
+                            sleep(0.5)
+                        else:
+                            print('分享朋友圈失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf2='../../test_report/ios/'+now+'_errPGCsharewechatpyq_R_stg_tc037.png'
+                            driver.get_screenshot_as_file(sf2)
                         sleep(1)
                     else:
-                        print('分享微信好友失败，请检查原因')
+                        print('分享到朋友圈按钮不存在，请检查原因')
+                    sleep(2)
+                    #share
+                    #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
+                    sleep(2)
+                    #微博
+                    wb=driver.find_elements_by_accessibility_id('微博')
+                    if len(wb) != 0:
+                        print('分享到微博按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微博').click()
+                        sleep(6)
+                        ad=driver.find_elements_by_accessibility_id('确定')
+                        if len(ad) != 0:
+                            driver.find_element_by_accessibility_id('确定').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('发送到分组').click()
+                        sleep(2)
+                        #仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                        sleep(2)
+                        #发送
+                        driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorPGCsharewechat_R_stg_tc037.png'
-                        driver.get_screenshot_as_file(sf1)
-                    sleep(2)
-                else:
-                    print('分享到微信好友按钮不存在，请检查原因')
-                sleep(2)
-                #share
-                #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                sleep(2)
-                #朋友圈
-                pyq=driver.find_elements_by_accessibility_id('朋友圈')
-                if len(pyq) != 0:
-                    print('分享到朋友圈按钮存在，检查通过')
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('朋友圈').click()
-                    sleep(8)
-                    word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
-                    word2.click()
-                    sleep(1)
-                    now2=time.strftime('%Y%m%d_%H%M%S')
-                    word2.send_keys('人生苦短PGC朋友圈:'+now2)
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('表情').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
-                    sleep(1)
-                    #私密, 仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    #发表
-                    driver.find_element_by_accessibility_id('发表').click()
-                    sleep(1)
-                    #检查toast
-                    save2=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save2) != 0:
-                        print('分享朋友圈成功')
+                        #检查toast
+                        save3=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save3) != 0:
+                            print('分享微博成功')
+                            sleep(0.5)
+                        else:
+                            print('分享微博失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf3='../../test_report/ios/'+now+'_errPGCsharewebo_R_stg_tc037.png'
+                            driver.get_screenshot_as_file(sf3)
                         sleep(1)
                     else:
-                        print('分享朋友圈失败，请检查原因')
+                        print('分享到新浪微博按钮不存在，请检查原因')
+                    sleep(2)
+                    #share
+                    #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
+                    sleep(2)
+                    #我的朋友
+                    mf=driver.find_elements_by_accessibility_id('我的朋友')
+                    if len(mf) != 0:
+                        print('分享到我的朋友按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('我的朋友').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(2)
+                        driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]')[0].click()
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorPGCsharewechatpyq_R_stg_tc037.png'
-                        driver.get_screenshot_as_file(sf2)
-                    sleep(1)
-                else:
-                    print('分享到朋友圈按钮不存在，请检查原因')
-                sleep(2)
-                #share
-                #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                sleep(2)
-                #微博
-                wb=driver.find_elements_by_accessibility_id('微博')
-                if len(wb) != 0:
-                    print('分享到微博按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微博').click()
-                    sleep(6)
-                    ad=driver.find_elements_by_accessibility_id('确定')
-                    if len(ad) != 0:
-                        driver.find_element_by_accessibility_id('确定').click()
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('发送到分组').click()
-                    sleep(2)
-                    #仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
-                    sleep(2)
-                    #发送
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                    sleep(1)
-                    #检查toast
-                    save3=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save3) != 0:
-                        print('分享微博成功')
+                        #检查toast
+                        save4=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save4) != 0:
+                            print('分享我的朋友成功')
+                            sleep(0.5)
+                        else:
+                            print('分享我的朋友失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf4='../../test_report/ios/'+now+'_errPGCsharemyfriend_R_stg_tc037.png'
+                            driver.get_screenshot_as_file(sf4)
                         sleep(1)
                     else:
-                        print('分享微博失败，请检查原因')
+                        print('分享到我的朋友按钮不存在，请检查原因')
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorPGCsharewebo_R_stg_tc037.png'
-                        driver.get_screenshot_as_file(sf3)
-                    sleep(1)
                 else:
-                    print('分享到新浪微博按钮不存在，请检查原因')
-                sleep(2)
-                #share
-                #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[2]').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                sleep(2)
-                #我的朋友
-                mf=driver.find_elements_by_accessibility_id('我的朋友')
-                if len(mf) != 0:
-                    print('分享到我的朋友按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('我的朋友').click()
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('朋友').click()
-                    sleep(2)
-                    driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam")]')[0].click()
+                    print('分享按钮不存在，请检查原因')
                     sleep(1)
-                    #检查toast
-                    save4=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save4) != 0:
-                        print('分享我的朋友成功')
-                        sleep(1)
-                    else:
-                        print('分享我的朋友失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorPGCsharemyfriend_R_stg_tc037.png'
-                        driver.get_screenshot_as_file(sf4)
-                    sleep(1)
-                else:
-                    print('分享到我的朋友按钮不存在，请检查原因')
-                    sleep(2)
+                #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[1]').click()
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(1)
             else:
-                print('分享按钮不存在，请检查原因')
-                sleep(2)
-            #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[1]').click()
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
-            sleep(2)
-        else:
-            print('PGC:小龙投票stg不存在，无法执行分享操作')
-            sleep(2)
+                print('PGC:看完 「斌哥给道服同事内部信」 不吐不快不存在/未找到，无法执行分享操作')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_发现页面资讯tab下的PGC的分享功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_experjoin_tc038
 #Purpose:发现页面体验tab活动的报名功能
 #OS:iOS
@@ -3434,7 +3475,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/09/30]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_experjoin_tc038(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:已登录账号发现——体验tab活动的报名功能---step1发现页面里点击体验tab')
@@ -3446,159 +3487,112 @@ class Weilai_test(unittest.TestCase):
         #体验
         driver.find_element_by_accessibility_id('体验').click()
         sleep(4)
-        """
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
-        sleep(2)
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':550,'toX':50,'toY':150,'duration':1.0})
-        #sleep(2)
-        driver.find_element_by_accessibility_id('蔚来中心丨上海太古汇店1112121312').click()
-        sleep(2)
-        """
         for i in range(2):
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-            sleep(1)
-        sleep(3)
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':150,'duration':1.0})
+        sleep(2)
         #小龙自动化3
-        driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
-        sleep(5)
-        #报名
-        joins=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="报名"]')
-        sleep(1)
-        if len(joins) != 0:
-            print('报名按钮存在,检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeLink[@name="报名"]').click()
-            sleep(6)
-            #场次
-            #driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"02/04")]').click()
-            #sleep(1)
-            #driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"稍等哈活动")]').click()
-            #sleep(2)
-            #+限购1张
-            #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="+"]').click()
-            #sleep(1)
-            #driver.execute_script('mobile: dragFromToForDuration',{'fromX':350,'fromY':550,'toX':350,'toY':150,'duration':1.0})
-            #sleep(2)
-            #driver.execute_script("mobile: scroll", {"direction": "down"})
-            #sleep(2)
-            #姓名
-            name=driver.find_element_by_class_name('XCUIElementTypeTextField')
-            name.click()
-            sleep(0.5)
-            #name.clear()
-            #sleep(0.5)
-            #name.send_keys('王镇声')
-            name.send_keys('')
-            sleep(1)
-            driver.find_element_by_accessibility_id('完成').click()
-            sleep(1)
-            """
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':268})
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="性别"]').click()
-            sleep(1)
-            #确定
-            driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"确定")]').click()
-            sleep(1)
-            #mobile
-            mb=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
-            mb.click()
-            sleep(1)
-            mb.send_keys('18930018803')
-            sleep(1)
-            driver.find_element_by_accessibility_id('完成').click()
-            sleep(1)
-            #证件类别
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="证件类别"]').click()
-            driver.find_element_by_accessibility_id('证件类别').click()
-            sleep(2)
-            #确定
-            driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"确定")]').click()
-            sleep(1)
-            #证件号码
-            em=driver.find_elements_by_class_name('XCUIElementTypeTextField')[2]
-            em.click()
-            sleep(1)
-            em.send_keys('340103197301142518')
-            sleep(1)
-            driver.find_element_by_accessibility_id('完成').click()
-            sleep(2)
-            """
-            #购买
-            driver.find_element_by_accessibility_id('购买').click()
-            sleep(1)
-            #确认
-            driver.find_element_by_accessibility_id('确认').click()
-            sleep(6)
-            #checking
-            ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"预约成功")]')
-            if len(ch) == 0:
-                print('报名失败，请检查原因')
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorJoin_R_stg_tc038.png'
-                driver.get_screenshot_as_file(sf1)
+        ch1=driver.find_elements_by_accessibility_id('小龙自动化4（报名之后记得取消）')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_accessibility_id('小龙自动化4（报名之后记得取消）').get_attribute('visible')
+            if ch1v == 'true':
+                print('小龙自动化4找到')
                 sleep(1)
-            else:
-                print('报名成功')
-                sleep(1)
-                driver.find_element_by_accessibility_id('完成').click()
+                driver.find_element_by_accessibility_id('小龙自动化4（报名之后记得取消）').click()
                 sleep(5)
-                #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':30, 'y':42})
-                sleep(3)
-                #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[1]').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
-                sleep(2)
-                #driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-                #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':27, 'y':42})
-                #sleep(2)
-                #我的
-                driver.find_element_by_accessibility_id('我的').click()
-                sleep(3)
-                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-                sleep(2)
-                driver.find_element_by_accessibility_id('我的活动').click()
-                sleep(3)
-                #活动降序排列检查
-                ch3=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeStaticText[1]').get_attribute('value')
-                if '小龙自动化3' in ch3:
-                    print('活动降序排列检查通过')
-                    sleep(1)
-                else:
-                    print('活动降序排列检查失败，请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf3='../../test_report/ios/'+now+'_errorMyActivityOrder_R_stg_tc038.png'
-                    driver.get_screenshot_as_file(sf3)
-                sleep(2)
-                ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,"3月29日")]')
-                if len(ch2) != 0:
-                    print('活动订单里活动时间检查通过')
-                    sleep(1)
-                else:
-                    print('活动订单里活动时间检查失败，请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf2='../../test_report/ios/'+now+'_errorMyActivity_R_stg_tc038.png'
-                    driver.get_screenshot_as_file(sf2)
+                #报名
+                joins=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="立即报名"]')
+                sleep(1)
+                if len(joins) != 0:
+                    print('报名按钮存在,检查通过')
                     sleep(2)
-                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="all page back grey icon"]').click()
-                sleep(2)
-        else:
-            print('报名按钮不存在，请检查原因')
-            sleep(2)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
-            sleep(2)
+                    driver.find_element_by_xpath('//XCUIElementTypeLink[@name="立即报名"]').click()
+                    sleep(6)
+                    #姓名
+                    name=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                    name.click()
+                    sleep(0.5)
+                    #name.clear()
+                    #sleep(0.5)
+                    #name.send_keys('王镇声')
+                    name.send_keys('')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('完成').click()
+                    sleep(1)
+                    #购买
+                    driver.find_element_by_accessibility_id('购买').click()
+                    sleep(1)
+                    #确认
+                    driver.find_element_by_accessibility_id('确认').click()
+                    sleep(6)
+                    #checking
+                    ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"预约成功")]')
+                    if len(ch) == 0:
+                        print('报名失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errJoin_R_stg_tc038.png'
+                        driver.get_screenshot_as_file(sf1)
+                        sleep(1)
+                    else:
+                        print('报名成功')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(5)
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':30, 'y':42})
+                        sleep(3)
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                        sleep(2)
+                        #我的
+                        driver.find_element_by_accessibility_id('我的').click()
+                        sleep(3)
+                        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('我的活动').click()
+                        sleep(3)
+                        #活动降序排列检查XCUIElementTypeOther/
+                        ch3=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeStaticText[1]').get_attribute('value')
+                        if '小龙自动化4' in ch3:
+                            print('活动降序排列检查通过')
+                            sleep(0.5)
+                        else:
+                            print('活动降序排列检查失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf3='../../test_report/ios/'+now+'_errMyActivityOrder_R_stg_tc038.png'
+                            driver.get_screenshot_as_file(sf3)
+                        sleep(2)
+                        ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,"6月1日")]')
+                        if len(ch2) != 0:
+                            print('活动订单里活动时间检查通过')
+                            sleep(0.5)
+                        else:
+                            print('活动订单里活动时间检查失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf2='../../test_report/ios/'+now+'_errMyActivity_R_stg_tc038.png'
+                            driver.get_screenshot_as_file(sf2)
+                            sleep(2)
+                        driver.find_element_by_xpath('//XCUIElementTypeButton[@name="all page back grey icon"]').click()
+                        sleep(2)
+                else:
+                    print('报名按钮不存在，请检查原因')
+                    sleep(2)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                    sleep(2)
+            else:
+                print('小龙自动化3未找到,请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现——体验tab活动的报名功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_canceljoin_tc039
 #Purpose:我的页面我的活动里取消报名的功能
 #OS:iOS
 #Device:iPhone7 Plus
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/09/30]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_canceljoin_tc039(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:已登录账号发现——我的页面我的活动里取消报名的功能---step1进入我的->我的活动页面')
@@ -3637,7 +3631,7 @@ class Weilai_test(unittest.TestCase):
             driver.find_element_by_accessibility_id('我的活动').click()
             sleep(4)
             #暂无活动预约
-            ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="小龙自动化3（请勿报名）"]')
+            ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="小龙自动化4（报名之后记得取消）"]')
             if len(ch2) == 0:
                 print('我的预约活动已取消报名，检查通过')
                 sleep(1)
@@ -3662,7 +3656,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的——我的活动里取消报名的功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_expershare_tc040
 #Purpose:检查发现页面资讯tab下的pgc的分享功能
 #OS:iOS
@@ -3670,7 +3664,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/09/30]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_expershare_tc040(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_发现页面体验tab下的活动的分享功能----step1进入发现页面体验tab')
@@ -3689,9 +3683,7 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('蔚来中心丨上海太古汇店1112121312').click()
         sleep(2)
         driver.find_element_by_accessibility_id('新活动_9.7stg1').click()
-        sleep(6)
-        page=driver.page_source
-        sleep(2)
+        sleep(7)
         #分享图标
         share=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[3]')
         sleep(2)
@@ -3854,15 +3846,15 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_发现页面体验tab下的活动的分享功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_jingxi_giftshare_tc041
-#Purpose:检查发现页面资讯tab下的pgc的分享功能
+#Purpose:检查惊喜页面的商品的分享功能
 #OS:iOS
 #Device:iPhone7 Plus
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/09/30]
-#*******************************************************
+#***********************************************************************************************************************
     def test_jingxi_giftshare_tc041(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:惊喜_惊喜页面的商品的分享功能----step1进入惊喜页面')
@@ -3874,182 +3866,187 @@ class Weilai_test(unittest.TestCase):
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(6)
-        for i in range(7):
+        for i in range(8):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
         sleep(2)
-        u=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]')
+        u=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
         if len(u) != 0:
-            print('需要兑换的商品存在，检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]').click()
-            sleep(8)
-            #分享图标
-            share=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="横幅"]/XCUIElementTypeOther[3]')
-            sleep(2)
-            if len(share) != 0:
-                print('分享按钮存在,检查通过')
-                sleep(3)
-                #share
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品存在，检查通过')
                 sleep(2)
-                #微信
-                wh=driver.find_elements_by_accessibility_id('微信')
-                if len(wh) != 0:
-                    print('分享到微信好友按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微信').click()
-                    sleep(9)
-                    driver.find_element_by_accessibility_id('王小龙').click()
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(8)
+                #分享图标
+                share=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="横幅"]/XCUIElementTypeOther[3]')
+                sleep(2)
+                if len(share) != 0:
+                    print('分享按钮存在,检查通过')
                     sleep(3)
-                    words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                    #share
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
                     sleep(2)
-                    if len(words) != 0:
-                        words[0].click()
-                        sleep(1)
-                        now0=time.strftime('%Y%m%d_%H%M%S')
-                        driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('我用Python_Gift微信好友:'+now0)
-                        sleep(1)
-                    #发送
-                    driver.find_element_by_accessibility_id('发送').click()
+                    #微信
+                    wh=driver.find_elements_by_accessibility_id('微信')
+                    if len(wh) != 0:
+                        print('分享到微信好友按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微信').click()
+                        sleep(9)
+                        driver.find_element_by_accessibility_id('王小龙').click()
+                        sleep(3)
+                        words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                        sleep(2)
+                        if len(words) != 0:
+                            words[0].click()
+                            sleep(1)
+                            now0=time.strftime('%Y%m%d_%H%M%S')
+                            driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('我用Python_Gift微信好友:'+now0)
+                            sleep(1)
+                        #发送
+                        driver.find_element_by_accessibility_id('发送').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('返回蔚来').click()
+                        sleep(1.2)
+                        #检查toast
+                        save1=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save1) != 0:
+                            print('分享微信好友成功')
+                            sleep(1)
+                        else:
+                            print('分享微信好友失败，请检查原因')
+                            sleep(1)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_stg_tc041.png'
+                            driver.get_screenshot_as_file(sf1)
+                        sleep(2)
+                    else:
+                        print('分享到微信好友按钮不存在，请检查原因')
+                        sleep(2)
+                    #share
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
                     sleep(2)
-                    driver.find_element_by_accessibility_id('返回蔚来').click()
-                    sleep(0.5)
-                    #检查toast
-                    save1=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save1) != 0:
-                        print('分享微信好友成功')
+                    #朋友圈
+                    pyq=driver.find_elements_by_accessibility_id('朋友圈')
+                    if len(pyq) != 0:
+                        print('分享到朋友圈按钮存在，检查通过')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('朋友圈').click()
+                        sleep(8)
+                        word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                        word2.click()
+                        sleep(1)
+                        now2=time.strftime('%Y%m%d_%H%M%S')
+                        word2.send_keys('我用Python_Gift朋友圈:'+now2)
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('表情').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                        sleep(1)
+                        #私密, 仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        #发表
+                        driver.find_element_by_accessibility_id('发表').click()
+                        sleep(1)
+                        #检查toast
+                        save2=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save2) != 0:
+                            print('分享朋友圈成功')
+                            sleep(0.5)
+                        else:
+                            print('分享朋友圈失败，请检查原因')
+                            sleep(1)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_stg_tc041.png'
+                            driver.get_screenshot_as_file(sf2)
                         sleep(1)
                     else:
-                        print('分享微信好友失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_stg_tc041.png'
-                        driver.get_screenshot_as_file(sf1)
+                        print('分享到朋友圈按钮不存在，请检查原因')
                     sleep(2)
-                else:
-                    print('分享到微信好友按钮不存在，请检查原因')
+                    #share
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
                     sleep(2)
-                #share
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
-                sleep(2)
-                #朋友圈
-                pyq=driver.find_elements_by_accessibility_id('朋友圈')
-                if len(pyq) != 0:
-                    print('分享到朋友圈按钮存在，检查通过')
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('朋友圈').click()
-                    sleep(8)
-                    word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
-                    word2.click()
-                    sleep(1)
-                    now2=time.strftime('%Y%m%d_%H%M%S')
-                    word2.send_keys('我用Python_Gift朋友圈:'+now2)
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('表情').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
-                    sleep(1)
-                    #私密, 仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    #发表
-                    driver.find_element_by_accessibility_id('发表').click()
-                    sleep(1)
-                    #检查toast
-                    save2=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save2) != 0:
-                        print('分享朋友圈成功')
+                    #微博
+                    wb=driver.find_elements_by_accessibility_id('微博')
+                    if len(wb) != 0:
+                        print('分享到微博按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微博').click()
+                        sleep(8)
+                        ad=driver.find_elements_by_accessibility_id('确定')
+                        if len(ad) != 0:
+                            driver.find_element_by_accessibility_id('确定').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('发送到分组').click()
+                        sleep(3)
+                        #仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                        sleep(2)
+                        #发送
+                        driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
+                        sleep(1.3)
+                        #检查toast
+                        save3=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save3) != 0:
+                            print('分享微博成功')
+                            sleep(0.5)
+                        else:
+                            print('分享微博失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_stg_tc041.png'
+                            driver.get_screenshot_as_file(sf3)
                         sleep(1)
                     else:
-                        print('分享朋友圈失败，请检查原因')
+                        print('分享到新浪微博按钮不存在，请检查原因')
+                    sleep(2)
+                    #share
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
+                    sleep(2)
+                    #朋友
+                    mf=driver.find_elements_by_accessibility_id('朋友')
+                    if len(mf) != 0:
+                        print('分享到我的朋友按钮存在，检查通过')
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_stg_tc041.png'
-                        driver.get_screenshot_as_file(sf2)
-                    sleep(1)
-                else:
-                    print('分享到朋友圈按钮不存在，请检查原因')
-                sleep(2)
-                #share
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
-                sleep(2)
-                #微博
-                wb=driver.find_elements_by_accessibility_id('微博')
-                if len(wb) != 0:
-                    print('分享到微博按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微博').click()
-                    sleep(8)
-                    driver.find_element_by_accessibility_id('发送到分组').click()
-                    sleep(3)
-                    #仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
-                    sleep(2)
-                    #发送
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                    sleep(1)
-                    #检查toast
-                    save3=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save3) != 0:
-                        print('分享微博成功')
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(3)
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
+                        sleep(1)
+                        #检查toast
+                        save4=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save4) != 0:
+                            print('分享朋友成功')
+                            sleep(0.5)
+                        else:
+                            print('分享朋友失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_stg_tc041.png'
+                            driver.get_screenshot_as_file(sf4)
                         sleep(1)
                     else:
-                        print('分享微博失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_stg_tc041.png'
-                        driver.get_screenshot_as_file(sf3)
-                    sleep(1)
+                        print('分享到我的朋友按钮不存在，请检查原因')
+                        sleep(2)
                 else:
-                    print('分享到新浪微博按钮不存在，请检查原因')
-                sleep(2)
-                #share
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
-                sleep(2)
-                #朋友
-                mf=driver.find_elements_by_accessibility_id('朋友')
-                if len(mf) != 0:
-                    print('分享到我的朋友按钮存在，检查通过')
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('朋友').click()
+                    print('分享按钮不存在/未找到，请检查原因')
                     sleep(2)
-                    driver.find_element_by_accessibility_id('朋友').click()
-                    sleep(3)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
-                    sleep(1)
-                    #检查toast
-                    save4=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save4) != 0:
-                        print('分享朋友成功')
-                        sleep(1)
-                    else:
-                        print('分享朋友失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_stg_tc041.png'
-                        driver.get_screenshot_as_file(sf4)
-                    sleep(1)
-                else:
-                    print('分享到我的朋友按钮不存在，请检查原因')
-                    sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':29, 'y':40})
+                sleep(2)
             else:
-                print('分享按钮不存在/未找到，请检查原因')
+                print('需要兑换的商品不存在/未找到，请检查原因')
                 sleep(2)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':29, 'y':40})
-            sleep(2)
-        else:
-            print('需要兑换的商品不存在/未找到，请检查原因')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_惊喜页面的商品的分享功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_jingxi_visitor_tc042
 #Purpose:检查访客模式点击我的页面各个菜单的预期动作
 #OS:android
@@ -4057,7 +4054,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app/未登录
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/10/10]
-#*******************************************************
+#***********************************************************************************************************************
     def test_jingxi_visitor_tc042(self):
         driver=self.driver
         print('TC_访客模式点击我的页面各个菜单，检查点:惊喜_惊喜页面的商品详细页面的访客模式检查----step1检查用户是否已经登录')
@@ -4071,53 +4068,54 @@ class Weilai_test(unittest.TestCase):
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(6)
-        for i in range(7):
+        for i in range(8):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
-        sleep(2)
-        u=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]')
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
+        sleep(3)
+        u=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
         if len(u) != 0:
-            print('需要兑换的商品存在，检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]').click()
-            sleep(6)
-            f=fun_getjingxiloginmenu(self)
-            sleep(2)
-            #check the menu by turn
-            for j in range(0,2):
-                driver.find_element_by_xpath(f[0][j]).click()
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品存在，检查通过')
                 sleep(2)
-                print('检查的元素名称：'+f[1][j])
-                sleep(1)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(6)
+                f=fun_getjingxiloginmenu(self)
+                sleep(2)
+                #check the menu by turn
+                for j in range(0,2):
+                    driver.find_element_by_xpath(f[0][j]).click()
+                    sleep(2)
+                    print('检查的元素名称：'+f[1][j])
+                    sleep(1)
+                    bp_is_loginshow(self)
+                    sleep(1)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                    sleep(1)
+                #机器人图标
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':701})
+                sleep(2)
                 bp_is_loginshow(self)
                 sleep(1)
                 driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
                 sleep(1)
-            #机器人图标
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':701})
-            sleep(2)
-            bp_is_loginshow(self)
-            sleep(1)
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-            sleep(1)
-            #购物车图标
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':76, 'y':701})
-            sleep(2)
-            bp_is_loginshow(self)
-            sleep(1)
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-            sleep(1)
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="横幅"]/XCUIElementTypeOther[1]').click()
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':29, 'y':40})
-            sleep(2)
-            driver.find_element_by_accessibility_id('我的').click()
-            sleep(3)
-            bp_normalloginmp(self)
-            sleep(2)
-        else:
-            print('需要兑换的商品不存在/未找到，请重新挑选')
-            sleep(2)
+                #购物车图标
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':76, 'y':701})
+                sleep(2)
+                bp_is_loginshow(self)
+                sleep(1)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                sleep(1)
+                #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="横幅"]/XCUIElementTypeOther[1]').click()
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':29, 'y':40})
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的').click()
+                sleep(3)
+                bp_normalloginmp(self)
+                sleep(2)
+            else:
+                print('需要兑换的商品不存在/未找到，请重新挑选')
+                sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_惊喜页面的商品详细页面的访客模式检查----结束:'+now)
 
@@ -4143,123 +4141,122 @@ class Weilai_test(unittest.TestCase):
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(5)
-        for i in range(7):
+        for i in range(8):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
         sleep(2)
-        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]')
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
         if len(u1) != 0:
-            print('需要兑换的商品1存在，检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]').click()
-            sleep(7)
-            add2b=driver.find_elements_by_accessibility_id('加入购物车')
-            sleep(1)
-            if len(add2b) != 0:
-                print('加入购物车按钮存在，检查通过')
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品1存在，检查通过')
                 sleep(2)
-                driver.find_element_by_accessibility_id('加入购物车').click()
-                sleep(3)
-                driver.find_element_by_accessibility_id('加入购物车').click()
-                sleep(4)
-                #购物车角标
-                ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')
-                if len(ch1) != 0:
-                    print('购物车图标角标数字为1检查成功')
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(7)
+                add2b=driver.find_elements_by_accessibility_id('加入购物车')
+                sleep(1)
+                if len(add2b) != 0:
+                    print('加入购物车按钮存在，检查通过')
                     sleep(2)
-                    #点击购物车图标
-                    #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"]').click()
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
+                    driver.find_element_by_accessibility_id('加入购物车').click()
+                    sleep(3)
+                    driver.find_element_by_accessibility_id('加入购物车').click()
                     sleep(4)
-                    ch1a=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"已选(1)")]')
-                    if len(ch1a) != 0:
-                        print('购物车详细页面左下角显示已选(1)检查通过')
-                        sleep(1)
-                    else:
-                        print('购物车详细页面左下角显示已选(1)检查失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1a='../../test_report/ios/'+now+'_errorCartGift1a_R_tc043.png'
-                        driver.get_screenshot_as_file(sf1a)
-                    sleep(2)
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
-                    sleep(2)
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
-                    sleep(2)
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
-                    sleep(2)
-                    driver.execute_script("mobile: scroll", {"direction": "down"})
-                    sleep(2)
-                    u2=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 自动化专用纯积分 10000"]')
-                    if len(u2) != 0:
-                        print('需要兑换的商品2存在，检查通过')
+                    #购物车角标
+                    ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')
+                    if len(ch1) != 0:
+                        print('购物车图标角标数字为1检查成功')
                         sleep(2)
-                        driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 自动化专用纯积分 10000"]').click()
-                        sleep(8)
-                        #page=driver.page_source
-                        #sleep(2)
-                        #add2b=driver.find_element_by_accessibility_id('加入购物车')
-                        #sleep(2)
-                        driver.find_element_by_accessibility_id('加入购物车').click()
-                        sleep(3)
-                        driver.find_element_by_accessibility_id('加入购物车').click()
-                        sleep(5)
-                        #购物车角标
-                        ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="2"]')
-                        if len(ch1) != 0:
-                            print('购物车图标角标数字为2检查成功')
+                        #点击购物车图标
+                        #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"]').click()
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
+                        sleep(4)
+                        ch1a=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"已选(1)")]')
+                        if len(ch1a) != 0:
+                            print('购物车详细页面左下角显示已选(1)检查通过')
+                            sleep(1)
+                        else:
+                            print('购物车详细页面左下角显示已选(1)检查失败，请检查原因')
+                            sleep(1)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf1a='../../test_report/ios/'+now+'_errorCartGift1a_R_tc043.png'
+                            driver.get_screenshot_as_file(sf1a)
+                        sleep(2)
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
+                        sleep(2)
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                        sleep(2)
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                        sleep(2)
+                        u2=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]')
+                        if len(u2) != 0:
+                            print('需要兑换的商品2存在，检查通过')
                             sleep(2)
-                            #点击购物车图标
-                            #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="2"]').click()
-                            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
-                            sleep(4)
-                            ch2a=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"已选(2)")]')
-                            if len(ch2a) != 0:
-                                print('购物车详细页面左下角显示已选(2)检查通过')
-                                sleep(1)
+                            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]').click()
+                            sleep(8)
+                            #page=driver.page_source
+                            #sleep(2)
+                            #add2b=driver.find_element_by_accessibility_id('加入购物车')
+                            #sleep(2)
+                            driver.find_element_by_accessibility_id('加入购物车').click()
+                            sleep(3)
+                            driver.find_element_by_accessibility_id('加入购物车').click()
+                            sleep(5)
+                            #购物车角标
+                            ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="2"]')
+                            if len(ch1) != 0:
+                                print('购物车图标角标数字为2检查成功')
+                                sleep(2)
+                                #点击购物车图标
+                                #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="2"]').click()
+                                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
+                                sleep(4)
+                                ch2a=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"已选(2)")]')
+                                if len(ch2a) != 0:
+                                    print('购物车详细页面左下角显示已选(2)检查通过')
+                                    sleep(1)
+                                else:
+                                    print('购物车详细页面左下角显示已选(2)检查失败，请检查原因')
+                                    sleep(1)
+                                    now=time.strftime('%Y%m%d_%H%M%S')
+                                    sf2a='../../test_report/ios/'+now+'_errorCartGift2a_R_stg_tc043.png'
+                                    driver.get_screenshot_as_file(sf2a)
+                                sleep(2)
+                                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
+                                sleep(2)
+                                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                                sleep(2)
+                                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                                sleep(2)
                             else:
-                                print('购物车详细页面左下角显示已选(2)检查失败，请检查原因')
-                                sleep(1)
+                                print('购物车图标角标数字为2检查失败，请检查原因')
+                                sleep(0.5)
                                 now=time.strftime('%Y%m%d_%H%M%S')
-                                sf2a='../../test_report/ios/'+now+'_errorCartGift2a_R_stg_tc043.png'
-                                driver.get_screenshot_as_file(sf2a)
-                            sleep(2)
-                            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
-                            sleep(2)
-                            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
-                            sleep(2)
-                            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                                sf2='../../test_report/ios/'+now+'_errorCartGift2_R_stg_tc043.png'
+                                driver.get_screenshot_as_file(sf2)
                             sleep(2)
                         else:
-                            print('购物车图标角标数字为2检查失败，请检查原因')
-                            sleep(0.5)
-                            now=time.strftime('%Y%m%d_%H%M%S')
-                            sf2='../../test_report/ios/'+now+'_errorCartGift2_R_stg_tc043.png'
-                            driver.get_screenshot_as_file(sf2)
-                        sleep(2)
+                            print('需要兑换的商品2不存在/未找到，请重新挑选')
+                            sleep(2)
                     else:
-                        print('需要兑换的商品2不存在/未找到，请重新挑选')
+                        print('购物车图标角标数字为1检查失败，请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errorCartGift1_R_stg_tc043.png'
+                        driver.get_screenshot_as_file(sf1)
                         sleep(2)
                 else:
-                    print('购物车图标角标数字为1检查失败，请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf1='../../test_report/ios/'+now+'_errorCartGift1_R_stg_tc043.png'
-                    driver.get_screenshot_as_file(sf1)
+                    print('加入购物车按钮不存在，请检查原因')
+                    sleep(2)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
                     sleep(2)
             else:
-                print('加入购物车按钮不存在，请检查原因')
+                print('需要兑换的商品1不存在/未找到，请重新挑选')
                 sleep(2)
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
-                sleep(2)
-        else:
-            print('需要兑换的商品1不存在/未找到，请重新挑选')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_选择多款商品加入购物车后购物车图标角标的变化检查----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_jingxi_clearcart_tc044
 #Purpose:检查用户模式惊喜选择多款商品加入购物车后清空购物车的功能检查
 #OS:android
@@ -4267,7 +4264,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app/未登录
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/10/10]
-#*******************************************************
+#***********************************************************************************************************************
     def test_jingxi_clearcart_tc044(self):
         driver=self.driver
         print('TC_用户模式进入惊喜页面，检查点:惊喜_选择多款商品加入购物车后清空购物车的功能检查----step1用户模式进入惊喜页面')
@@ -4281,104 +4278,99 @@ class Weilai_test(unittest.TestCase):
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(6)
-        for i in range(7):
+        for i in range(8):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
         sleep(2)
-        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]')
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
         if len(u1) != 0:
-            print('需要兑换的商品1存在，检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake cake 2"]').click()
-            sleep(6)
-            #page=driver.page_source
-            #sleep(2)
-            add2b=driver.find_elements_by_accessibility_id('加入购物车')
-            sleep(2)
-            if len(add2b) != 0:
-                print('加入购物车按钮存在，检查通过')
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品1存在，检查通过')
                 sleep(2)
-                driver.find_element_by_accessibility_id('加入购物车').click()
-                sleep(3)
-                driver.find_element_by_accessibility_id('加入购物车').click()
-                sleep(3)
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(6)
+                add2b=driver.find_elements_by_accessibility_id('加入购物车')
                 sleep(2)
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
-                sleep(2)
-                driver.execute_script("mobile: scroll", {"direction": "down"})
-                sleep(2)
-                u2=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 自动化专用纯积分 10000"]')
-                if len(u2) != 0:
-                    print('需要兑换的商品2存在，检查通过')
+                if len(add2b) != 0:
+                    print('加入购物车按钮存在，检查通过')
                     sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 自动化专用纯积分 10000"]').click()
-                    sleep(7)
-                    #page=driver.page_source
-                    #sleep(2)
-                    #add2b=driver.find_element_by_accessibility_id('加入购物车')
-                    #sleep(2)
                     driver.find_element_by_accessibility_id('加入购物车').click()
                     sleep(3)
                     driver.find_element_by_accessibility_id('加入购物车').click()
-                    sleep(4)
-                    #点击购物车图标
-                    #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="2"]').click()
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
-                    sleep(4)
-                    ch2a=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="编辑"]')
-                    if len(ch2a) != 0:
-                        print('编辑按钮存在，检查通过')
+                    sleep(3)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                    sleep(2)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
+                    sleep(2)
+                    u2=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]')
+                    if len(u2) != 0:
+                        print('需要兑换的商品2存在，检查通过')
                         sleep(2)
-                        driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="编辑"]')[4].click()
-                        sleep(2)
-                        #driver.find_element_by_xpath('//XCUIElementTypeOther[contains(@name,"全选")]').click()
-                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':35, 'y':694})
-                        sleep(2)
-                        #删除所选
-                        driver.find_element_by_accessibility_id('删除所选').click()
-                        sleep(1)
-                        driver.find_element_by_accessibility_id('确定').click()
+                        driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]').click()
+                        sleep(7)
+                        #add2b=driver.find_element_by_accessibility_id('加入购物车')
+                        #sleep(2)
+                        driver.find_element_by_accessibility_id('加入购物车').click()
                         sleep(3)
-                        chk0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"去添加点什么吧")]')
-                        sleep(2)
-                        if len(chk0) != 0:
-                            print('购物车已清空')
+                        driver.find_element_by_accessibility_id('加入购物车').click()
+                        sleep(4)
+                        #点击购物车图标
+                        #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="2"]').click()
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':84, 'y':694})
+                        sleep(4)
+                        ch2a=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="编辑"]')
+                        if len(ch2a) != 0:
+                            print('编辑按钮存在，检查通过')
+                            sleep(2)
+                            driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="编辑"]')[4].click()
+                            sleep(2)
+                            #driver.find_element_by_xpath('//XCUIElementTypeOther[contains(@name,"全选")]').click()
+                            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':35, 'y':694})
+                            sleep(2)
+                            #删除所选
+                            driver.find_element_by_accessibility_id('删除所选').click()
                             sleep(1)
+                            driver.find_element_by_accessibility_id('确定').click()
+                            sleep(3)
+                            chk0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"去添加点什么吧")]')
+                            sleep(2)
+                            if len(chk0) != 0:
+                                print('购物车已清空')
+                                sleep(1)
+                            else:
+                                print('购物车未被清空，请检查原因')
+                                sleep(1)
+                                now=time.strftime('%Y%m%d_%H%M%S')
+                                sf3='../../test_report/ios/'+now+'_errorCartNoEdit_R_stg_tc044.png'
+                                driver.get_screenshot_as_file(sf3)
+                                sleep(2)
+                                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
+                                sleep(2)
                         else:
-                            print('购物车未被清空，请检查原因')
+                            print('编辑按钮不存在，检查失败，请检查原因')
                             sleep(1)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf3='../../test_report/ios/'+now+'_errorCartNoEdit_R_stg_tc044.png'
-                            driver.get_screenshot_as_file(sf3)
-                            sleep(2)
-                            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
-                            sleep(2)
+                            sf2a='../../test_report/ios/'+now+'_errorCartNoEdit_R_stg_tc044.png'
+                            driver.get_screenshot_as_file(sf2a)
+                        sleep(2)
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
+                        sleep(2)
                     else:
-                        print('编辑按钮不存在，检查失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2a='../../test_report/ios/'+now+'_errorCartNoEdit_R_stg_tc044.png'
-                        driver.get_screenshot_as_file(sf2a)
-                    sleep(2)
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
-                    sleep(2)
+                        print('需要兑换的商品2不存在/未找到，请重新挑选')
+                        sleep(2)
                 else:
-                    print('需要兑换的商品2不存在/未找到，请重新挑选')
+                    print('加入购物车按钮不存在，请检查原因')
+                    sleep(2)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
                     sleep(2)
             else:
-                print('加入购物车按钮不存在，请检查原因')
+                print('需要兑换的商品1不存在/未找到，请重新挑选')
                 sleep(2)
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':58})
-                sleep(2)
-        else:
-            print('需要兑换的商品1不存在/未找到，请重新挑选')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_选择多款商品加入购物车后清空购物车的功能检查----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_activityshow_tc046
 #Purpose:检查用户模式点击我的页面各个菜单的预期动作
 #OS:android
@@ -4386,7 +4378,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app/未登录
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/10/15]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_activityshow_tc046(self):
         driver=self.driver
         print('TC_用户模式点击我的我的活动菜单，检查点:我的_我的活动晒图功能检查----')
@@ -4398,8 +4390,8 @@ class Weilai_test(unittest.TestCase):
         #我的
         driver.find_element_by_accessibility_id('我的').click()
         sleep(3)
-        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-        sleep(2)
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+        #sleep(2)
         driver.find_element_by_accessibility_id('我的活动').click()
         sleep(3)
         u=driver.find_elements_by_accessibility_id('晒图')
@@ -4415,12 +4407,10 @@ class Weilai_test(unittest.TestCase):
             allow=driver.find_elements_by_accessibility_id('好')
             if len(allow) != 0:
                 driver.find_element_by_accessibility_id('好').click()
-                sleep(2)
-            sleep(1)
+            sleep(2)
             for i in range(9):
                 #driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="compose guide check box defaul"]')[i].click()
                 driver.find_elements_by_ios_predicate('name=="compose guide check box defaul"')[i].click()
-                sleep(1)
             sleep(1)
             driver.find_element_by_accessibility_id('完成(9/9)').click()
             sleep(2)
@@ -4446,7 +4436,7 @@ class Weilai_test(unittest.TestCase):
                 print('晒图的文字检查失败，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorPublishText_R_tc046.png'
+                sf1='../../test_report/ios/'+now+'_errPublishText_R_tc046.png'
                 driver.get_screenshot_as_file(sf1)
             sleep(2)
             number=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="9"]')
@@ -4457,7 +4447,7 @@ class Weilai_test(unittest.TestCase):
                 print('晒图的上传9张图片检查失败，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorPublishPicture9_R_tc046.png'
+                sf2='../../test_report/ios/'+now+'_errPublishPicture9_R_tc046.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
@@ -4470,7 +4460,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_我的活动晒图功检查----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_es8ordershare_tc047
 #Purpose:检查我的ES8订单的分享功能
 #OS:iOS
@@ -4478,35 +4468,42 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/10/25]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_es8ordershare_tc047(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:我的_我的ES8订单的分享功能----step1进入我的页面')
         print('step2进入我的es8订单点击进入订单详细页面；step3点右上角的分享按钮（先检查是否存在；step4检查分享微信好友功能是否正常')
-        print('step5检查分享朋友圈功能是否正常;step6检查分享新浪微博功能是否正常;step7检查分享NIO好友功能是否正常')
+        print('step5检查分享朋友圈功能是否正常;step6检查分享好友功能是否正常')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_我的ES8订单的分享功能----开始:'+now)
         sleep(1)
         #我的
         driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('我的订单').click()
         sleep(4)
-        driver.find_element_by_accessibility_id('我的车辆订单').click()
-        sleep(6)
+        driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "购车订单"').click()
+        sleep(4)
+        driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(3)
         #订单排序检查
-        ordername=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeStaticText[1]').get_attribute('value')
-        if 'ES8六座版' in ordername:
+        ordername=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[4]/XCUIElementTypeStaticText[4]').get_attribute('value')
+        if 'ES6基准版' in ordername:
             print('我的车辆订单降序排列检查通过')
-            sleep(1)
+            sleep(0.5)
         else:
             print('我的车辆订单降序排列检查失败,请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
             sf0='../../test_report/ios/'+now+'_errorCarorderList_R_stg_tc047.png'
             driver.get_screenshot_as_file(sf0)
+        sleep(2)
+        driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        car=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="ES8七座版"]')
         sleep(1)
-        car=driver.find_elements_by_accessibility_id('ES8基准版')
         if len(car) != 0:
-            driver.find_element_by_accessibility_id('ES8基准版').click()
+            driver.find_elements_by_class_name('XCUIElementTypeCell')[4].click()
             sleep(4)
             #分享图标
             share=driver.find_elements_by_accessibility_id('navigationbar btn share')
@@ -4517,12 +4514,12 @@ class Weilai_test(unittest.TestCase):
                 #share
                 driver.find_element_by_accessibility_id('navigationbar btn share').click()
                 sleep(2)
-                #微信好友
-                wh=driver.find_elements_by_accessibility_id('微信好友')
+                #微信
+                wh=driver.find_elements_by_accessibility_id('微信')
                 if len(wh) != 0:
                     print('分享到微信好友按钮存在，检查通过')
                     sleep(2)
-                    driver.find_element_by_accessibility_id('微信好友').click()
+                    driver.find_element_by_accessibility_id('微信').click()
                     sleep(6)
                     driver.find_element_by_accessibility_id('王小龙').click()
                     sleep(3)
@@ -4542,31 +4539,31 @@ class Weilai_test(unittest.TestCase):
                     #检查toast
                     save1=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save1) != 0:
-                        print('分享微信好友成功')
-                        sleep(1)
+                        print('分享微信成功')
+                        sleep(0.5)
                     else:
                         print('分享微信好友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_stg_tc047.png'
+                        sf1='../../test_report/ios/'+now+'_errGiftsharewechat_R_stg_tc047.png'
                         driver.get_screenshot_as_file(sf1)
                     sleep(2)
                 else:
-                    print('分享到微信好友按钮不存在，请检查原因')
+                    print('分享到微信按钮不存在，请检查原因')
                 sleep(2)
                 #share
                 driver.find_element_by_accessibility_id('navigationbar btn share').click()
                 sleep(2)
-                #微信朋友圈
-                pyq=driver.find_elements_by_accessibility_id('微信朋友圈')
+                #朋友圈
+                pyq=driver.find_elements_by_accessibility_id('朋友圈')
                 if len(pyq) != 0:
                     print('分享到微信朋友圈按钮存在，检查通过')
                     sleep(1)
-                    driver.find_element_by_accessibility_id('微信朋友圈').click()
+                    driver.find_element_by_accessibility_id('朋友圈').click()
                     sleep(9)
-                    word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                    word2=driver.find_element_by_class_name('XCUIElementTypeTextView')
                     word2.click()
-                    sleep(1)
+                    sleep(0.5)
                     now2=time.strftime('%Y%m%d_%H%M%S')
                     word2.send_keys('人生苦短我的ES8订单微信朋友圈:'+now2)
                     sleep(1)
@@ -4587,62 +4584,27 @@ class Weilai_test(unittest.TestCase):
                     #检查toast
                     save2=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save2) != 0:
-                        print('分享微信朋友圈成功')
-                        sleep(1)
+                        print('分享朋友圈成功')
+                        sleep(0.5)
                     else:
-                        print('分享微信朋友圈失败，请检查原因')
-                        sleep(1)
+                        print('分享朋友圈失败，请检查原因')
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_stg_tc047.png'
+                        sf2='../../test_report/ios/'+now+'_errGiftsharewechatpyq_R_stg_tc047.png'
                         driver.get_screenshot_as_file(sf2)
                     sleep(2)
                 else:
-                    print('分享到微信朋友圈按钮不存在，请检查原因')
+                    print('分享到朋友圈按钮不存在，请检查原因')
                 sleep(2)
-                """
                 #share
                 driver.find_element_by_accessibility_id('navigationbar btn share').click()
                 sleep(2)
-                #微博no such menu now
-                wb=driver.find_elements_by_accessibility_id('微博')
-                if len(wb) != 0:
-                    print('分享到微博按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微博').click()
-                    sleep(8)
-                    driver.find_element_by_accessibility_id('发送到分组').click()
-                    sleep(2)
-                    #仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
-                    sleep(2)
-                    #发送
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                    sleep(1)
-                    #检查toast
-                    save3=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save3) != 0:
-                        print('分享微博成功')
-                        sleep(1)
-                    else:
-                        print('分享微博失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_stg_tc047.png'
-                        driver.get_screenshot_as_file(sf3)
-                    sleep(1)
-                else:
-                    print('分享到新浪微博按钮不存在，请检查原因')
-                sleep(2)
-                """
-                #share
-                driver.find_element_by_accessibility_id('navigationbar btn share').click()
-                sleep(2)
-                #NIO好友
-                mf=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="NIO好友"]')
+                #朋友
+                mf=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="朋友"]')
                 if len(mf) != 0:
                     print('分享到NIO好友按钮存在，检查通过')
                     sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="NIO好友"]').click()
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="朋友"]').click()
                     sleep(2)
                     driver.find_element_by_accessibility_id('朋友').click()
                     sleep(2)
@@ -4651,29 +4613,31 @@ class Weilai_test(unittest.TestCase):
                     #检查toast
                     save4=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save4) != 0:
-                        print('分享NIO好友成功')
-                        sleep(1)
+                        print('分享朋友成功')
+                        sleep(0.5)
                     else:
-                        print('分享NIO好友失败，请检查原因')
-                        sleep(1)
+                        print('分享朋友失败，请检查原因')
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_stg_tc047.png'
+                        sf4='../../test_report/ios/'+now+'_errGiftsharemyfriend_R_stg_tc047.png'
                         driver.get_screenshot_as_file(sf4)
                     sleep(1)
                 else:
-                    print('分享到NIO好友按钮不存在，请检查原因')
-                    sleep(2)
+                    print('分享到朋友按钮不存在，请检查原因')
+                    sleep(1)
             else:
                 print('分享按钮不存在/未找到，请检查原因')
-                sleep(2)
-            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':24, 'y':58})
-            driver.find_element_by_accessibility_id('navigationbar btn back black1').click()   
-            sleep(2)
+                sleep(1)
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':35, 'y':42})
+            ###driver.find_element_by_accessibility_id('navigationbar btn back black1').click()   
+            sleep(1)
         else:
             print('暂无订单，无法执行该脚本')
-            sleep(2)
-            driver.find_element_by_accessibility_id('navigationbar btn back black1').click()   
-            sleep(2)
+            sleep(1)
+            driver.find_element_by_accessibility_id('icon back').click()   
+            sleep(1)
+            driver.find_element_by_accessibility_id('icon back').click()   
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_我的ES8订单的分享功能----结束:'+now)
 
@@ -4765,7 +4729,6 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         city=driver.find_elements_by_accessibility_id('城市服务查询')
@@ -4828,58 +4791,69 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[5]').click()
-            sleep(4)
-            #page=driver.page_source
-            sleep(2)
-            #8号充电桩
-            #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":287, "y":272})
-            sleep(4)
-            ch1=driver.find_elements_by_accessibility_id('上海曹安景林苑充电站')
-            if len(ch1) != 0:
-                print('充电桩信息显示正常')
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[5]').click()
+                sleep(6)
+                #8号充电桩
+                #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":287, "y":272})
+                sleep(4)
+                ch1=driver.find_elements_by_accessibility_id('上海曹安景林苑充电站')
+                if len(ch1) != 0:
+                    print('充电桩信息显示正常')
+                    sleep(0.5)
+                else:
+                    print('充电桩信息显示不正常，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errPileStatus_R_tc050.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
                 sleep(1)
             else:
-                print('充电桩信息显示不正常，请检查原因')
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errPileStatus_R_tc050.png'
-                driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
+                print('充电地图按钮未找到/不存在，请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图及查看充电桩信息----结束:'+now)
 
-#*******************************************************
-#TC Name:test_aiche_milecalculator_tc051
+#***********************************************************************************************************************
+#TC Name:test_aiche_es8milecalculator_tc051
 #Purpose:检查爱车页面里ES8里程计算器
 #OS:iOS
 #Device:iPhone7 Plus
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/13]
-#*******************************************************
-    def test_aiche_milecalculator_tc051(self):
+#***********************************************************************************************************************
+    def test_aiche_es8milecalculator_tc051(self):
         driver=self.driver
-        print('TC_检查手机号码登录APP，检查点:爱车_里程计算器----step1进入爱车页面')
+        print('TC_检查手机号码登录APP，检查点:爱车_ES8里程计算器----step1进入爱车页面')
         print('step2点击里程计算器；step3改变行驶速度;step4改变车外温度')
-        print('step5打开空调;step6改变轮毂尺寸检查里程计算是否正确')
+        print('step5打开空调检查里程计算是否正确')
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_爱车_里程计算器----开始:'+now)
+        print('TC_爱车_ES8里程计算器----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
         sleep(1)
         #爱车
         driver.find_element_by_accessibility_id('爱车').click()
@@ -4888,88 +4862,53 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('里程计算器')
-        ch0=driver.find_element_by_accessibility_id('里程计算器').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('里程计算器按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('里程计算器').click()
-            sleep(6)
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':200,'fromY':520,'toX':200,'toY':340,'duration':1.0})
-            sleep(2)
-            #改变行驶速度
-            #>
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':359, 'y':443})
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="里程计算器"]/XCUIElementTypeOther[12]').click()
-            sleep(1)
-            res1=driver.find_elements_by_accessibility_id('393')
-            if len(res1) != 0:
-                print('改变行驶速度后里程计算正确')
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('里程计算器').get_attribute('visible')
+            if ch0v == 'true':
+                print('里程计算器按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('里程计算器').click()
+                sleep(7)
+                #改变车外温度>
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':177, 'y':551})
                 sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':177, 'y':551})
+                sleep(1)
+                res2=driver.find_elements_by_accessibility_id('343')
+                if len(res2) != 0:
+                    print('改变车外温度后里程计算正确')
+                    sleep(0.5)
+                else:
+                    print('改变车外温度后里程计算不正确，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errMileTemp_R_tc051.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                #打开空调
+                driver.find_element_by_accessibility_id('AC ON').click()
+                sleep(1)
+                res3=driver.find_elements_by_accessibility_id('292')
+                if len(res3) != 0:
+                    print('打开空调后里程计算正确')
+                    sleep(0.5)
+                else:
+                    print('打开空调后里程计算不正确，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errMileAir_R_tc051.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(2)
+                driver.find_element_by_accessibility_id('nav back btn').click()
+                sleep(2)
             else:
-                print('改变行驶速度后里程计算不正确，请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errMileV_R_tc051.png'
-                driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            #改变车外温度>
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':177, 'y':551})
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="里程计算器"]/XCUIElementTypeOther[16]').click()
-            sleep(1)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':177, 'y':551})
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="里程计算器"]/XCUIElementTypeOther[16]').click()
-            sleep(1)
-            res2=driver.find_elements_by_accessibility_id('387')
-            if len(res2) != 0:
-                print('改变车外温度后里程计算正确')
-                sleep(1)
-            else:
-                print('改变车外温度后里程计算不正确，请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errMileTemp_R_tc051.png'
-                driver.get_screenshot_as_file(sf2)
-            sleep(2)
-            #打开空调
-            driver.find_element_by_accessibility_id('AC ON').click()
-            sleep(1)
-            res3=driver.find_elements_by_accessibility_id('309')
-            if len(res3) != 0:
-                print('打开空调后里程计算正确')
-                sleep(1)
-            else:
-                print('打开空调后里程计算不正确，请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_errMileAir_R_tc051.png'
-                driver.get_screenshot_as_file(sf3)
-            sleep(2)
-            #改变轮毂尺寸
-            driver.find_element_by_accessibility_id('21英寸').click()
-            sleep(1)
-            res4=driver.find_elements_by_accessibility_id('301')
-            if len(res4) != 0:
-                print('改变轮毂尺寸后里程计算正确')
-                sleep(1)
-            else:
-                print('改变轮毂尺寸后里程计算不正确，请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf4='../../test_report/ios/'+now+'_errMileDem_R_tc051.png'
-                driver.get_screenshot_as_file(sf4)
-            sleep(2)
-            driver.find_element_by_accessibility_id('nav back btn').click()
-            sleep(2)
-        else:
-            print('里程计算器按钮未找到/不存在，请检查原因')
-            sleep(2)
+                print('里程计算器按钮未找到/不存在，请检查原因')
+                sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_爱车_里程计算器----结束:'+now)
+        print('TC_爱车_ES8里程计算器----结束:'+now)
 
 #*******************************************************
 #TC Name:test_aiche_es8content_tc052
@@ -4997,207 +4936,211 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
-        cmap=driver.find_elements_by_accessibility_id('详细配置表')
-        ch0=driver.find_element_by_accessibility_id('详细配置表').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('详细配置表按钮找到')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[6]').click()
-            #driver.find_element_by_accessibility_id('详细配置表').click()
-            sleep(6)
-            #page=driver.page_source
-            #sleep(2)
-            #
-            #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="个性化"]').click()
-            driver.find_element_by_accessibility_id('个性化').click()
-            sleep(3)
-            driver.find_element_by_accessibility_id('选装包').click()
-            sleep(3)
-            driver.find_element_by_accessibility_id('附件').click()
-            sleep(3)
-            #分享图标
-            share=driver.find_elements_by_accessibility_id('nav share btn')
-            sleep(2)
-            if len(share) != 0:
-                print('分享按钮存在,检查通过')
+        ##cmap=driver.find_elements_by_accessibility_id('详细配置表')
+        cmap=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[7]/XCUIElementTypeButton[8]')
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[7]/XCUIElementTypeButton[8]').get_attribute('visible')
+            if ch0v == 'true':
+                print('详细配置表按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[7]/XCUIElementTypeButton[8]').click()
+                #driver.find_element_by_accessibility_id('详细配置表').click()
+                sleep(6)
+                #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="个性化"]').click()
+                driver.find_element_by_accessibility_id('个性化').click()
                 sleep(3)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
+                driver.find_element_by_accessibility_id('选装包').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('附件').click()
+                sleep(3)
+                #分享图标
+                share=driver.find_elements_by_accessibility_id('nav share btn')
                 sleep(2)
-                #微信好友
-                wh=driver.find_elements_by_accessibility_id('微信好友')
-                if len(wh) != 0:
-                    print('分享到微信好友按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微信好友').click()
-                    sleep(6)
-                    driver.find_element_by_accessibility_id('王小龙').click()
+                if len(share) != 0:
+                    print('分享按钮存在,检查通过')
                     sleep(3)
-                    words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
                     sleep(2)
-                    if len(words) != 0:
-                        words[0].click()
-                        sleep(1)
-                        now0=time.strftime('%Y%m%d_%H%M%S')
-                        words[0].send_keys('人生苦短我的ES8订单微信好友:'+now0)
-                        sleep(1)
-                    #发送
-                    driver.find_element_by_accessibility_id('发送').click()
+                    #微信
+                    wh=driver.find_elements_by_accessibility_id('微信')
+                    if len(wh) != 0:
+                        print('分享到微信好友按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微信').click()
+                        sleep(6)
+                        driver.find_element_by_accessibility_id('王小龙').click()
+                        sleep(3)
+                        words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                        sleep(2)
+                        if len(words) != 0:
+                            words[0].click()
+                            sleep(0.5)
+                            now0=time.strftime('%Y%m%d_%H%M%S')
+                            driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('人生苦短我的ES8订单微信好友:'+now0)
+                            sleep(1)
+                        #发送
+                        driver.find_element_by_accessibility_id('发送').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('返回蔚来').click()
+                        sleep(0.5)
+                        #检查toast
+                        save1=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save1) != 0:
+                            print('分享微信好友成功')
+                            sleep(0.5)
+                        else:
+                            print('分享微信好友失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf1='../../test_report/ios/'+now+'_errGiftsharewechat_R_tc052.png'
+                            driver.get_screenshot_as_file(sf1)
+                        sleep(2)
+                    else:
+                        print('分享到微信好友按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('letter btn close').click()
                     sleep(2)
-                    driver.find_element_by_accessibility_id('返回蔚来').click()
-                    sleep(0.5)
-                    #检查toast
-                    save1=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save1) != 0:
-                        print('分享微信好友成功')
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
+                    sleep(2)
+                    #朋友圈
+                    pyq=driver.find_elements_by_accessibility_id('朋友圈')
+                    if len(pyq) != 0:
+                        print('分享到微信朋友圈按钮存在，检查通过')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('朋友圈').click()
+                        sleep(8)
+                        word2=driver.find_element_by_class_name('XCUIElementTypeTextView')
+                        word2.click()
+                        sleep(0.5)
+                        now2=time.strftime('%Y%m%d_%H%M%S')
+                        word2.send_keys('人生苦短ES8详细配置表朋友圈:'+now2)
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('表情').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                        sleep(1)
+                        #私密, 仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        #发表
+                        driver.find_element_by_accessibility_id('发表').click()
+                        sleep(1)
+                        #检查toast
+                        save2=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save2) != 0:
+                            print('分享微信朋友圈成功')
+                            sleep(0.5)
+                        else:
+                            print('分享微信朋友圈失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf2='../../test_report/ios/'+now+'_errGiftsharewechatpyq_R_tc052.png'
+                            driver.get_screenshot_as_file(sf2)
                         sleep(1)
                     else:
-                        print('分享微信好友失败，请检查原因')
+                        print('分享到微信朋友圈按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('letter btn close').click()
+                    sleep(2)
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
+                    sleep(2)
+                    #微博
+                    wb=driver.find_elements_by_accessibility_id('微博')
+                    if len(wb) != 0:
+                        print('分享到微博按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微博').click()
+                        sleep(5)
+                        ad=driver.find_elements_by_accessibility_id('确定')
+                        if len(ad) != 0:
+                            driver.find_element_by_accessibility_id('确定').click()
+                        sleep(3)
+                        driver.find_element_by_accessibility_id('发送到分组').click()
+                        sleep(2)
+                        #仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                        sleep(2)
+                        #发送
+                        driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_tc052.png'
-                        driver.get_screenshot_as_file(sf1)
-                    sleep(2)
-                else:
-                    print('分享到微信好友按钮不存在，请检查原因')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('letter btn close').click()
-                sleep(2)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
-                sleep(2)
-                #微信朋友圈
-                pyq=driver.find_elements_by_accessibility_id('微信朋友圈')
-                if len(pyq) != 0:
-                    print('分享到微信朋友圈按钮存在，检查通过')
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('微信朋友圈').click()
-                    sleep(8)
-                    word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
-                    word2.click()
-                    sleep(1)
-                    now2=time.strftime('%Y%m%d_%H%M%S')
-                    word2.send_keys('人生苦短我的ES8订单微信朋友圈:'+now2)
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('表情').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
-                    sleep(1)
-                    #私密, 仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    #发表
-                    driver.find_element_by_accessibility_id('发表').click()
-                    sleep(1)
-                    #检查toast
-                    save2=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save2) != 0:
-                        print('分享微信朋友圈成功')
+                        #检查toast
+                        save3=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save3) != 0:
+                            print('分享微博成功')
+                            sleep(0.5)
+                        else:
+                            print('分享微博失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf3='../../test_report/ios/'+now+'_errGiftsharewebo_R_tc052.png'
+                            driver.get_screenshot_as_file(sf3)
                         sleep(1)
                     else:
-                        print('分享微信朋友圈失败，请检查原因')
+                        print('分享到微博按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('letter btn close').click()
+                    sleep(2)
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
+                    sleep(2)
+                    #NIO好友
+                    mf=driver.find_elements_by_accessibility_id('朋友')
+                    if len(mf) != 0:
+                        print('分享到朋友按钮存在，检查通过')
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_tc052.png'
-                        driver.get_screenshot_as_file(sf2)
-                    sleep(1)
-                else:
-                    print('分享到微信朋友圈按钮不存在，请检查原因')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('letter btn close').click()
-                sleep(2)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
-                sleep(2)
-                #微博
-                wb=driver.find_elements_by_accessibility_id('微博')
-                if len(wb) != 0:
-                    print('分享到微博按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微博').click()
-                    sleep(8)
-                    driver.find_element_by_accessibility_id('发送到分组').click()
-                    sleep(2)
-                    #仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
-                    sleep(2)
-                    #发送
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                    sleep(1)
-                    #检查toast
-                    save3=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save3) != 0:
-                        print('分享微博成功')
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(2)
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
                         sleep(1)
+                        #检查toast
+                        save4=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save4) != 0:
+                            print('分享NIO好友成功')
+                            sleep(0.5)
+                        else:
+                            print('分享NIO好友失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf4='../../test_report/ios/'+now+'_errGiftsharemyfriend_R_tc052.png'
+                            driver.get_screenshot_as_file(sf4)
+                        sleep(0.5)
                     else:
-                        print('分享微博失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_tc052.png'
-                        driver.get_screenshot_as_file(sf3)
-                    sleep(1)
+                        print('分享到朋友按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('letter btn close').click()
+                    sleep(2)
                 else:
-                    print('分享到微博按钮不存在，请检查原因')
+                    print('分享按钮不存在/未找到，请检查原因')
                     sleep(2)
-                    driver.find_element_by_accessibility_id('letter btn close').click()
-                sleep(2)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
-                sleep(2)
-                #NIO好友
-                mf=driver.find_elements_by_accessibility_id('NIO好友')
-                if len(mf) != 0:
-                    print('分享到NIO好友按钮存在，检查通过')
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('NIO好友').click()
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('朋友').click()
-                    sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
-                    sleep(0.3)
-                    #检查toast
-                    save4=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save4) != 0:
-                        print('分享NIO好友成功')
-                        sleep(1)
-                    else:
-                        print('分享NIO好友失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_tc052.png'
-                        driver.get_screenshot_as_file(sf4)
-                    sleep(1)
-                else:
-                    print('分享到NIO好友按钮不存在，请检查原因')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('letter btn close').click()
+                driver.find_element_by_accessibility_id('nav back btn').click()   
                 sleep(2)
             else:
-                print('分享按钮不存在/未找到，请检查原因')
+                print('详细配置表按钮未找到')
                 sleep(2)
-            driver.find_element_by_accessibility_id('nav back btn').click()   
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_ES8配置表浏览及分享功能----结束:'+now)
 
 #*********************************************************************************************
-#TC Name:test_jingxi_giftexchange_noaddress_tc055
+#TC Name:test_jingxi_buynoaddress_tc055
 #Purpose:检查惊喜页面用户无收货地址时购买商品的功能测试
 #OS:iOS
 #Device:iPhone7 Plus
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
-#Modify History:created by Sam [2018/12/04]
+#Modify History:created by Sam [2019/03/14]
 #*********************************************************************************************
-    def test_jingxi_giftexchange_noaddress_tc055(self):
+    def test_jingxi_buynoaddress_tc055(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:惊喜_惊喜页面用户添加商品到购物车的功能----step1进入个人信息页面删除所有的地址信息')
         print('step2进入惊喜页面翻页找到所需兑换的商品；step3把商品加入购物车；step4点击购物车图标进入购物车页面')
@@ -5209,71 +5152,115 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
-        sleep(8)
-        for i in range(5):
+        sleep(6)
+        for i in range(7):
             driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(1)
-        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
-        sleep(2)
-        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="充气懒人沙发(自动化专用) (自动化专用) 1"]')
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
+        sleep(3)
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
         if len(u1) != 0:
-            print('需要兑换的商品存在，检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="充气懒人沙发(自动化专用) (自动化专用) 1"]').click()
-            sleep(9)
-            #加入购物车
-            add2b=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]')
-            sleep(2)
-            if len(add2b) != 0:
-                print('加入购物车按钮存在，检查通过')
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品存在，检查通过')
                 sleep(2)
-                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
-                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(7)
                 driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
                 sleep(3)
-                #点击购物车图标
-                ###driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"])').click()
-                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':76, 'y':632})
-                sleep(6)
-                driver.find_element_by_accessibility_id('立即购买').click()
+                driver.execute_script("mobile: dragFromToForDuration",{"fromX":150,"fromY":600,"toX":150,"toY":300,"duration":1.0})
+                sleep(3)
+                #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                #sleep(3)
+                #点击购买数量的+默认数量为1
+                for i in range(19):
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                    sleep(1)
+                sleep(2)
+                #再点+号一次
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                #检查toast
+                over=driver.find_elements_by_accessibility_id('单品已达上限')
+                if len(over) != 0:
+                    print('单品已达上限toast检查通过')
+                    sleep(0.5)
+                else:
+                    print('单品已达上限toast检查通过失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errOver20_R_stg_tc055.png'
+                    driver.get_screenshot_as_file(sf4)
                 sleep(4)
+                driver.find_element_by_accessibility_id('立即购买').click()
+                sleep(3)
                 #添加新地址
-                name=driver.find_element_by_xpath('//*[contains(@name,"请输入收件人姓名")]')
-                name.click()
+                ###name=driver.find_element_by_xpath('//*[contains(@name,"请输入收件人姓名")]')
+                ###name.click()
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':200, 'y':90})
+                sleep(0.5)
                 r=random.randint(10,99)
                 sleep(1)
-                name.send_keys('测试'+str(r))
+                #name.send_keys('测试'+str(r))
+                driver.find_element_by_accessibility_id('c').click()
+                driver.find_element_by_accessibility_id('e').click()
+                driver.find_element_by_accessibility_id('s').click()
+                driver.find_element_by_accessibility_id('h').click()
+                driver.find_element_by_accessibility_id('i').click()
                 sleep(1)
-                pnum=driver.find_element_by_xpath('//*[contains(@name,"请输入收件人手机号")]')
-                pnum.click()
-                r2=random.randint(10,99)
-                sleep(1)
-                pnum.send_keys('138160328'+str(r2))
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':35, 'y':491})
+                sleep(0.5)
+                #pnum=driver.find_element_by_xpath('//*[contains(@name,"请输入收件人手机号")]')
+                #pnum.click()
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':200, 'y':146})
+                sleep(0.5)
+                #r2=random.randint(10,99)
+                #sleep(1)
+                #pnum.send_keys('138160328'+str(r2))
+                driver.find_element_by_accessibility_id('1').click()
+                driver.find_element_by_accessibility_id('3').click()
+                driver.find_element_by_accessibility_id('8').click()
+                driver.find_element_by_accessibility_id('1').click()
+                driver.find_element_by_accessibility_id('6').click()
+                driver.find_element_by_accessibility_id('0').click()
+                driver.find_element_by_accessibility_id('3').click()
+                driver.find_element_by_accessibility_id('2').click()
+                driver.find_element_by_accessibility_id('6').click()
+                driver.find_element_by_accessibility_id('7').click()
+                driver.find_element_by_accessibility_id('8').click()
                 sleep(1)
                 #完成
-                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
-                sleep(1)
+                #driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                #sleep(1)
                 #选择所在地区
-                driver.find_element_by_accessibility_id('选择所在地区').click()
+                #driver.find_element_by_accessibility_id('选择所在地区').click()
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':210, 'y':206})
                 sleep(2)
                 #确定
                 driver.find_element_by_accessibility_id('确定').click()
                 sleep(1)
                 #街道/楼牌号等
-                addr=driver.find_element_by_class_name('XCUIElementTypeTextView')
-                addr.click()
-                r3=random.randint(100,999)
+                #addr=driver.find_element_by_class_name('XCUIElementTypeTextView')
+                #addr.click()
+                #r3=random.randint(100,999)
+                #sleep(1)
+                #addr.send_keys('中山北路'+str(r3)+'号')
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':210, 'y':270})
+                sleep(0.5)
                 sleep(1)
-                addr.send_keys('中山北路'+str(r3)+'号')
+                driver.find_element_by_accessibility_id('b').click()
+                driver.find_element_by_accessibility_id('j').click()
+                driver.find_element_by_accessibility_id('l').click()
+                driver.find_element_by_accessibility_id('u').click()
                 sleep(1)
+                #北京路
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':45, 'y':491})
+                sleep(0.5)
                 #完成
-                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
-                sleep(1)
+                #driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                #sleep(1)
                 #保存
-                driver.find_element_by_accessibility_id('保存').click()
-                sleep(2)
-                driver.find_element_by_accessibility_id('立即购买').click()
-                sleep(3)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':381, 'y':41})
+                sleep(6)
                 driver.find_element_by_accessibility_id('立即下单').click()
                 sleep(1)
                 driver.find_element_by_accessibility_id('确定').click()
@@ -5282,9 +5269,9 @@ class Weilai_test(unittest.TestCase):
                 sleep(1)
                 if len(chk) == 0:
                     print('订单已提交检查失败，请检查原因')
-                    sleep(1)
+                    sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf1='../../test_report/ios/'+now+'_errorGiftOrder_R_stg_tc023.png'
+                    sf1='../../test_report/ios/'+now+'_errGiftOrder_R_stg_tc055.png'
                     driver.get_screenshot_as_file(sf1)
                     sleep(2)
                 else:
@@ -5292,25 +5279,25 @@ class Weilai_test(unittest.TestCase):
                     sleep(2)
                     #查看订单
                     driver.find_element_by_accessibility_id('查看订单').click()
-                    sleep(6)
+                    sleep(5)
                     #检查商品状态
-                    chk1=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"充气懒人沙发(自动化专用) (自动化专用) 1")]')
-                    chk2=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"已付款")]')
+                    chk1=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "cake"')
+                    chk2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "已付款"')
                     sleep(1)
                     if len(chk1) != 0 and len(chk2) != 0:
                         print('订单里商品状态检查通过')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('订单里商品状态检查失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorGiftStatus_R_stg_tc055.png'
+                        sf1='../../test_report/ios/'+now+'_errGiftStatus_R_stg_tc055.png'
                         driver.get_screenshot_as_file(sf1)
                     sleep(2)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
-            sleep(2)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
+                    sleep(2)
         else:
-            print('需要兑换的商品不存在，请重新挑选')
+            print('需要兑换的商品不存在/未找到，请重新挑选')
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_惊喜页面用户无收货地址时购买商品的功能----结束:'+now)
@@ -5343,9 +5330,11 @@ class Weilai_test(unittest.TestCase):
         #服务安全密码
         pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
         if len(pin) != 0:
-            driver.find_element_by_accessibility_id('1').click()
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.3)
-            driver.find_element_by_accessibility_id('1').click()
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.3)
             #driver.find_element_by_accessibility_id('2').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
@@ -5359,7 +5348,7 @@ class Weilai_test(unittest.TestCase):
             #driver.find_element_by_accessibility_id('3').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.3)
-        sleep(2)
+        sleep(4)
         #设置
         driver.find_element_by_accessibility_id('vehicle setting icon').click()
         sleep(5)
@@ -5394,12 +5383,12 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             if len(ch2) != 0:
                 print('点亮中国页面跳转正常')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('点亮中国页面跳转不正常，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorLightenChinaPage_R_stg_tc056.png'
+                sf2='../../test_report/ios/'+now+'_errLightenChinaPage_R_stg_tc056.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
@@ -5434,12 +5423,12 @@ class Weilai_test(unittest.TestCase):
         sleep(2)
         if len(ch1) == 0:
             print('点亮中国入口不显示检查通过')
-            sleep(1)
+            sleep(0.5)
         else:
             print('点亮中国入口不显示检查通过失败，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf3='../../test_report/ios/'+now+'_errorLightenChinaTextOff_R_stg_tc056.png'
+            sf3='../../test_report/ios/'+now+'_errLightenChinaTextOff_R_stg_tc056.png'
             driver.get_screenshot_as_file(sf3)
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
@@ -5463,15 +5452,28 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_点亮中国首页中点击我已点亮的校验测试----开始:'+now)
         sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6988"')
+        if len(name) != 0:
+            print('车主用户Sam6988已登录')
+            sleep(0.5)
+        else:
+            print('车主用户Sam6988未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+        sleep(1)
         #爱车
         driver.find_element_by_accessibility_id('爱车').click()
         sleep(2)
         #服务安全密码
         pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
         if len(pin) != 0:
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
             sleep(0.2)
@@ -5481,7 +5483,7 @@ class Weilai_test(unittest.TestCase):
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.2)
-        sleep(2)
+        sleep(4)
         #设置
         driver.find_element_by_accessibility_id('vehicle setting icon').click()
         sleep(5)
@@ -5532,7 +5534,7 @@ class Weilai_test(unittest.TestCase):
                 print('地址推送toast显示不正常，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorMyLightedPushAddress_R_stg_tc057.png'
+                sf2='../../test_report/ios/'+now+'_errMyLightedPushAddress_R_stg_tc057.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             #1st address
@@ -5551,25 +5553,22 @@ class Weilai_test(unittest.TestCase):
                 print('地标详细页面显示不正常，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_error1stAddressDetail_R_stg_tc057.png'
+                sf3='../../test_report/ios/'+now+'_err1stAddressDetail_R_stg_tc057.png'
                 driver.get_screenshot_as_file(sf3)
             sleep(2)
             #返回
-            #(32,42)
             #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
             sleep(3)
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
             sleep(5)
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
             sleep(2)
         else:
             print('点亮中国入口不显示，请检查原因')
             sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf4='../../test_report/ios/'+now+'_errorNoLightenChina_stg_tc057.png'
+            sf4='../../test_report/ios/'+now+'_errNoLightenChina_stg_tc057.png'
             driver.get_screenshot_as_file(sf4)
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
@@ -5593,15 +5592,28 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_点亮中国首页中点击我已探索的校验测试----开始:'+now)
         sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6988"')
+        if len(name) != 0:
+            print('车主用户Sam6988已登录')
+            sleep(0.5)
+        else:
+            print('车主用户Sam6988未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+        sleep(1)
         #爱车
         driver.find_element_by_accessibility_id('爱车').click()
         sleep(4)
         #服务安全密码
         pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
         if len(pin) != 0:
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
             sleep(0.2)
@@ -5611,7 +5623,7 @@ class Weilai_test(unittest.TestCase):
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.2)
-        sleep(2)
+        sleep(4)
         #设置
         driver.find_element_by_accessibility_id('vehicle setting icon').click()
         sleep(5)
@@ -5662,7 +5674,7 @@ class Weilai_test(unittest.TestCase):
                 print('地址推送toast显示不正常，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorMyExploredPushAddress_R_stg_tc058.png'
+                sf2='../../test_report/ios/'+now+'_errMyExploredPushAddress_R_stg_tc058.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             #1st address
@@ -5681,7 +5693,7 @@ class Weilai_test(unittest.TestCase):
                 print('地标详细页面显示不正常，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_error1stAddressDetail_R_stg_tc058.png'
+                sf3='../../test_report/ios/'+now+'_err1stAddressDetail_R_stg_tc058.png'
                 driver.get_screenshot_as_file(sf3)
             sleep(2)
             #返回
@@ -5698,7 +5710,7 @@ class Weilai_test(unittest.TestCase):
             print('点亮中国入口不显示，请检查原因')
             sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf4='../../test_report/ios/'+now+'_errorNoLightenChina_stg_tc058.png'
+            sf4='../../test_report/ios/'+now+'_errNoLightenChina_stg_tc058.png'
             driver.get_screenshot_as_file(sf4)
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
@@ -5722,15 +5734,28 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_点亮中国首页中点击到过的城市的校验测试----开始:'+now)
         sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6988"')
+        if len(name) != 0:
+            print('车主用户Sam6988已登录')
+            sleep(0.5)
+        else:
+            print('车主用户Sam6988未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+        sleep(1)
         #爱车
         driver.find_element_by_accessibility_id('爱车').click()
         sleep(4)
         #服务安全密码
         pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
         if len(pin) != 0:
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
             sleep(0.2)
@@ -5740,7 +5765,7 @@ class Weilai_test(unittest.TestCase):
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.2)
-        sleep(2)
+        sleep(4)
         #设置
         driver.find_element_by_accessibility_id('vehicle setting icon').click()
         sleep(5)
@@ -5837,9 +5862,9 @@ class Weilai_test(unittest.TestCase):
         #服务安全密码
         pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
         if len(pin) != 0:
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
             sleep(0.2)
@@ -5849,7 +5874,7 @@ class Weilai_test(unittest.TestCase):
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.2)
-        sleep(2)
+        sleep(4)
         #设置
         driver.find_element_by_accessibility_id('vehicle setting icon').click()
         sleep(5)
@@ -5881,7 +5906,6 @@ class Weilai_test(unittest.TestCase):
             sleep(9)
             for i in range(1):
                 driver.execute_script("mobile: scroll", {"direction": "down"})
-                sleep(2)
             driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":550,"toX":5,"toY":300,"duration":1.0})
             sleep(2)
             #查看更多
@@ -5891,7 +5915,7 @@ class Weilai_test(unittest.TestCase):
             if len(addr1a) != 0:
                 print('查看更多的详细地图页面显示正常')
                 sleep(2)
-                site=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="安亭老街"]')
+                site=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="嘉定图书馆"]')
                 sleep(1)
                 #zoom
                 driver.execute_script('mobile: pinch', {'scale': 1.5, 'velocity': 1.3, 'element':site})
@@ -5902,7 +5926,7 @@ class Weilai_test(unittest.TestCase):
                 sleep(2)
                 print('放大地图完成')
                 sleep(1)
-                st2=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="安亭镇龚闵村就在安亭新镇旁边的一个小村子"]')
+                st2=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="上海赛车场地铁站"]')
                 sleep(1)
                 #pinch
                 driver.execute_script('mobile: pinch', {'scale': 0.7, 'velocity': -1.3, 'element':st2})
@@ -5992,13 +6016,7 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         #search
         driver.find_element_by_accessibility_id('Search').click()  
-        sleep(3)
-        """
-        for i in range(19):
-            driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         sleep(2)
-        """
         #点亮中国跳转
         ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
         sleep(1)
@@ -6014,12 +6032,12 @@ class Weilai_test(unittest.TestCase):
             sleep(2)
             if len(ch1) != 0 and len(ch2) != 0 and len(ch3) != 0:
                 print('我已点亮、我已探索、到过的城市3个按钮找到')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('我已点亮、我已探索、到过的城市3个按钮未找到，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_errorNo3Buttons_R_stg_tc061.png'
+                sf3='../../test_report/ios/'+now+'_errNo3Buttons_R_stg_tc061.png'
                 driver.get_screenshot_as_file(sf3)
             sleep(2)
             #探索附近
@@ -6031,17 +6049,14 @@ class Weilai_test(unittest.TestCase):
             chk2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"位车主探索过此地标")]')
             chk3=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeLink[7]/XCUIElementTypeLink[3]')
             sleep(1)
-            #print(len(chk1))
-            #print(len(chk2))
-            #print(len(chk3))
             if len(chk1) != 0 and len(chk2) != 0 and len(chk3) != 0:
                 print('此地标无人探索，快来点亮地标吧、我与n位车主探索过此地标文案和导航按钮检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('此地标无人探索，快来点亮地标吧、我与n位车主探索过此地标文案和导航按钮检查失败，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_errorNearby_R_stg_tc061.png'
+                sf3='../../test_report/ios/'+now+'_errNearby_R_stg_tc061.png'
                 driver.get_screenshot_as_file(sf3)
             sleep(2)
             #导航按钮
@@ -6055,12 +6070,12 @@ class Weilai_test(unittest.TestCase):
             ch0=driver.find_elements_by_accessibility_id('地址已推送至你的爱车')
             if len(ch0) != 0:
                 print('地址推送toast显示正常')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('地址推送toast显示不正常，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorNearbyPushAddress_R_stg_tc061.png'
+                sf2='../../test_report/ios/'+now+'_errNearbyPushAddress_R_stg_tc061.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             #问号
@@ -6069,12 +6084,12 @@ class Weilai_test(unittest.TestCase):
             ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="点亮中国说明"]')
             if len(ch2) != 0:
                 print('点亮中国说明页面显示正常')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('点亮中国说明页面显示不正常，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorQuestionPage_R_stg_tc061.png'
+                sf2='../../test_report/ios/'+now+'_errQuestionPage_R_stg_tc061.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             #返回
@@ -6086,11 +6101,11 @@ class Weilai_test(unittest.TestCase):
             sleep(3)
         else:
             print('资讯tab点亮中国跳转未找到，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf4='../../test_report/ios/'+now+'_errorNoLightenChina_stg_tc061.png'
+            sf4='../../test_report/ios/'+now+'_errNoLightenChina_stg_tc061.png'
             driver.get_screenshot_as_file(sf4)
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_从发现页面资讯tab进入点亮中国首页的校验----结束:'+now)
 
@@ -6119,9 +6134,9 @@ class Weilai_test(unittest.TestCase):
         #服务安全密码
         pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
         if len(pin) != 0:
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
-            driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
             sleep(0.2)
@@ -6131,7 +6146,7 @@ class Weilai_test(unittest.TestCase):
             sleep(0.2)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.2)
-        sleep(2)
+        sleep(4)
         #设置
         driver.find_element_by_accessibility_id('vehicle setting icon').click()
         sleep(5)
@@ -6215,12 +6230,12 @@ class Weilai_test(unittest.TestCase):
             ch0=driver.find_elements_by_accessibility_id('地址已推送至你的爱车')
             if len(ch0) != 0:
                 print('地址推送toast显示正常')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('地址推送toast显示不正常，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorAllPushAddress_R_stg_tc062.png'
+                sf2='../../test_report/ios/'+now+'_errAllPushAddress_R_stg_tc062.png'
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             driver.find_element_by_accessibility_id('已点亮').click()
@@ -6242,7 +6257,7 @@ class Weilai_test(unittest.TestCase):
             print('资讯tab点亮中国跳转未找到，请检查原因')
             sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf4='../../test_report/ios/'+now+'_errorNoLightenChina_stg_tc062.png'
+            sf4='../../test_report/ios/'+now+'_errNoLightenChina_stg_tc062.png'
             driver.get_screenshot_as_file(sf4)
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
@@ -6268,10 +6283,19 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_非车主从发现页面资讯tab进入点亮中国首页的校验----开始:'+now)
         sleep(1)
-        bp_is_loggedin(self)
-        sleep(1)
-        bp_normalloginmp(self)
-        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]')
+        if len(name) != 0:
+            print('非车主用户已登录')
+            sleep(0.5)
+        else:
+            print('非主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+            sleep(1)
         driver.find_element_by_accessibility_id('发现').click()
         sleep(3)
         driver.find_element_by_accessibility_id('资讯').click()
@@ -6321,15 +6345,15 @@ class Weilai_test(unittest.TestCase):
             driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":500,"toX":5,"toY":150,"duration":1.0})
             sleep(2)
             #2个检查点
-            chk1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="此地标无人探索，快来点亮地标吧"]')
+            #chk1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="此地标无人探索，快来点亮地标吧"]')
             chk2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"位探索者吧")]')
             chk3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="探索附近"]')
             sleep(1)
-            if len(chk1) != 0 and len(chk2) != 0 and len(chk3) != 0:
-                print('探索附近、此地标无人探索，快来点亮地标吧、快来成为第n位探索者吧文案检查通过')
+            if len(chk2) != 0 and len(chk3) != 0:
+                print('探索附近、快来成为第n位探索者吧文案检查通过')
                 sleep(1)
             else:
-                print('探索附近、此地标无人探索，快来点亮地标吧、快来成为第n位探索者吧文案检查失败，请检查原因')
+                print('探索附近、快来成为第n位探索者吧文案检查失败，请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf2='../../test_report/ios/'+now+'_errorNearby_R_stg_tc063.png'
@@ -6408,25 +6432,34 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_非车主点击已点亮的地标详情页的校验----开始:'+now)
         sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]')
+        if len(name) != 0:
+            print('非车主用户已登录')
+            sleep(0.5)
+        else:
+            print('非主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(2)
         driver.find_element_by_accessibility_id('资讯').click()
-        sleep(4)
+        sleep(2)
         driver.find_element_by_accessibility_id('main global search icon').click()
         sleep(2)
         #search
         sear=driver.find_element_by_class_name('XCUIElementTypeTextField')
         sear.click()
-        sleep(1)
+        sleep(0.5)
         sear.send_keys('点亮中国跳转')
         sleep(1)
         #search
         driver.find_element_by_accessibility_id('Search').click()  
-        sleep(3)
-        """
-        for i in range(19):
-            driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         sleep(2)
-        """
         #点亮中国跳转
         ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
         #ch0=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').get_attribute('visible')
@@ -6439,12 +6472,12 @@ class Weilai_test(unittest.TestCase):
             driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":500,"toX":5,"toY":200,"duration":1.0})
             #driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(2)
-            lighted=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeLink[4]/XCUIElementTypeLink[1]')
+            lighted=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeLink[7]/XCUIElementTypeLink[1]')
             sleep(1)
             lighted.click()
             sleep(6)
             #ui_check here
-            driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":500,"toX":5,"toY":300,"duration":1.0})
+            driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(2)
             c1=fun_lightedui_check(self)
             sleep(1)
@@ -6456,20 +6489,18 @@ class Weilai_test(unittest.TestCase):
             ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我的探索")]')
             if len(ch1) == 0 and len(ch2) == 0:
                 print('我的探索和导航按钮不显示,检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('我的探索和导航按钮显示，检查不通过,请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf4='../../test_report/ios/'+now+'_errorShouldnotShow_R_stg_tc064.png'
+                sf4='../../test_report/ios/'+now+'_errShouldnotShow_R_stg_tc064.png'
                 driver.get_screenshot_as_file(sf4)
             sleep(2)
             #返回
             #(32,42)
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
             sleep(5)
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
             sleep(3)
             #x
@@ -6477,11 +6508,11 @@ class Weilai_test(unittest.TestCase):
             #sleep(2)
         else:
             print('资讯tab点亮中国跳转未找到，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf5='../../test_report/ios/'+now+'_errorNoLightenChina_stg_tc064.png'
+            sf5='../../test_report/ios/'+now+'_errNoLightenChina_stg_tc064.png'
             driver.get_screenshot_as_file(sf5)
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_非车主点击已点亮的地标详情页的校验----结束:'+now)
 
@@ -6504,6 +6535,21 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_非车主点击未点亮的地标详情页的校验----开始:'+now)
         sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]')
+        if len(name) != 0:
+            print('非车主用户已登录')
+            sleep(0.5)
+        else:
+            print('非主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(2)
         driver.find_element_by_accessibility_id('资讯').click()
         sleep(4)
         driver.find_element_by_accessibility_id('main global search icon').click()
@@ -6516,7 +6562,7 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         #search
         driver.find_element_by_accessibility_id('Search').click()  
-        sleep(4)
+        sleep(2)
         """
         for i in range(19):
             driver.execute_script("mobile: scroll", {"direction": "down"})
@@ -6531,40 +6577,49 @@ class Weilai_test(unittest.TestCase):
             print('资讯tab点亮中国跳转已找到')
             sleep(1)
             driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
-            sleep(9)
-            driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":600,"toX":5,"toY":200,"duration":1.0})
-            sleep(2)
-            #未点亮
-            notlighted=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="此地标无人探索，快来点亮地标吧"]')
-            notlighted.click()
-            sleep(6)
-            #ui_check here
-            #driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(10)
+            #driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":600,"toX":5,"toY":200,"duration":1.0})
             #sleep(2)
-            c1=fun_notlightedui_check(self)
-            sleep(1)
-            if c1 == True:
-                print('非车主点击未点亮的地标详情页上各个被检查元素都检查完毕')
-            sleep(1)
-            #导航按钮
-            ch1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeLink[1]/XCUIElementTypeLink[3]')
-            ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我的探索")]')
-            ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"全部探索")]')
-            if len(ch1) == 0 and len(ch2) == 0 and len(ch3) == 0:
-                print('全部探索、我的探索和导航按钮不显示,检查通过')
+            #未点亮
+            notlighted=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="此地标无人探索，快来点亮地标吧"]')
+            if len(notlighted) != 0:
+                print('未点亮的地标找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="此地标无人探索，快来点亮地标吧"]').click()
+                sleep(6)
+                #ui_check here
+                #driver.execute_script("mobile: scroll", {"direction": "down"})
+                #sleep(2)
+                c1=fun_notlightedui_check(self)
                 sleep(1)
+                if c1 == True:
+                    print('非车主点击未点亮的地标详情页上各个被检查元素都检查完毕')
+                sleep(1)
+                #导航按钮
+                ch1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeLink[1]/XCUIElementTypeLink[3]')
+                ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我的探索")]')
+                ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"全部探索")]')
+                if len(ch1) == 0 and len(ch2) == 0 and len(ch3) == 0:
+                    print('全部探索、我的探索和导航按钮不显示,检查通过')
+                    sleep(1)
+                else:
+                    print('全部探索、我的探索和导航按钮显示，检查不通过,请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errorShouldnotShow_R_stg_tc065.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(2)
+                #返回
+                #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(5)
             else:
-                print('全部探索、我的探索和导航按钮显示，检查不通过,请检查原因')
-                sleep(1)
+                print('未点亮的地标未找到,请检查原因')
+                sleep(2)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf4='../../test_report/ios/'+now+'_errorShouldnotShow_R_stg_tc065.png'
-                driver.get_screenshot_as_file(sf4)
-            sleep(2)
-            #返回
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
-            sleep(5)
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
+                sf3='../../test_report/ios/'+now+'_errNoNotlighted_stg_tc065.png'
+                driver.get_screenshot_as_file(sf3)
+                sleep(2)
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
             sleep(3)
             #x
@@ -6599,25 +6654,34 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_非车主从发现页面资讯tab进入点亮中国首页地图省/市列表页地标互切的校验----开始:'+now)
         sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]')
+        if len(name) != 0:
+            print('非车主用户已登录')
+            sleep(0.5)
+        else:
+            print('非主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(2)
         driver.find_element_by_accessibility_id('资讯').click()
-        sleep(4)
+        sleep(2)
         driver.find_element_by_accessibility_id('main global search icon').click()
         sleep(2)
         #search
         sear=driver.find_element_by_class_name('XCUIElementTypeTextField')
         sear.click()
-        sleep(1)
+        sleep(0.5)
         sear.send_keys('点亮中国跳转')
-        sleep(1)
+        sleep(0.5)
         #search
         driver.find_element_by_accessibility_id('Search').click()  
-        sleep(3)
-        """
-        for i in range(19):
-            driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         sleep(2)
-        """
         #点亮中国跳转
         ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
         #ch0=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').get_attribute('visible')
@@ -6626,7 +6690,7 @@ class Weilai_test(unittest.TestCase):
             print('资讯tab点亮中国跳转已找到')
             sleep(1)
             driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
-            sleep(9)
+            sleep(10)
             #地图
             #108,220
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':108, 'y':220})
@@ -6736,22 +6800,13 @@ class Weilai_test(unittest.TestCase):
             sleep(9)
             for i in range(1):
                 driver.execute_script("mobile: scroll", {"direction": "down"})
-                sleep(1)
             #driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":530,"toX":5,"toY":40,"duration":1.0})
             sleep(2)
             #查看更多
             driver.find_element_by_xpath('//XCUIElementTypeLink[@name="查看更多"]').click()
             sleep(5)
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
             sleep(4)
-            """
-            for i in range(1):
-                driver.execute_script("mobile: scroll", {"direction": "down"})
-                sleep(1)
-            driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":500,"toX":5,"toY":200,"duration":1.0})
-            sleep(4)
-            """
             #最地标:更多
             driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeLink[11]').click()
             #driver.find_element_by_xpath('//XCUIElementTypeLink[contains(@name,"更多")]').click()
@@ -6762,42 +6817,39 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             if c1 == True:
                 print('最地标页面上各个被检查元素都检查完毕')
-            sleep(2)
+            sleep(1)
             #返回
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
             sleep(4)
-            for i in range(1):
+            for i in range(2):
                 driver.execute_script("mobile: scroll", {"direction": "down"})
-                sleep(1)
             #driver.execute_script("mobile: dragFromToForDuration",{"fromX":5,"fromY":500,"toX":5,"toY":300,"duration":1.0})
             sleep(2)
-            #非神秘用户的头像3rd carowner
-            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="ADAS_ACC"]').click()
+            #非神秘用户的头像9th carowner
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="ADAS_Test"]').click()
             sleep(7)
             #checking
             ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')
             if len(ch2) != 0:
                 print('非神秘用户的个人信息页面显示正常')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('非神秘用户的个人信息页面显示不正常，检查不通过,请检查原因')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf4='../../test_report/ios/'+now+'_errorPersonalInfo_R_stg_tc067.png'
+                sf4='../../test_report/ios/'+now+'_errPersonalInfo_R_stg_tc067.png'
                 driver.get_screenshot_as_file(sf4)
             sleep(2)
             driver.find_element_by_accessibility_id('full screen back icon').click()
             sleep(3)
             #返回
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
-            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="点亮中国"]/XCUIElementTypeOther[1]').click()
             sleep(2)
         else:
             print('点亮中国入口不显示，请检查原因')
             sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf4='../../test_report/ios/'+now+'_errorNoLightenChina_stg_tc059.png'
+            sf4='../../test_report/ios/'+now+'_errNoLightenChina_stg_tc067.png'
             driver.get_screenshot_as_file(sf4)
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
@@ -6881,12 +6933,12 @@ class Weilai_test(unittest.TestCase):
             sleep(2)
             if len(ch1) != 0 and len(ch2) != 0:
                 print('解锁点亮中国，记录你与蔚来的故事文案、解锁按钮找到')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('解锁点亮中国，记录你与蔚来的故事文案、解锁按钮未找到，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_errorNoButtons_R_stg_tc068.png'
+                sf3='../../test_report/ios/'+now+'_errNoButtons_R_stg_tc068.png'
                 driver.get_screenshot_as_file(sf3)
             sleep(2)
             driver.find_element_by_xpath('//XCUIElementTypeLink[@name="解锁"]').click()
@@ -6901,12 +6953,12 @@ class Weilai_test(unittest.TestCase):
             sleep(2)
             if len(c1) != 0 and len(c2) != 0 and len(c3) != 0 and len(c4) == 0:
                 print('我已点亮、我已探索、到过的城市3个按钮显示,解锁按钮消失,检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('我已点亮、我已探索、到过的城市3个按钮未显示,解锁按钮未消失，检查不通过,请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorAuthied_stg_tc068.png'
+                sf1='../../test_report/ios/'+now+'_errAuthied_stg_tc068.png'
                 driver.get_screenshot_as_file(sf1)
             sleep(2)
             #(32,42)
@@ -6925,27 +6977,27 @@ class Weilai_test(unittest.TestCase):
             c_swi2=swi2.get_attribute('value')
             if c_swi2 == '1':
                 print('参与点亮中国开关已打开,验证通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('参与点亮中国开关未打开,请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errorSetting_stg_tc068.png'
+                sf2='../../test_report/ios/'+now+'_errSetting_stg_tc068.png'
                 driver.get_screenshot_as_file(sf2)
-            sleep(2)
+            sleep(1)
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-            sleep(2)
+            sleep(1)
         else:
             print('资讯tab点亮中国跳转未找到，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
-            sf4='../../test_report/ios/'+now+'_errorNoLightenChina_stg_tc061.png'
+            sf4='../../test_report/ios/'+now+'_errNoLightenChina_stg_tc061.png'
             driver.get_screenshot_as_file(sf4)
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_未授权的车主车主从发现页面资讯tab进入点亮中国首页的校验----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_experjoincancel_tc069
 #Purpose:发现页面体验tab活动的报名及立即取消报名功能
 #OS:iOS
@@ -6953,7 +7005,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/09/30]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_experjoincancel_tc069(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:已登录账号发现——发现_体验tab活动的报名并立即取消报名---')
@@ -6976,157 +7028,135 @@ class Weilai_test(unittest.TestCase):
         sleep(2)
         """
         for i in range(2):
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-            sleep(1)
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':150,'duration':1.0})
         sleep(3)
-        #小龙自动化3（请勿报名）
-        driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
-        sleep(6)
-        #报名
-        joins=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="报名"]')
-        sleep(2)
-        if len(joins) != 0:
-            print('报名按钮存在,检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeLink[@name="报名"]').click()
-            sleep(6)
-            #场次
-            #driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"02/04")]').click()
-            #sleep(1)
-            #driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"稍等哈活动")]').click()
-            #sleep(2)
-            #+限购1张
-            #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="+"]').click()
-            #sleep(1)
-            #driver.execute_script('mobile: dragFromToForDuration',{'fromX':350,'fromY':550,'toX':350,'toY':150,'duration':1.0})
-            #sleep(2)
-            #driver.execute_script("mobile: scroll", {"direction": "down"})
-            #sleep(2)
-            #姓名
-            name=driver.find_element_by_class_name('XCUIElementTypeTextField')
-            name.click()
-            sleep(0.5)
-            #name.send_keys('王振声')
-            #sleep(0.5)
-            driver.find_element_by_accessibility_id('完成').click()
+        #小龙自动化4（报名之后记得取消）
+        ch1=driver.find_elements_by_accessibility_id('小龙自动化4（报名之后记得取消）')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_accessibility_id('小龙自动化4（报名之后记得取消）').get_attribute('visible')
             sleep(1)
-            """
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':268})
-            ##driver.find_element_by_xpath('//XCUIElementTypeOther[@name="性别"]').click()
-            sleep(1)
-            #确定
-            driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"确定")]').click()
-            sleep(2)
-            #mobile
-            mb=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
-            mb.click()
-            sleep(1)
-            mb.send_keys('18930018883')
-            sleep(1)
-            driver.find_element_by_accessibility_id('完成').click()
-            sleep(1)
-            #证件类别
-            driver.find_element_by_accessibility_id('证件类别').click()
-            sleep(1)
-            #确定
-            driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"确定")]').click()
-            sleep(2)
-            #证件号码
-            em=driver.find_elements_by_class_name('XCUIElementTypeTextField')[2]
-            em.click()
-            sleep(1)
-            em.send_keys('340103197301142518')
-            sleep(1)
-            driver.find_element_by_accessibility_id('完成').click()
-            sleep(2)
-            """
-            #购买
-            driver.find_element_by_accessibility_id('购买').click()
-            sleep(1)
-            #确认
-            driver.find_element_by_accessibility_id('确认').click()
-            sleep(6)
-            #checking
-            ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"预约成功")]')
-            if len(ch) == 0:
-                print('报名失败，请检查原因')
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errorJoin_R_stg_tc069.png'
-                driver.get_screenshot_as_file(sf1)
-                sleep(1)
-            else:
-                print('报名成功')
-                sleep(1)
-                driver.find_element_by_accessibility_id('完成').click()
-                sleep(8)
-                #活动清单详细页面
-                for i in range(1):
-                    self.driver.execute_script("mobile: scroll", {"direction": "down"})
+            if ch1v == 'true':
+                driver.find_element_by_accessibility_id('小龙自动化4（报名之后记得取消）').click()
+                sleep(6)
+                #报名
+                joins=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="立即报名"]')
                 sleep(2)
-                ch0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="取消报名"]')
-                if len(ch0) != 0:
-                    print('取消报名按钮存在')
+                if len(joins) != 0:
+                    print('报名按钮存在,检查通过')
+                    sleep(2)
+                    driver.find_element_by_xpath('//XCUIElementTypeLink[@name="立即报名"]').click()
+                    sleep(6)
+                    #场次
+                    #driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"02/04")]').click()
+                    #sleep(1)
+                    #driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"稍等哈活动")]').click()
+                    #sleep(2)
+                    #+限购1张
+                    #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="+"]').click()
+                    #sleep(1)
+                    #driver.execute_script('mobile: dragFromToForDuration',{'fromX':350,'fromY':550,'toX':350,'toY':150,'duration':1.0})
+                    #sleep(2)
+                    #driver.execute_script("mobile: scroll", {"direction": "down"})
+                    #sleep(2)
+                    #姓名
+                    name=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                    name.click()
+                    sleep(0.5)
+                    #name.send_keys('王振声')
+                    #sleep(0.5)
+                    driver.find_element_by_accessibility_id('完成').click()
                     sleep(1)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="取消报名"]').click()
-                    sleep(1)
+                    #购买
+                    driver.find_element_by_accessibility_id('购买').click()
+                    sleep(2)
+                    #确认
                     driver.find_element_by_accessibility_id('确认').click()
-                    sleep(2)
-                    ch1=driver.find_elements_by_accessibility_id('取消成功')
-                    if len(ch1) != 0:
-                        print('取消报名成功')
-                        sleep(4)
-                        driver.find_element_by_accessibility_id('完成').click()
-                        sleep(3)
-                        #32,42
-                        #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[1]').click()
-                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
-                        sleep(2)
-                        driver.find_element_by_accessibility_id('我的').click()
-                        sleep(2)
-                        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-                        sleep(2)
-                        #我的活动
-                        driver.find_element_by_accessibility_id('我的活动').click()
-                        sleep(3)
-                        #暂无活动预约
-                        ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="小龙自动化3（请勿报名）"]')
-                        if len(ch3) == 0:
-                            print('我的预约活动已取消报名，检查通过')
-                            sleep(1)
-                        else:
-                            print('我的预约活动取消报名失败，请检查原因')
-                            sleep(1)
-                            now=time.strftime('%Y%m%d_%H%M%S')
-                            sf0='../../test_report/ios/'+now+'_errorActivityList_R_stg_tc069.png'
-                            driver.get_screenshot_as_file(sf0)
-                            sleep(2)
-                        driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-                        sleep(2)
-                    else:
-                        print('取消报名失败，请检查原因')
-                        sleep(1)
+                    sleep(6)
+                    #checking
+                    ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"预约成功")]')
+                    if len(ch) == 0:
+                        print('报名失败，请检查原因')
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorCancel_R_stg_tc069.png'
-                        driver.get_screenshot_as_file(sf3)
-                        sleep(2) 
+                        sf1='../../test_report/ios/'+now+'_errJoin_R_stg_tc069.png'
+                        driver.get_screenshot_as_file(sf1)
+                        sleep(1)
+                    else:
+                        print('报名成功')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(8)
+                        #活动清单详细页面
+                        for i in range(1):
+                            self.driver.execute_script("mobile: scroll", {"direction": "down"})
+                        sleep(2)
+                        ch0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="取消报名"]')
+                        if len(ch0) != 0:
+                            print('取消报名按钮存在')
+                            sleep(1)
+                            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="取消报名"]').click()
+                            sleep(1)
+                            driver.find_element_by_accessibility_id('确认').click()
+                            sleep(2)
+                            ch1=driver.find_elements_by_accessibility_id('取消成功')
+                            if len(ch1) != 0:
+                                print('取消报名成功')
+                                sleep(4)
+                                driver.find_element_by_accessibility_id('完成').click()
+                                sleep(3)
+                                #32,42
+                                #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[1]').click()
+                                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                                sleep(2)
+                                driver.find_element_by_accessibility_id('我的').click()
+                                sleep(2)
+                                #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+                                #sleep(2)
+                                #我的活动
+                                driver.find_element_by_accessibility_id('我的活动').click()
+                                sleep(3)
+                                #暂无活动预约
+                                ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="小龙自动化4（报名之后记得取消）"]')
+                                if len(ch3) == 0:
+                                    print('我的预约活动已取消报名，检查通过')
+                                    sleep(0.5)
+                                else:
+                                    print('我的预约活动取消报名失败，请检查原因')
+                                    sleep(0.5)
+                                    now=time.strftime('%Y%m%d_%H%M%S')
+                                    sf0='../../test_report/ios/'+now+'_errActivityList_R_stg_tc069.png'
+                                    driver.get_screenshot_as_file(sf0)
+                                    sleep(2)
+                                driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                                sleep(2)
+                            else:
+                                print('取消报名失败，请检查原因')
+                                sleep(0.5)
+                                now=time.strftime('%Y%m%d_%H%M%S')
+                                sf3='../../test_report/ios/'+now+'_errCancel_R_stg_tc069.png'
+                                driver.get_screenshot_as_file(sf3)
+                                sleep(2) 
+                        else:
+                            print('取消报名按钮不存在，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf2='../../test_report/ios/'+now+'_errNoCancel_R_stg_tc069.png'
+                            driver.get_screenshot_as_file(sf2)
+                            sleep(2)
+                            driver.find_element_by_accessibility_id('all page back grey icon').click()
+                            sleep(1)
                 else:
-                    print('取消报名按钮不存在，请检查原因')
+                    print('报名按钮不存在，请检查原因')
+                    sleep(2)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
                     sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf2='../../test_report/ios/'+now+'_errorNoCancel_R_stg_tc069.png'
-                    driver.get_screenshot_as_file(sf2)
-                    sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="all page back grey icon"]').click()
-                    sleep(2)
-        else:
-            print('报名按钮不存在，请检查原因')
-            sleep(2)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
-            sleep(2)
+            else:
+                print('小龙自动化4未找到,请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_体验tab活动的报名并立即取消报名----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_infospecialshare_tc070
 #Purpose:检查发现页面资讯tab下的专题的分享功能
 #OS:iOS
@@ -7134,7 +7164,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2018/12/17]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_infospecialshare_tc070(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_发现页面资讯tab下的专题的分享功能----step1进入发现页面资讯tab')
@@ -7155,7 +7185,7 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         #search
         driver.find_element_by_accessibility_id('Search').click()  
-        sleep(3)
+        sleep(2)
         #stg倒计时直播
         ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
         sleep(1)
@@ -7192,15 +7222,15 @@ class Weilai_test(unittest.TestCase):
                     driver.find_element_by_accessibility_id('发送').click()
                     sleep(2)
                     driver.find_element_by_accessibility_id('返回蔚来').click()
-                    sleep(0.2)
+                    sleep(1.2)
                     #检查toast
                     save1=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save1) != 0:
                         print('分享微信好友成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享微信好友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf1='../../test_report/ios/'+now+'_errorSpecialsharewechat_R_stg_tc070.png'
                         driver.get_screenshot_as_file(sf1)
@@ -7242,10 +7272,10 @@ class Weilai_test(unittest.TestCase):
                     save2=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save2) != 0:
                         print('分享朋友圈成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享朋友圈失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf2='../../test_report/ios/'+now+'_errorSpecialsharewechatpyq_R_stg_tc070.png'
                         driver.get_screenshot_as_file(sf2)
@@ -7262,7 +7292,7 @@ class Weilai_test(unittest.TestCase):
                     print('分享到微博按钮存在，检查通过')
                     sleep(2)
                     driver.find_element_by_accessibility_id('微博').click()
-                    sleep(6)
+                    sleep(8)
                     #ar=driver.find_elements_by_accessibility_id('确认')
                     ad=driver.find_elements_by_accessibility_id('确定')
                     if len(ad) != 0:
@@ -7276,15 +7306,15 @@ class Weilai_test(unittest.TestCase):
                     sleep(2)
                     #发送
                     driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                    sleep(1)
+                    sleep(1.2)
                     #检查toast
-                    save3=driver.find_elements_by_accessibility_id('分享成功')
+                    save3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"分享成功")]')
                     if len(save3) != 0:
                         print('分享微博成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享微博失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf3='../../test_report/ios/'+now+'_errorSpecialsharewebo_R_stg_tc070.png'
                         driver.get_screenshot_as_file(sf3)
@@ -7310,10 +7340,10 @@ class Weilai_test(unittest.TestCase):
                     save4=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save4) != 0:
                         print('分享我的朋友成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享我的朋友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf4='../../test_report/ios/'+now+'_errorSpecialsharemyfriend_R_stg_tc070.png'
                         driver.get_screenshot_as_file(sf4)
@@ -7391,8 +7421,9 @@ class Weilai_test(unittest.TestCase):
                 sleep(2)
                 driver.find_element_by_accessibility_id('自动化文章').click()
                 sleep(4)
-                #左上角按钮
+                #右上角按钮
                 sh=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化文章"]/XCUIElementTypeOther[2]')
+                sleep(1)
                 if len(sh) != 0:
                     print('分享按钮存在，检查通过')
                     sleep(2)
@@ -7424,12 +7455,12 @@ class Weilai_test(unittest.TestCase):
                         save1=driver.find_elements_by_accessibility_id('分享成功')
                         if len(save1) != 0:
                             print('分享微信好友成功')
-                            sleep(1)
+                            sleep(0.5)
                         else:
                             print('分享微信好友失败，请检查原因')
-                            sleep(1)
+                            sleep(0.5)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf1='../../test_report/ios/'+now+'_errorArticlesharewechat_R_stg_tc071.png'
+                            sf1='../../test_report/ios/'+now+'_errArticlesharewechat_R_stg_tc071.png'
                             driver.get_screenshot_as_file(sf1)
                         sleep(2)
                     else:
@@ -7452,7 +7483,7 @@ class Weilai_test(unittest.TestCase):
                         word2.send_keys('人生苦短自动化文章朋友圈:'+now2)
                         sleep(1)
                         driver.find_element_by_accessibility_id('表情').click()
-                        sleep(1)
+                        sleep(2)
                         driver.find_element_by_accessibility_id('完成').click()
                         sleep(2)
                         driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
@@ -7469,12 +7500,12 @@ class Weilai_test(unittest.TestCase):
                         save2=driver.find_elements_by_accessibility_id('分享成功')
                         if len(save2) != 0:
                             print('分享朋友圈成功')
-                            sleep(1)
+                            sleep(0.5)
                         else:
                             print('分享朋友圈失败，请检查原因')
-                            sleep(1)
+                            sleep(0.5)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf2='../../test_report/ios/'+now+'_errorArticlesharewechatpyq_R_stg_tc071.png'
+                            sf2='../../test_report/ios/'+now+'_errArticlesharewechatpyq_R_stg_tc071.png'
                             driver.get_screenshot_as_file(sf2)
                         sleep(1)
                     else:
@@ -7503,12 +7534,12 @@ class Weilai_test(unittest.TestCase):
                         save3=driver.find_elements_by_accessibility_id('分享成功')
                         if len(save3) != 0:
                             print('分享微博成功')
-                            sleep(1)
+                            sleep(0.5)
                         else:
                             print('分享微博失败，请检查原因')
-                            sleep(1)
+                            sleep(0.5)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf3='../../test_report/ios/'+now+'_errorArticlesharewebo_R_stg_tc071.png'
+                            sf3='../../test_report/ios/'+now+'_errArticlesharewebo_R_stg_tc071.png'
                             driver.get_screenshot_as_file(sf3)
                         sleep(1)
                     else:
@@ -7532,12 +7563,12 @@ class Weilai_test(unittest.TestCase):
                         save4=driver.find_elements_by_accessibility_id('分享成功')
                         if len(save4) != 0:
                             print('分享我的朋友成功')
-                            sleep(1)
+                            sleep(0.5)
                         else:
                             print('分享我的朋友失败，请检查原因')
-                            sleep(1)
+                            sleep(0.5)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf4='../../test_report/ios/'+now+'_errorArticlesharemyfriend_R_stg_tc071.png'
+                            sf4='../../test_report/ios/'+now+'_errArticlesharemyfriend_R_stg_tc071.png'
                             driver.get_screenshot_as_file(sf4)
                         sleep(1)
                     else:
@@ -7598,10 +7629,10 @@ class Weilai_test(unittest.TestCase):
             driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
             sleep(8)
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(2)
+            sleep(3)
             ch1a=driver.find_elements_by_accessibility_id('自动化链接')
             ch1=driver.find_element_by_accessibility_id('自动化链接').get_attribute('visible')
-            sleep(1)
+            sleep(1.5)
             if len(ch1a) != 0 and ch1 == 'true':
                 print('链接文章存在，检查通过')
                 sleep(2)
@@ -7645,7 +7676,7 @@ class Weilai_test(unittest.TestCase):
                             print('分享微信好友失败，请检查原因')
                             sleep(1)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf1='../../test_report/ios/'+now+'_errorLinksharewechat_R_stg_tc072.png'
+                            sf1='../../test_report/ios/'+now+'_errLinksharewechat_R_stg_tc072.png'
                             driver.get_screenshot_as_file(sf1)
                         sleep(2)
                     else:
@@ -7690,7 +7721,7 @@ class Weilai_test(unittest.TestCase):
                             print('分享朋友圈失败，请检查原因')
                             sleep(1)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf2='../../test_report/ios/'+now+'_errorLinksharewechatpyq_R_stg_tc072.png'
+                            sf2='../../test_report/ios/'+now+'_errLinksharewechatpyq_R_stg_tc072.png'
                             driver.get_screenshot_as_file(sf2)
                         sleep(1)
                     else:
@@ -7723,7 +7754,7 @@ class Weilai_test(unittest.TestCase):
                             print('分享微博失败，请检查原因')
                             sleep(1)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf3='../../test_report/ios/'+now+'_errorLinksharewebo_R_stg_tc072.png'
+                            sf3='../../test_report/ios/'+now+'_errLinksharewebo_R_stg_tc072.png'
                             driver.get_screenshot_as_file(sf3)
                         sleep(1)
                     else:
@@ -7752,7 +7783,7 @@ class Weilai_test(unittest.TestCase):
                             print('分享我的朋友失败，请检查原因')
                             sleep(1)
                             now=time.strftime('%Y%m%d_%H%M%S')
-                            sf4='../../test_report/ios/'+now+'_errorLinksharemyfriend_R_stg_tc072.png'
+                            sf4='../../test_report/ios/'+now+'_errLinksharemyfriend_R_stg_tc072.png'
                             driver.get_screenshot_as_file(sf4)
                         sleep(1)
                     else:
@@ -7815,175 +7846,175 @@ class Weilai_test(unittest.TestCase):
             driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(2)
             ch1a=driver.find_elements_by_accessibility_id('自动化投票')
-            ch1=driver.find_element_by_accessibility_id('自动化投票').get_attribute('visible')
-            sleep(1)
-            if len(ch1a) != 0 and ch1 == 'true':
-                print('自动化投票存在，检查通过')
-                sleep(2)
-                driver.find_element_by_accessibility_id('自动化投票').click()
-                sleep(3)
-                #左上角按钮
-                sh=driver.find_elements_by_xpath('(//XCUIElementTypeOther[@name="自动化投票"])[1]/XCUIElementTypeOther[2]')
-                if len(sh) != 0:
-                    print('分享按钮存在，检查通过')
+            if len(ch1a) != 0:
+                ch1v=driver.find_element_by_accessibility_id('自动化投票').get_attribute('visible')
+                if ch1v == 'true':
+                    print('自动化投票存在，检查通过')
                     sleep(2)
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                    sleep(2)
-                    #微信
-                    wh=driver.find_elements_by_accessibility_id('微信')
-                    if len(wh) != 0:
-                        print('分享到微信按钮存在，检查通过')
+                    driver.find_element_by_accessibility_id('自动化投票').click()
+                    sleep(3)
+                    #左上角按钮
+                    sh=driver.find_elements_by_xpath('(//XCUIElementTypeOther[@name="自动化投票"])[1]/XCUIElementTypeOther[2]')
+                    if len(sh) != 0:
+                        print('分享按钮存在，检查通过')
                         sleep(2)
-                        driver.find_element_by_accessibility_id('微信').click()
-                        sleep(6)
-                        driver.find_element_by_accessibility_id('王小龙').click()
-                        sleep(3)
-                        words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
                         sleep(2)
-                        if len(words) != 0:
-                            words[0].click()
+                        #微信
+                        wh=driver.find_elements_by_accessibility_id('微信')
+                        if len(wh) != 0:
+                            print('分享到微信按钮存在，检查通过')
+                            sleep(2)
+                            driver.find_element_by_accessibility_id('微信').click()
+                            sleep(6)
+                            driver.find_element_by_accessibility_id('王小龙').click()
+                            sleep(3)
+                            words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                            sleep(2)
+                            if len(words) != 0:
+                                words[0].click()
+                                sleep(1)
+                                now0=time.strftime('%Y%m%d_%H%M%S')
+                                driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('人生苦短投票微信好友:'+now0)
+                                sleep(1)
+                            #发送
+                            driver.find_element_by_accessibility_id('发送').click()
+                            sleep(2)
+                            driver.find_element_by_accessibility_id('返回蔚来').click()
+                            sleep(0.2)
+                            #检查toast
+                            save1=driver.find_elements_by_accessibility_id('分享成功')
+                            if len(save1) != 0:
+                                print('分享微信好友成功')
+                                sleep(1)
+                            else:
+                                print('分享微信好友失败，请检查原因')
+                                sleep(1)
+                                now=time.strftime('%Y%m%d_%H%M%S')
+                                sf1='../../test_report/ios/'+now+'_errVotesharewechat_R_stg_tc073.png'
+                                driver.get_screenshot_as_file(sf1)
+                            sleep(2)
+                        else:
+                            print('分享到微信好友按钮不存在，请检查原因')
+                        sleep(2)
+                        #share
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
+                        sleep(2)
+                        #朋友圈
+                        pyq=driver.find_elements_by_accessibility_id('朋友圈')
+                        if len(pyq) != 0:
+                            print('分享到朋友圈按钮存在，检查通过')
                             sleep(1)
-                            now0=time.strftime('%Y%m%d_%H%M%S')
-                            driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('人生苦短投票微信好友:'+now0)
+                            driver.find_element_by_accessibility_id('朋友圈').click()
+                            sleep(8)
+                            word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                            word2.click()
                             sleep(1)
-                        #发送
-                        driver.find_element_by_accessibility_id('发送').click()
-                        sleep(2)
-                        driver.find_element_by_accessibility_id('返回蔚来').click()
-                        sleep(0.2)
-                        #检查toast
-                        save1=driver.find_elements_by_accessibility_id('分享成功')
-                        if len(save1) != 0:
-                            print('分享微信好友成功')
+                            now2=time.strftime('%Y%m%d_%H%M%S')
+                            word2.send_keys('人生苦短投票朋友圈:'+now2)
+                            sleep(1)
+                            driver.find_element_by_accessibility_id('表情').click()
+                            sleep(1)
+                            driver.find_element_by_accessibility_id('完成').click()
+                            sleep(2)
+                            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                            sleep(1)
+                            #私密, 仅自己可见
+                            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                            sleep(1)
+                            driver.find_element_by_accessibility_id('完成').click()
+                            sleep(2)
+                            #发表
+                            driver.find_element_by_accessibility_id('发表').click()
+                            sleep(1)
+                            #检查toast
+                            save2=driver.find_elements_by_accessibility_id('分享成功')
+                            if len(save2) != 0:
+                                print('分享朋友圈成功')
+                                sleep(1)
+                            else:
+                                print('分享朋友圈失败，请检查原因')
+                                sleep(1)
+                                now=time.strftime('%Y%m%d_%H%M%S')
+                                sf2='../../test_report/ios/'+now+'_errVotesharewechatpyq_R_stg_tc073.png'
+                                driver.get_screenshot_as_file(sf2)
                             sleep(1)
                         else:
-                            print('分享微信好友失败，请检查原因')
+                            print('分享到朋友圈按钮不存在，请检查原因')
+                        sleep(2)
+                        #share
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
+                        sleep(2)
+                        #微博
+                        wb=driver.find_elements_by_accessibility_id('微博')
+                        if len(wb) != 0:
+                            print('分享到微博按钮存在，检查通过')
+                            sleep(2)
+                            driver.find_element_by_accessibility_id('微博').click()
+                            sleep(8)
+                            driver.find_element_by_accessibility_id('发送到分组').click()
+                            sleep(2)
+                            #仅自己可见
+                            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                            sleep(2)
+                            #发送
+                            driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "转发到微博"').click()
                             sleep(1)
-                            now=time.strftime('%Y%m%d_%H%M%S')
-                            sf1='../../test_report/ios/'+now+'_errorVotesharewechat_R_stg_tc073.png'
-                            driver.get_screenshot_as_file(sf1)
-                        sleep(2)
-                    else:
-                        print('分享到微信好友按钮不存在，请检查原因')
-                    sleep(2)
-                    #share
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                    sleep(2)
-                    #朋友圈
-                    pyq=driver.find_elements_by_accessibility_id('朋友圈')
-                    if len(pyq) != 0:
-                        print('分享到朋友圈按钮存在，检查通过')
-                        sleep(1)
-                        driver.find_element_by_accessibility_id('朋友圈').click()
-                        sleep(8)
-                        word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
-                        word2.click()
-                        sleep(1)
-                        now2=time.strftime('%Y%m%d_%H%M%S')
-                        word2.send_keys('人生苦短投票朋友圈:'+now2)
-                        sleep(1)
-                        driver.find_element_by_accessibility_id('表情').click()
-                        sleep(1)
-                        driver.find_element_by_accessibility_id('完成').click()
-                        sleep(2)
-                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
-                        sleep(1)
-                        #私密, 仅自己可见
-                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
-                        sleep(1)
-                        driver.find_element_by_accessibility_id('完成').click()
-                        sleep(2)
-                        #发表
-                        driver.find_element_by_accessibility_id('发表').click()
-                        sleep(1)
-                        #检查toast
-                        save2=driver.find_elements_by_accessibility_id('分享成功')
-                        if len(save2) != 0:
-                            print('分享朋友圈成功')
+                            #检查toast
+                            save3=driver.find_elements_by_accessibility_id('分享成功')
+                            if len(save3) != 0:
+                                print('分享微博成功')
+                                sleep(0.5)
+                            else:
+                                print('分享微博失败，请检查原因')
+                                sleep(0.5)
+                                now=time.strftime('%Y%m%d_%H%M%S')
+                                sf3='../../test_report/ios/'+now+'_errVotesharewebo_R_stg_tc073.png'
+                                driver.get_screenshot_as_file(sf3)
                             sleep(1)
                         else:
-                            print('分享朋友圈失败，请检查原因')
+                            print('分享到新浪微博按钮不存在，请检查原因')
+                        sleep(2)
+                        #share
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
+                        sleep(2)
+                        #我的朋友
+                        mf=driver.find_elements_by_accessibility_id('我的朋友')
+                        if len(mf) != 0:
+                            print('分享到我的朋友按钮存在，检查通过')
+                            sleep(2)
+                            driver.find_element_by_accessibility_id('我的朋友').click()
+                            sleep(2)
+                            driver.find_element_by_accessibility_id('朋友').click()
+                            sleep(2)
+                            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
                             sleep(1)
-                            now=time.strftime('%Y%m%d_%H%M%S')
-                            sf2='../../test_report/ios/'+now+'_errorVotesharewechatpyq_R_stg_tc073.png'
-                            driver.get_screenshot_as_file(sf2)
-                        sleep(1)
-                    else:
-                        print('分享到朋友圈按钮不存在，请检查原因')
-                    sleep(2)
-                    #share
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                    sleep(2)
-                    #微博
-                    wb=driver.find_elements_by_accessibility_id('微博')
-                    if len(wb) != 0:
-                        print('分享到微博按钮存在，检查通过')
-                        sleep(2)
-                        driver.find_element_by_accessibility_id('微博').click()
-                        sleep(8)
-                        driver.find_element_by_accessibility_id('发送到分组').click()
-                        sleep(2)
-                        #仅自己可见
-                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
-                        sleep(2)
-                        #发送
-                        driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                        sleep(1)
-                        #检查toast
-                        save3=driver.find_elements_by_accessibility_id('分享成功')
-                        if len(save3) != 0:
-                            print('分享微博成功')
+                            #检查toast
+                            save4=driver.find_elements_by_accessibility_id('分享成功')
+                            if len(save4) != 0:
+                                print('分享我的朋友成功')
+                                sleep(1)
+                            else:
+                                print('分享我的朋友失败，请检查原因')
+                                sleep(1)
+                                now=time.strftime('%Y%m%d_%H%M%S')
+                                sf4='../../test_report/ios/'+now+'_errVotesharemyfriend_R_stg_tc073.png'
+                                driver.get_screenshot_as_file(sf4)
                             sleep(1)
                         else:
-                            print('分享微博失败，请检查原因')
-                            sleep(1)
-                            now=time.strftime('%Y%m%d_%H%M%S')
-                            sf3='../../test_report/ios/'+now+'_errorVotesharewebo_R_stg_tc073.png'
-                            driver.get_screenshot_as_file(sf3)
-                        sleep(1)
+                            print('分享到我的朋友按钮不存在，请检查原因')
+                            sleep(2)
                     else:
-                        print('分享到新浪微博按钮不存在，请检查原因')
+                        print('分享按钮不存在，请检查原因')
+                        sleep(2)
+                    #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[1]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
                     sleep(2)
-                    #share
-                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
-                    sleep(2)
-                    #我的朋友
-                    mf=driver.find_elements_by_accessibility_id('我的朋友')
-                    if len(mf) != 0:
-                        print('分享到我的朋友按钮存在，检查通过')
-                        sleep(2)
-                        driver.find_element_by_accessibility_id('我的朋友').click()
-                        sleep(2)
-                        driver.find_element_by_accessibility_id('朋友').click()
-                        sleep(2)
-                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
-                        sleep(1)
-                        #检查toast
-                        save4=driver.find_elements_by_accessibility_id('分享成功')
-                        if len(save4) != 0:
-                            print('分享我的朋友成功')
-                            sleep(1)
-                        else:
-                            print('分享我的朋友失败，请检查原因')
-                            sleep(1)
-                            now=time.strftime('%Y%m%d_%H%M%S')
-                            sf4='../../test_report/ios/'+now+'_errorVotesharemyfriend_R_stg_tc073.png'
-                            driver.get_screenshot_as_file(sf4)
-                        sleep(1)
-                    else:
-                        print('分享到我的朋友按钮不存在，请检查原因')
-                        sleep(2)
                 else:
-                    print('分享按钮不存在，请检查原因')
+                    print('自动化投票不存在，无法执行分享操作')
                     sleep(2)
-                #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[1]').click()
                 driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
                 sleep(2)
-            else:
-                print('投票不存在，无法执行分享操作')
-                sleep(2)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
-            sleep(2)
         else:
             print('专题不存在，请检查原因')
             sleep(2)
@@ -8006,43 +8037,53 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_用户积分不足购买一件纯积分商品的测试----开始:'+now)
         sleep(1)
-        bp_is_loggedin(self)
-        sleep(1)
-        bp_normalloginmp_notenoughscore(self)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6986")]')
+        if len(name) != 0:
+            print('积分不足用户已登录')
+            sleep(0.5)
+        else:
+            print('积分不足用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_notenoughscore(self)
         sleep(1)
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(5)
-        for i in range(5):
+        for i in range(8):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
-        sleep(3)
-        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化_供应商发货商品1 自动化_供应商发货商品1 10000"]')
-        #ch0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 自动化专用别动 10000"]').get_attribute('visible')
-        sleep(1)
-        if len(u1) != 0:
-            print('纯积分商品找到')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化_供应商发货商品1 自动化_供应商发货商品1 10000"]').click()
-            sleep(9)
-            #加入购物车
-            nomore=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="积分不足"]')
-            if len(nomore) != 0:
-                print('积分不足检查通过')
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
+        sleep(4)
+        u=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]')
+        sleep(0.5)
+        if len(u) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]').get_attribute('visible')
+            sleep(0.5)
+            if ch0v == 'true':
+                print('纯积分商品找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]').click()
+                sleep(6)
+                #积分不足
+                nomore=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="积分不足"]')
+                if len(nomore) != 0:
+                    print('积分不足检查通过')
+                    sleep(0.5)
+                else:
+                    print('积分不足检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errorNotenoughscore_R_stg_tc074.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
                 sleep(2)
             else:
-                print('积分不足检查失败，请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf4='../../test_report/ios/'+now+'_errorNotenoughscore_R_stg_tc074.png'
-                driver.get_screenshot_as_file(sf4)
-            sleep(1)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
-            sleep(2)
-        else:
-            print('纯积分商品不存在/未找到，请重新挑选')
-            sleep(2)
+                print('纯积分商品不存在/未找到，请重新挑选')
+                sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_用户积分不足购买一件纯积分商品的测试----结束:'+now)
 
@@ -8067,44 +8108,44 @@ class Weilai_test(unittest.TestCase):
         sleep(8)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
         sleep(3)
         u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化专用别动积分+现金 自动化专用别动 15000"]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用别动积分+现金 自动化专用别动 15000"]').get_attribute('visible')
-        sleep(1)
-        if len(u1) != 0 and ch0 == 'true':
-            print('积分+现金商品找到')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用别动积分+现金 自动化专用别动 15000"]').click()
-            sleep(9)
-            driver.find_element_by_accessibility_id('立即购买').click()
-            sleep(1)
-            driver.find_element_by_accessibility_id('立即购买').click()
-            sleep(1)
-            driver.find_element_by_accessibility_id('立即下单').click()
-            sleep(1)
-            driver.find_element_by_accessibility_id('确定').click()
-            sleep(3)
-            #选择支付方式
-            #not finished
-            #加入购物车
-            nomore=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="积分不足"]')
-            if len(nomore) != 0:
-                print('积分不足检查通过')
+        if len(u1) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用别动积分+现金 自动化专用别动 15000"]').get_attribute('visible')
+            sleep(0.5)
+            if ch0v == 'true':
+                print('积分+现金商品找到')
                 sleep(2)
-            else:
-                print('积分不足检查失败，请检查原因')
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用别动积分+现金 自动化专用别动 15000"]').click()
+                sleep(9)
+                driver.find_element_by_accessibility_id('立即购买').click()
                 sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf4='../../test_report/ios/'+now+'_errorNotenoughscore_R_stg_tc074.png'
-                driver.get_screenshot_as_file(sf4)
-            sleep(1)
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
-            sleep(2)
-        else:
-            print('积分+现金商品不存在/未找到，请重新挑选')
-            sleep(2)
+                driver.find_element_by_accessibility_id('立即购买').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('立即下单').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(3)
+                #选择支付方式
+                #not finished
+                #加入购物车
+                nomore=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="积分不足"]')
+                if len(nomore) != 0:
+                    print('积分不足检查通过')
+                    sleep(0.5)
+                else:
+                    print('积分不足检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errorNotenoughscore_R_stg_tc074.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
+                sleep(1)
+            else:
+                print('积分+现金商品不存在/未找到，请重新挑选')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_用户积分不足购买一件积分+现金商品的测试----结束:'+now)
 
@@ -8176,9 +8217,8 @@ class Weilai_test(unittest.TestCase):
         #账号绑定
         driver.find_element_by_accessibility_id('账号绑定').click()
         sleep(4)
-        swi_wechat=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微信"]')
-        swi=swi_wechat.get_attribute('value')
-        if swi == '1':
+        swi_wechat=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微信"]').get_attribute('value')
+        if swi_wechat == '1':
             driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微信"]').click()
             sleep(1)
             driver.find_element_by_accessibility_id('确定').click()
@@ -8232,9 +8272,8 @@ class Weilai_test(unittest.TestCase):
         #账号绑定
         driver.find_element_by_accessibility_id('账号绑定').click()
         sleep(4)
-        swi_wechat=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微信"]')
-        swi=swi_wechat.get_attribute('value')
-        if swi != '1':
+        swi_wechat=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微信"]').get_attribute('value')
+        if swi_wechat != '1':
             driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微信"]').click()
             sleep(1)
             #检查toast
@@ -8286,9 +8325,8 @@ class Weilai_test(unittest.TestCase):
         #账号绑定
         driver.find_element_by_accessibility_id('账号绑定').click()
         sleep(4)
-        swi_webo=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微博"]')
-        swi=swi_webo.get_attribute('value')
-        if swi == '1':
+        swi_webo=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微博"]').get_attribute('value')
+        if swi_webo == '1':
             driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微博"]').click()
             sleep(1)
             driver.find_element_by_accessibility_id('确定').click()
@@ -8331,7 +8369,7 @@ class Weilai_test(unittest.TestCase):
         print('step2点击账号绑定；step3检查微博绑定状态,如果未绑定,点绑定开关,检查是否绑定是否成功')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('我的_设置里绑定微博的功能----开始:'+now)
-        sleep(1)
+        sleep(9)
         #我的
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
@@ -8342,11 +8380,10 @@ class Weilai_test(unittest.TestCase):
         #账号绑定
         driver.find_element_by_accessibility_id('账号绑定').click()
         sleep(4)
-        swi_webo=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微博"]')
-        swi=swi_webo.get_attribute('value')
-        if swi != '1':
+        swi_webo=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微博"]').get_attribute('value')
+        if swi_webo != '1':
             driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="微博"]').click()
-            sleep(2.5)
+            sleep(3.5)
             """
             re=driver.find_elements_by_accessibility_id('重新加载')
             if len(re) != 0:
@@ -8396,7 +8433,8 @@ class Weilai_test(unittest.TestCase):
         #我的
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
-        driver.find_element_by_accessibility_id('发布').click()
+        ###driver.find_element_by_accessibility_id('发布').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeButton[3]').click()
         sleep(2)
         #driver.find_element_by_xpath('//XCUIElementTypeTextView[contains(@value,"我用Python")]').click()
         driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeTextView').click()
@@ -8482,7 +8520,7 @@ class Weilai_test(unittest.TestCase):
                 else:
                     print('从全部对话列表里删除聊天失败，请检查原因')
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf1='../../test_report/ios/'+now+'_errorDelchatfromchats_R_stg_tc082.png'
+                    sf1='../../test_report/ios/'+now+'_errDelchatfromchats_R_stg_tc082.png'
                     driver.get_screenshot_as_file(sf1)
                 sleep(2)
             else:
@@ -8512,43 +8550,52 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_零积分用户购买一件纯积分商品的测试----开始:'+now)
         sleep(1)
-        bp_is_loggedin(self)
-        sleep(1)
-        bp_normalloginmp_zeroscore(self)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamZero")]')
+        if len(name) != 0:
+            print('零积分用户SamZero已登录')
+            sleep(0.5)
+        else:
+            print('零积分用户SamZero未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_zeroscore(self)
         sleep(1)
         #惊喜
         driver.find_element_by_accessibility_id('惊喜').click()
         sleep(5)
-        for i in range(5):
+        for i in range(7):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
-        sleep(2)
-        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化_供应商发货商品1 自动化_供应商发货商品1 10000"]')
-        #ch0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 自动化专用别动 10000"]').get_attribute('visible')
-        sleep(1)
+        sleep(4)
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]')
+        #ch1=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]').get_attribute('visible')
+        sleep(1.5)
         if len(u1) != 0:
             print('纯积分商品找到')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化_供应商发货商品1 自动化_供应商发货商品1 10000"]').click()
-            sleep(9)
+            sleep(3)
+            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="自动化专用纯积分 10000"]').click()
+            ###driver.find_element_by_ios_predicate('wdType == "XCUIElementTypeOther" AND wdName == "自动化专用纯积分 10000"').click()
+            sleep(7)
             #加入购物车
             nomore=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="积分不足"]')
             if len(nomore) != 0:
                 print('积分不足检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('积分不足检查失败，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf4='../../test_report/ios/'+now+'_errorNotenoughscore_R_stg_tc083.png'
+                sf4='../../test_report/ios/'+now+'_errNotenoughscore_R_stg_tc083.png'
                 driver.get_screenshot_as_file(sf4)
             sleep(1)
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':40})
-            sleep(2)
+            sleep(1)
         else:
             print('纯积分商品不存在/未找到，请重新挑选')
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_惊喜_零积分用户购买一件纯积分商品的测试----结束:'+now)
 
@@ -8620,7 +8667,7 @@ class Weilai_test(unittest.TestCase):
                 else:
                     print('从朋友列表里删除聊天失败，请检查原因')
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf1='../../test_report/ios/'+now+'_errorDelchatfromFriendsList_R_stg_tc084.png'
+                    sf1='../../test_report/ios/'+now+'_errDelchatfromFriendsList_R_stg_tc084.png'
                     driver.get_screenshot_as_file(sf1)
                 sleep(2)
             else:
@@ -8653,44 +8700,55 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_检查积分不足用户在体验tab报名活动是否显示积分不足----开始:'+now)
         sleep(1)
-        bp_is_loggedin(self)
-        sleep(1)
-        bp_normalloginmp_zeroscore(self)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamZero"')
+        if len(name) != 0:
+            print('零积分用户SamZero已登录')
+            sleep(0.5)
+        else:
+            print('零积分用户SamZero未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_zeroscore(self)
         sleep(1)
         driver.find_element_by_accessibility_id('发现').click()
-        sleep(4)
+        sleep(3)
         #体验
         driver.find_element_by_accessibility_id('体验').click()
-        sleep(6)
-        """
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
-        sleep(2)
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':550,'toX':50,'toY':150,'duration':1.0})
-        #sleep(2)
-        driver.find_element_by_accessibility_id('蔚来中心丨上海太古汇店1112121312').click()
-        sleep(2)
-        """
+        sleep(4)
         for i in range(2):
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-            sleep(1)
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':150,'duration':1.0})
         sleep(2)
         #小龙自动化3（请勿报名）
-        driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
-        sleep(6)
-        #积分不足
-        nomore=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="积分不足"]')
-        if len(nomore) != 0:
-            print('积分不足检查通过')
-            sleep(2)
-        else:
-            print('积分不足检查失败，请检查原因')
-            sleep(1)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf4='../../test_report/ios/'+now+'_errorNotenoughscore_R_stg_tc085.png'
-            driver.get_screenshot_as_file(sf4)
-        sleep(2)
-        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':42})
-        sleep(2)
+        ch1=driver.find_elements_by_accessibility_id('小龙自动化3（请勿报名）')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').get_attribute('visible')
+            if ch1v == 'true':
+                driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
+                sleep(6)
+                #积分不足
+                nomore=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="积分不足"]')
+                if len(nomore) != 0:
+                    print('积分不足检查通过')
+                    sleep(0.5)
+                else:
+                    print('积分不足检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errorNotenoughscore_R_stg_tc085.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':42})
+                sleep(1)
+            else:
+                print('小龙自动化3未找到,请检查原因')
+                sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp(self)
+        sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_检查积分不足用户在体验tab报名活动是否显示积分不足----结束:'+now)
 
@@ -8719,182 +8777,193 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(4):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
-        sleep(2)
-        es6=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]/XCUIElementTypeImage')
+        sleep(3)
+        #/XCUIElementTypeImage
+        es6=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[9]')
         if len(es6) != 0:
-            print('NIO es6找到')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]/XCUIElementTypeImage').click()
-            #driver.find_element_by_accessibility_id('详细配置表').click()
-            sleep(9)
-            #分享图标
-            share=driver.find_elements_by_accessibility_id('nav share btn')
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[9]').get_attribute('visible')
             sleep(1)
-            if len(share) != 0:
-                print('分享按钮存在,检查通过')
-                sleep(3)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
+            if ch0v == 'true':
+                print('NIO es6找到')
                 sleep(2)
-                #微信好友
-                wh=driver.find_elements_by_accessibility_id('微信')
-                if len(wh) != 0:
-                    print('分享到微信好友按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微信').click()
-                    sleep(6)
-                    driver.find_element_by_accessibility_id('王小龙').click()
+                driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[9]').click()
+                sleep(12)
+                #分享图标
+                share=driver.find_elements_by_accessibility_id('nav share btn')
+                sleep(1)
+                if len(share) != 0:
+                    print('分享按钮存在,检查通过')
                     sleep(3)
-                    words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
                     sleep(2)
-                    if len(words) != 0:
-                        driver.find_element_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').click()
-                        sleep(1)
-                        now0=time.strftime('%Y%m%d_%H%M%S')
-                        driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('人生苦短爱车ES6微信好友:'+now0)
-                        sleep(1)
-                    #发送
-                    driver.find_element_by_accessibility_id('发送').click()
+                    #微信好友
+                    wh=driver.find_elements_by_accessibility_id('微信')
+                    if len(wh) != 0:
+                        print('分享到微信好友按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微信').click()
+                        sleep(6)
+                        driver.find_element_by_accessibility_id('王小龙').click()
+                        sleep(3)
+                        words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                        sleep(2)
+                        if len(words) != 0:
+                            driver.find_element_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').click()
+                            sleep(1)
+                            now0=time.strftime('%Y%m%d_%H%M%S')
+                            driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('人生苦短爱车ES6微信好友:'+now0)
+                            sleep(1)
+                        #发送
+                        driver.find_element_by_accessibility_id('发送').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('返回蔚来').click()
+                        sleep(0.5)
+                        #检查toast
+                        save1=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save1) != 0:
+                            print('分享微信好友成功')
+                            sleep(1)
+                        else:
+                            print('分享微信好友失败，请检查原因')
+                            sleep(1)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_tc086.png'
+                            driver.get_screenshot_as_file(sf1)
+                        sleep(2)
+                    else:
+                        print('分享到微信好友按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('close').click()
                     sleep(2)
-                    driver.find_element_by_accessibility_id('返回蔚来').click()
-                    sleep(0.5)
-                    #检查toast
-                    save1=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save1) != 0:
-                        print('分享微信好友成功')
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
+                    sleep(2)
+                    #朋友圈
+                    pyq=driver.find_elements_by_accessibility_id('朋友圈')
+                    if len(pyq) != 0:
+                        print('分享到微信朋友圈按钮存在，检查通过')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('朋友圈').click()
+                        sleep(8)
+                        word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                        word2.click()
+                        sleep(1)
+                        now2=time.strftime('%Y%m%d_%H%M%S')
+                        word2.send_keys('人生苦短爱车ES6页面微信朋友圈:'+now2)
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('表情').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                        sleep(1)
+                        #私密, 仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('完成').click()
+                        sleep(2)
+                        #发表
+                        driver.find_element_by_accessibility_id('发表').click()
+                        sleep(1)
+                        #检查toast
+                        save2=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save2) != 0:
+                            print('分享朋友圈成功')
+                            sleep(0.5)
+                        else:
+                            print('分享朋友圈失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_tc086.png'
+                            driver.get_screenshot_as_file(sf2)
                         sleep(1)
                     else:
-                        print('分享微信好友失败，请检查原因')
+                        print('分享到朋友圈按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('close').click()
+                    sleep(2)
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
+                    sleep(2)
+                    #微博
+                    wb=driver.find_elements_by_accessibility_id('微博')
+                    if len(wb) != 0:
+                        print('分享到微博按钮存在，检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('微博').click()
+                        sleep(8)
+                        ad=driver.find_elements_by_accessibility_id('确定')
+                        if len(ad) != 0:
+                            driver.find_element_by_accessibility_id('确定').click()
+                        sleep(2)
+                        ###driver.find_element_by_accessibility_id('发送到分组').click()
+                        driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name CONTAINS "发送到分组"').click()
+                        sleep(2)
+                        #仅自己可见
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                        sleep(2)
+                        #发送
+                        driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_tc086.png'
-                        driver.get_screenshot_as_file(sf1)
-                    sleep(2)
-                else:
-                    print('分享到微信好友按钮不存在，请检查原因')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('close').click()
-                sleep(2)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
-                sleep(2)
-                #朋友圈
-                pyq=driver.find_elements_by_accessibility_id('朋友圈')
-                if len(pyq) != 0:
-                    print('分享到微信朋友圈按钮存在，检查通过')
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('朋友圈').click()
-                    sleep(8)
-                    word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
-                    word2.click()
-                    sleep(1)
-                    now2=time.strftime('%Y%m%d_%H%M%S')
-                    word2.send_keys('人生苦短爱车ES6页面微信朋友圈:'+now2)
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('表情').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
-                    sleep(1)
-                    #私密, 仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
-                    sleep(1)
-                    driver.find_element_by_accessibility_id('完成').click()
-                    sleep(2)
-                    #发表
-                    driver.find_element_by_accessibility_id('发表').click()
-                    sleep(1)
-                    #检查toast
-                    save2=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save2) != 0:
-                        print('分享朋友圈成功')
+                        #检查toast
+                        save3=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save3) != 0:
+                            print('分享微博成功')
+                            sleep(0.5)
+                        else:
+                            print('分享微博失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_tc086.png'
+                            driver.get_screenshot_as_file(sf3)
                         sleep(1)
                     else:
-                        print('分享朋友圈失败，请检查原因')
+                        print('分享到微博按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('close').click()
+                    sleep(2)
+                    #share
+                    driver.find_element_by_accessibility_id('nav share btn').click()
+                    sleep(2)
+                    #朋友
+                    mf=driver.find_elements_by_accessibility_id('朋友')
+                    if len(mf) != 0:
+                        print('分享到朋友按钮存在，检查通过')
                         sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_tc086.png'
-                        driver.get_screenshot_as_file(sf2)
-                    sleep(1)
-                else:
-                    print('分享到朋友圈按钮不存在，请检查原因')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('close').click()
-                sleep(2)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
-                sleep(2)
-                #微博
-                wb=driver.find_elements_by_accessibility_id('微博')
-                if len(wb) != 0:
-                    print('分享到微博按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微博').click()
-                    sleep(8)
-                    driver.find_element_by_accessibility_id('发送到分组').click()
-                    sleep(2)
-                    #仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
-                    sleep(2)
-                    #发送
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                    sleep(1)
-                    #检查toast
-                    save3=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save3) != 0:
-                        print('分享微博成功')
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(2)
+                        driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
+                        sleep(1)
+                        #检查toast
+                        save4=driver.find_elements_by_accessibility_id('分享成功')
+                        if len(save4) != 0:
+                            print('分享朋友成功')
+                            sleep(0.5)
+                        else:
+                            print('分享朋友失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_tc086.png'
+                            driver.get_screenshot_as_file(sf4)
                         sleep(1)
                     else:
-                        print('分享微博失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_tc086.png'
-                        driver.get_screenshot_as_file(sf3)
-                    sleep(1)
+                        print('分享到朋友按钮不存在，请检查原因')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('close').click()
+                        sleep(2)
                 else:
-                    print('分享到微博按钮不存在，请检查原因')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('close').click()
-                sleep(2)
-                #share
-                driver.find_element_by_accessibility_id('nav share btn').click()
-                sleep(2)
-                #朋友
-                mf=driver.find_elements_by_accessibility_id('朋友')
-                if len(mf) != 0:
-                    print('分享到朋友按钮存在，检查通过')
+                    print('分享按钮不存在/未找到，请检查原因')
                     sleep(1)
-                    driver.find_element_by_accessibility_id('朋友').click()
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('朋友').click()
-                    sleep(2)
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
+                    #driver.find_element_by_accessibility_id('nav back btn').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
                     sleep(1)
-                    #检查toast
-                    save4=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save4) != 0:
-                        print('分享朋友成功')
-                        sleep(1)
-                    else:
-                        print('分享朋友失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_tc086.png'
-                        driver.get_screenshot_as_file(sf4)
-                    sleep(1)
-                else:
-                    print('分享到朋友按钮不存在，请检查原因')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('close').click()
-                sleep(2)
             else:
-                print('分享按钮不存在/未找到，请检查原因')
-                sleep(2)
-            driver.find_element_by_accessibility_id('nav back btn').click()   
-            sleep(2)
+                print('NIO es6未找到,请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_ES6页面分享功能----结束:'+now)
 
@@ -8911,20 +8980,26 @@ class Weilai_test(unittest.TestCase):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:我的_我的ES6订单的分享功能----step1进入我的页面')
         print('step2进入我的es6订单点击进入订单详细页面；step3点右上角的分享按钮（先检查是否存在；step4检查分享微信好友功能是否正常')
-        print('step5检查分享朋友圈功能是否正常;step6检查分享新浪微博功能是否正常;step7检查分享NIO好友功能是否正常')
+        print('step5检查分享朋友圈功能是否正常;step6检查分享NIO好友功能是否正常')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_我的ES6订单的分享功能----开始:'+now)
         sleep(1)
         #我的
         driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('我的订单').click()
         sleep(4)
-        driver.find_element_by_accessibility_id('我的车辆订单').click()
-        sleep(9)
+        driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "购车订单"').click()
+        sleep(4)
         driver.execute_script("mobile: scroll", {"direction": "down"})
-        sleep(2)
-        car=driver.find_elements_by_accessibility_id('ES6基准版')
+        sleep(3)
+        car=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "ES6基准版"')
+        #carv=driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "ES6基准版"').get_attribute('visible')
+        sleep(1)
         if len(car) != 0:
-            driver.find_element_by_accessibility_id('ES6基准版').click()
+            print('ES6订单找到')
+            sleep(2)
+            driver.find_elements_by_class_name('XCUIElementTypeCell')[3].click()
             sleep(4)
             #分享图标
             share=driver.find_elements_by_accessibility_id('navigationbar btn share')
@@ -8961,12 +9036,12 @@ class Weilai_test(unittest.TestCase):
                     save1=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save1) != 0:
                         print('分享微信成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享微信失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_stg_tc087.png'
+                        sf1='../../test_report/ios/'+now+'_errGiftsharewechat_R_stg_tc087.png'
                         driver.get_screenshot_as_file(sf1)
                     sleep(2)
                 else:
@@ -8982,9 +9057,9 @@ class Weilai_test(unittest.TestCase):
                     sleep(1)
                     driver.find_element_by_accessibility_id('朋友圈').click()
                     sleep(8)
-                    word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                    word2=driver.find_element_by_class_name('XCUIElementTypeTextView')
                     word2.click()
-                    sleep(1)
+                    sleep(0.5)
                     now2=time.strftime('%Y%m%d_%H%M%S')
                     word2.send_keys('人生苦短我的ES6订单朋友圈:'+now2)
                     sleep(1)
@@ -9006,52 +9081,17 @@ class Weilai_test(unittest.TestCase):
                     save2=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save2) != 0:
                         print('分享朋友圈成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享朋友圈失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_stg_tc087.png'
+                        sf2='../../test_report/ios/'+now+'_errGiftsharewechatpyq_R_stg_tc087.png'
                         driver.get_screenshot_as_file(sf2)
                     sleep(1)
                 else:
                     print('分享到朋友圈按钮不存在，请检查原因')
                 sleep(2)
-                """
-                #share
-                driver.find_element_by_accessibility_id('navigationbar btn share').click()
-                sleep(2)
-                #微博no such menu now
-                wb=driver.find_elements_by_accessibility_id('微博')
-                if len(wb) != 0:
-                    print('分享到微博按钮存在，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('微博').click()
-                    sleep(8)
-                    driver.find_element_by_accessibility_id('发送到分组').click()
-                    sleep(2)
-                    #仅自己可见
-                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
-                    sleep(2)
-                    #发送
-                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
-                    sleep(1)
-                    #检查toast
-                    save3=driver.find_elements_by_accessibility_id('分享成功')
-                    if len(save3) != 0:
-                        print('分享微博成功')
-                        sleep(1)
-                    else:
-                        print('分享微博失败，请检查原因')
-                        sleep(1)
-                        now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_stg_tc087.png'
-                        driver.get_screenshot_as_file(sf3)
-                    sleep(1)
-                else:
-                    print('分享到新浪微博按钮不存在，请检查原因')
-                sleep(2)
-                """
                 #share
                 driver.find_element_by_accessibility_id('navigationbar btn share').click()
                 sleep(2)
@@ -9070,29 +9110,31 @@ class Weilai_test(unittest.TestCase):
                     save4=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save4) != 0:
                         print('分享朋友成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享朋友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_stg_tc087.png'
+                        sf4='../../test_report/ios/'+now+'_errGiftsharemyfriend_R_stg_tc087.png'
                         driver.get_screenshot_as_file(sf4)
                     sleep(1)
                 else:
                     print('分享到朋友按钮不存在，请检查原因')
-                    sleep(2)
+                    sleep(1)
             else:
                 print('分享按钮不存在/未找到，请检查原因')
-                sleep(2)
-            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':35, 'y':42})
-            driver.find_element_by_accessibility_id('navigationbar btn back black1').click()   
-            sleep(2)
+                sleep(1)
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':35, 'y':42})
+            ###driver.find_element_by_accessibility_id('navigationbar btn back black1').click()   
+            sleep(1)
         else:
             print('暂无订单，无法执行该脚本')
-            sleep(2)
-            #driver.find_element_by_accessibility_id('navigationbar btn back black1').click()
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':35, 'y':42})
-            sleep(2)
+            sleep(1)
+            driver.find_element_by_accessibility_id('icon back').click()
+            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':41})
+            sleep(1)
+            driver.find_element_by_accessibility_id('icon back').click()
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_我的ES6订单的分享功能----结束:'+now)
 
@@ -9121,15 +9163,16 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(4):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
-        sleep(2)
-        es8=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[11]/XCUIElementTypeImage')
-        if len(es8) != 0:
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
+        sleep(3)
+        es8=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]').get_attribute('visible')
+        sleep(1.5)
+        if len(es8) != 0 and ch0 == 'true':
             print('NIO es8找到')
             sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[11]/XCUIElementTypeImage').click()
-            sleep(8)
+            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]').click()
+            sleep(12)
             #分享图标
             share=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="nav share btn"]')
             sleep(1)
@@ -9165,10 +9208,10 @@ class Weilai_test(unittest.TestCase):
                     save1=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save1) != 0:
                         print('分享微信成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享微信失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf1='../../test_report/ios/'+now+'_errorGiftsharewechat_R_tc088.png'
                         driver.get_screenshot_as_file(sf1)
@@ -9212,10 +9255,10 @@ class Weilai_test(unittest.TestCase):
                     save2=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save2) != 0:
                         print('分享朋友圈成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享朋友圈失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf2='../../test_report/ios/'+now+'_errorGiftsharewechatpyq_R_tc088.png'
                         driver.get_screenshot_as_file(sf2)
@@ -9234,7 +9277,11 @@ class Weilai_test(unittest.TestCase):
                     print('分享到微博按钮存在，检查通过')
                     sleep(2)
                     driver.find_element_by_accessibility_id('微博').click()
-                    sleep(8)
+                    sleep(7)
+                    ad=driver.find_elements_by_accessibility_id('确定')
+                    if len(ad) != 0:
+                        driver.find_element_by_accessibility_id('确定').click()
+                    sleep(2)
                     driver.find_element_by_accessibility_id('发送到分组').click()
                     sleep(2)
                     #仅自己可见
@@ -9247,10 +9294,10 @@ class Weilai_test(unittest.TestCase):
                     save3=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save3) != 0:
                         print('分享微博成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享微博失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf3='../../test_report/ios/'+now+'_errorGiftsharewebo_R_tc088.png'
                         driver.get_screenshot_as_file(sf3)
@@ -9278,10 +9325,10 @@ class Weilai_test(unittest.TestCase):
                     save4=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save4) != 0:
                         print('分享朋友成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享朋友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
                         sf4='../../test_report/ios/'+now+'_errorGiftsharemyfriend_R_tc088.png'
                         driver.get_screenshot_as_file(sf4)
@@ -9295,6 +9342,9 @@ class Weilai_test(unittest.TestCase):
                 print('分享按钮不存在/未找到，请检查原因')
                 sleep(2)
             driver.find_element_by_accessibility_id('nav back btn').click()   
+            sleep(2)
+        else:
+            print('NIO es8未找到,请检查原因')
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_ES8页面分享功能----结束:'+now)
@@ -9319,13 +9369,14 @@ class Weilai_test(unittest.TestCase):
         #体验
         driver.find_element_by_accessibility_id('体验').click()
         sleep(3)
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
+        ##driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
+        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':110})
         sleep(2)
         #driver.execute_script('mobile: dragFromToForDuration',{'fromX':5,'fromY':650,'toX':5,'toY':50,'duration':1.0})
         driver.execute_script("mobile: scroll", {"direction": "down"})
         sleep(3)
         #南京市
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]/XCUIElementTypeOther[1]/XCUIElementTypeImage').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
         sleep(3)
         #报名
         activ=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="南京普通活动"]')
@@ -9334,7 +9385,6 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             for i in range(1):
                 driver.execute_script("mobile: scroll", {"direction": "down"})
-                sleep(1)
             sleep(2)
             #driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"更多同城活动")]').click()
             driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':632})
@@ -9363,7 +9413,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_体验tab切换城市的功能能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_aiche_rechargemapswipe_tc090
 #Purpose:检查爱车页面里爱车_充电地图滑动和定位操作
 #OS:iOS
@@ -9371,7 +9421,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/01/07]
-#*******************************************************
+#***********************************************************************************************************************
     def test_aiche_rechargemapswipe_tc090(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:爱车_充电地图及查看充电桩信息----step1进入爱车页面')
@@ -9380,77 +9430,89 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图滑动和定位操作----开始:'+now)
         sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
         #爱车
         driver.find_element_by_accessibility_id('爱车').click()
         sleep(4)
         for i in range(3):
-            driver.execute_script('mobile: scroll', {'direction': 'down'})
-            sleep(1)
+            driver.execute_script("mobile: scroll", {"direction": "down"})
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            p=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="7"]')
-            #zoom
-            driver.execute_script('mobile: pinch', {'scale': 1.3, 'velocity': 1.1, 'element':p})
-            sleep(2)
-            print('充电地图放大')
-            sleep(1)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_chargemapZoom_R_tc090.png'
-            driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            driver.find_element_by_accessibility_id('PE locate icon').click()
-            sleep(3)
-            p1=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="7"]')
-            #pinch
-            driver.execute_script('mobile: pinch', {'scale': 0.7, 'velocity': -1.1, 'element':p1})
-            sleep(2)
-            print('充电地图缩小')
-            sleep(1)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_chargemapPinch_R_tc090.png'
-            driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            #down
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
-            sleep(2)
-            print('充电地图向下滑动')
-            sleep(1)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_chargemapSwipeDown_R_tc090.png'
-            driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':300,'fromY':300,'toX':50,'toY':300,'duration':1.0})
-            sleep(2)
-            print('充电地图向右滑动')
-            sleep(1)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_chargemapSwipeRight_R_tc090.png'
-            driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            #定位
-            driver.find_element_by_accessibility_id('PE locate icon').click()
-            sleep(3)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_chargemapLocate_R_tc090.png'
-            driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                sleep(4)
+                p=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')[4]
+                #zoom
+                driver.execute_script('mobile: pinch', {'scale': 1.1, 'velocity': 1.1, 'element':p})
+                sleep(2)
+                print('充电地图放大')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_chargemapZoom_R_tc090.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                driver.find_element_by_accessibility_id('PE locate icon').click()
+                sleep(3)
+                p1=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="7"]')
+                #pinch
+                driver.execute_script('mobile: pinch', {'scale': 0.7, 'velocity': -1.1, 'element':p1})
+                sleep(2)
+                print('充电地图缩小')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_chargemapPinch_R_tc090.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                #down
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
+                sleep(2)
+                print('充电地图向下滑动')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_chargemapSwipeDown_R_tc090.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':300,'fromY':300,'toX':50,'toY':300,'duration':1.0})
+                sleep(2)
+                print('充电地图向右滑动')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_chargemapSwipeRight_R_tc090.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                #定位
+                driver.find_element_by_accessibility_id('PE locate icon').click()
+                sleep(3)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_chargemapLocate_R_tc090.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(1)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
+                sleep(1)
+            else:
+                print('充电地图按钮未找到/不存在，请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图滑动和定位操作----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_aiche_rechargemapfeedback_tc091
 #Purpose:检查爱车页面里充电地图提交反馈的功能
 #OS:iOS
@@ -9458,7 +9520,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/01/07]
-#*******************************************************
+#***********************************************************************************************************************
     def test_aiche_rechargemapfeedback_tc091(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:爱车_充电地图提交反馈的功能----')
@@ -9474,83 +9536,86 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            #8号充电桩
-            #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":287, "y":272})
-            sleep(5)
-            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"上海曹安景林苑充电站")]').click()
-            sleep(6)
-            #我要反馈
-            driver.find_element_by_accessibility_id('我要反馈').click()
-            sleep(2)
-            #5-star
-            driver.find_elements_by_accessibility_id('star_evaluate_normal')[4].click()
-            sleep(1)
-            driver.find_element_by_accessibility_id('充电很快').click()
-            sleep(1)
-            driver.find_element_by_accessibility_id('插枪很方便').click()
-            sleep(1)
-            fb=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
-            fb.click()
-            sleep(0.5)
-            now0=time.strftime('%Y%m%d_%H%M%S')
-            fb.send_keys('充电地图反馈:'+now0)
-            sleep(0.5)
-            driver.find_element_by_accessibility_id('Toolbar Done Button').click()
-            sleep(1)
-            #+
-            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':74, 'y':384})
-            sleep(1)
-            #好
-            allow=driver.find_elements_by_accessibility_id('好')
-            if len(allow) != 0:
-                driver.find_element_by_accessibility_id('好').click()
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                sleep(4)
+                #1号充电桩
+                #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":188, "y":369})
+                sleep(5)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"上海蔚来汽车总部直流充电站")]').click()
+                sleep(6)
+                #上拉卡片
+                #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+                #sleep(2)
+                #我要反馈
+                driver.find_element_by_accessibility_id('我要反馈').click()
+                sleep(2)
+                #5-star
+                ###driver.find_elements_by_xpath('//XCUIElementTypeImage[@name="star_evaluate_normal"]')[4].click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":231, "y":94})
                 sleep(1)
-            for i in range(3):
-                driver.find_elements_by_ios_predicate('name=="compose guide check box defaul"')[i].click()
+                driver.find_element_by_accessibility_id('充电很快').click()
                 sleep(1)
-            sleep(1)
-            driver.find_element_by_accessibility_id('完成(3/9)').click()
-            sleep(3)
-            #driver.execute_script("mobile: scroll", {"direction": "down"})
-            #sleep(2)
-            driver.find_element_by_accessibility_id('提交反馈').click()
-            sleep(3)
-            ch1=driver.find_elements_by_accessibility_id('反馈提交成功')
-            if len(ch1) != 0:
-                print('反馈提交成功')
+                driver.find_element_by_accessibility_id('插枪很方便').click()
                 sleep(1)
+                fb=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                fb.click()
+                sleep(0.5)
+                now0=time.strftime('%Y%m%d_%H%M%S')
+                fb.send_keys('充电地图反馈:'+now0)
+                t0='充电地图反馈:'+now0
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                sleep(1)
+                #+
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':74, 'y':384})
+                sleep(1)
+                #好
+                allow=driver.find_elements_by_accessibility_id('好')
+                if len(allow) != 0:
+                    driver.find_element_by_accessibility_id('好').click()
+                    sleep(1)
+                for i in range(3):
+                    driver.find_elements_by_ios_predicate('name=="compose guide check box defaul"')[i].click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成(3/9)').click()
+                sleep(3)
+                #driver.execute_script("mobile: scroll", {"direction": "down"})
+                #sleep(2)
+                driver.find_element_by_accessibility_id('提交反馈').click()
+                sleep(4)
+                ch1=driver.find_elements_by_accessibility_id('反馈提交成功')
+                if len(ch1) != 0:
+                    print('反馈提交成功')
+                    sleep(0.5)
+                else:
+                    print('反馈提交不成功，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errChargemapFeedback_R_tc091.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(6)
+                #driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                #sleep(2)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
+                sleep(2)
             else:
-                print('反馈提交不成功，请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errChargemapFeedback_R_tc091.png'
-                driver.get_screenshot_as_file(sf1)
-            sleep(6)
-            #driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-            #sleep(2)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
+                print('充电地图按钮未找到/不存在，请检查原因')
+                sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图提交反馈的功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_aiche_rechargemapownercommentslike_tc092
 #Purpose:检查爱车页面里充电地图车主评价点赞/取消点赞的功
 #OS:iOS
@@ -9558,7 +9623,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/01/07]
-#*******************************************************
+#***********************************************************************************************************************
     def test_aiche_rechargemapownercommentslike_tc092(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:爱车_充电地图车主评价点赞/取消点赞的功能----')
@@ -9574,62 +9639,61 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            #8号充电桩
-            #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":287, "y":273})
-            sleep(5)
-            #driver.execute_script('mobile: dragFromToForDuration',{'fromX':150,'fromY':550,'toX':150,'toY':50,'duration':1.0})
-            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"上海曹安景林苑充电站")]').click()
-            sleep(6)
-            #点赞
-            driver.find_element_by_xpath('//XCUIElementTypeOther[3]/XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeButton').click()
-            sleep(1)
-            print('点赞成功')
-            sleep(1)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf1='../../test_report/ios/'+now+'_ChargemapCommentsLike_R_tc092.png'
-            driver.get_screenshot_as_file(sf1)
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeOther[3]/XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeButton').click()
-            sleep(1)
-            print('取消点赞成功')
-            sleep(1)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            sf2='../../test_report/ios/'+now+'_ChargemapCommentsCancelLike_R_tc092.png'
-            driver.get_screenshot_as_file(sf2)
-            sleep(2)
-            #其他反馈
-            driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"其他反馈")]').click()
-            sleep(2)
-            ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"充电地图反馈:2019")]')
-            if len(ch) != 0:
-                print('其他反馈显示正常,检查通过')
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                sleep(4)
+                #1号充电桩
+                #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":188, "y":369})
+                sleep(5)
+                #driver.execute_script('mobile: dragFromToForDuration',{'fromX':150,'fromY':550,'toX':150,'toY':50,'duration':1.0})
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"上海蔚来汽车总部直流充电站")]').click()
+                sleep(6)
+                #点赞XCUIElementTypeOther[3]/
+                driver.find_element_by_xpath('//XCUIElementTypeScrollView/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeButton').click()
                 sleep(1)
-            else:
-                print('其他反馈显示不正常，请检查原因')
+                print('点赞成功')
                 sleep(1)
                 now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_errChargemapOtherFeedback_R_tc092.png'
-                driver.get_screenshot_as_file(sf3)
-            sleep(2)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
+                sf1='../../test_report/ios/'+now+'_ChargemapCommentsLike_R_tc092.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeScrollView/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeButton').click()
+                sleep(1)
+                print('取消点赞成功')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_ChargemapCommentsCancelLike_R_tc092.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                #其他反馈
+                driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"其他反馈")]').click()
+                sleep(2)
+                ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"充电地图反馈:2019")]')
+                if len(ch) != 0:
+                    print('其他反馈显示正常,检查通过')
+                    sleep(1)
+                else:
+                    print('其他反馈显示不正常，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errChargemapOtherFeedback_R_tc092.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(2)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
+                sleep(2)
+            else:
+                print('充电地图按钮未找到/不存在，请检查原因')
+                sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图车主评价点赞/取消点赞的功能----结束:'+now)
 
@@ -9657,50 +9721,49 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            #8号充电桩
-            #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
-            driver.execute_script("mobile: tap", {"touchCount":"1", "x":287, "y":273})
-            sleep(5)
-            #导航
-            pi=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="locationNav"]')
-            if len(pi) == 0:
-                print('导航按钮未找到,请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errNoPilot_R_tc093.png'
-                driver.get_screenshot_as_file(sf2)
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                sleep(4)
+                #1号充电桩
+                #driver.find_element_by_id('cn.com.weilaihui3:id/charging_pile_drag_view').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":188, "y":369})
+                sleep(5)
+                #导航
+                pi=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="locationNav"]')
+                if len(pi) == 0:
+                    print('导航按钮未找到,请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errNoPilot_R_tc093.png'
+                    driver.get_screenshot_as_file(sf2)
+                    sleep(2)
+                else:
+                    print('导航按钮找到,检查通过')
+                    sleep(1)
+                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="locationNav"]').click()
+                    sleep(1)
+                    #高德地图
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="苹果地图"]').click()
+                    sleep(4)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_ChargemapPilotApple_R_tc093.png'
+                    driver.get_screenshot_as_file(sf3)
+                    sleep(2)
+                    #driver.find_element_by_accessibility_id('蔚来Test').click()
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":36, "y":10})
+                    sleep(2)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
                 sleep(2)
             else:
-                print('导航按钮找到,检查通过')
-                sleep(1)
-                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="locationNav"]').click()
-                sleep(1)
-                #高德地图
-                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="苹果地图"]').click()
-                sleep(4)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_ChargemapPilotApple_R_tc093.png'
-                driver.get_screenshot_as_file(sf3)
+                print('充电地图按钮未找到/不存在，请检查原因')
                 sleep(2)
-                #driver.find_element_by_accessibility_id('蔚来Test').click()
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":36, "y":10})
-                sleep(2)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图充电桩导航的功能----结束:'+now)
 
@@ -9728,48 +9791,47 @@ class Weilai_test(unittest.TestCase):
         #sleep(2)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            #充电历史
-            pi=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="peMapHistory"]')
-            if len(pi) == 0:
-                print('充电历史未找到,请检查原因')
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
                 sleep(2)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errNoPilot_R_tc093.png'
-                driver.get_screenshot_as_file(sf2)
-                sleep(2)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                sleep(4)
+                #充电历史
+                pi=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="peMapHistory"]')
+                if len(pi) == 0:
+                    print('充电历史未找到,请检查原因')
+                    sleep(2)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errNoPilot_R_tc093.png'
+                    driver.get_screenshot_as_file(sf2)
+                    sleep(2)
+                else:
+                    print('充电历史按钮找到,检查通过')
+                    sleep(2)
+                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="peMapHistory"]').click()
+                    sleep(2)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_rechargeHistory_R_tc094.png'
+                    driver.get_screenshot_as_file(sf3)
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('换电').click()
+                    sleep(2)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_changeBatteryHistory_R_tc094.png'
+                    driver.get_screenshot_as_file(sf2)
+                    sleep(2)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                    sleep(3)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
+                sleep(1)
             else:
-                print('充电历史按钮找到,检查通过')
-                sleep(2)
-                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="peMapHistory"]').click()
-                sleep(2)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_rechargeHistory_R_tc094.png'
-                driver.get_screenshot_as_file(sf3)
-                sleep(2)
-                driver.find_element_by_accessibility_id('换电').click()
-                sleep(2)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_changeBatteryHistory_R_tc094.png'
-                driver.get_screenshot_as_file(sf2)
-                sleep(2)
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-                sleep(3)
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
+                print('充电地图按钮未找到/不存在，请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图充电历史检查----结束:'+now)
 
@@ -9795,88 +9857,62 @@ class Weilai_test(unittest.TestCase):
         sleep(4)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            #7号充电桩
-            pi=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')
-            if len(pi) == 0:
-                print('1号充电桩群未找到,请检查原因')
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
                 sleep(2)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errNoPole_R_tc095.png'
-                driver.get_screenshot_as_file(sf2)
-                sleep(2)
-            else:
-                print('1号充电桩群找到,检查通过')
-                sleep(2)
-                #zoom
-                p0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')[1]
-                sleep(1)
-                driver.execute_script('mobile: pinch', {'scale': 1.4, 'velocity': 1.1, 'element':p0})
-                sleep(2)
-                #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"]').click()
-                p=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')[1]
-                sleep(1)
-                #pinch
-                driver.execute_script("mobile: pinch", {"scale": 0.9, "velocity": -1.1, "element":p})
-                sleep(2)
-                """
-                p=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"]')
-                sleep(1)
-                #zoom
-                driver.execute_script('mobile: pinch', {'scale': 1.3, 'velocity': 1.1, 'element':p})
-                sleep(2)
-                p0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"]')
-                sleep(1)
-                x0=p0.location.get('x')+21
-                y0=p0.location.get('y')+21
-                for i in range(2):
-                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":x0, "y":y0})
-                sleep(2)
-                #to show the charging pole
-                p2=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"]')
-                #pinch
-                driver.execute_script("mobile: pinch", {"scale": 0.6, "velocity": -1.1, "element":p2})
-                sleep(2)
-                """
-                #3号充电桩
-                p1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="3"]')[1]
-                sleep(1)
-                x1=p1.location.get('x')+20
-                y1=p1.location.get('y')+20
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":x1, "y":y1})
-                sleep(5)
-                px=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"20190123annie")]')
-                if len(px) == 0:
-                    print('3号充电桩未找到,请检查原因')
-                    sleep(1)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                sleep(4)
+                #7号充电桩
+                pi=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')
+                if len(pi) == 0:
+                    print('1号充电桩群未找到,请检查原因')
+                    sleep(2)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf3='../../test_report/ios/'+now+'_rechargepole_R_tc095.png'
-                    driver.get_screenshot_as_file(sf3)
+                    sf2='../../test_report/ios/'+now+'_errNoPole_R_tc095.png'
+                    driver.get_screenshot_as_file(sf2)
                     sleep(2)
                 else:
-                    print('3号充电桩找到,检查通过')
-                    sleep(1)
-                    """
-                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    print('1号充电桩群找到,检查通过')
                     sleep(2)
-                    driver.find_element_by_accessibility_id('PE locate icon').click()
-                    sleep(3)
-                    """
-            driver.find_element_by_accessibility_id('routPlanBack').click()
-            sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
+                    #zoom
+                    p0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')[1]
+                    sleep(1)
+                    driver.execute_script('mobile: pinch', {'scale': 1.4, 'velocity': 1.1, 'element':p0})
+                    sleep(2)
+                    #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="1"]').click()
+                    p=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="1"]')[1]
+                    sleep(1)
+                    #pinch
+                    driver.execute_script("mobile: pinch", {"scale": 0.9, "velocity": -1.1, "element":p})
+                    sleep(2)
+                    #3号充电桩
+                    p1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="3"]')[1]
+                    sleep(1)
+                    x1=p1.location.get('x')+20
+                    y1=p1.location.get('y')+20
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":x1, "y":y1})
+                    sleep(5)
+                    px=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"20190123annie")]')
+                    if len(px) == 0:
+                        print('3号充电桩未找到,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf3='../../test_report/ios/'+now+'_rechargepole_R_tc095.png'
+                        driver.get_screenshot_as_file(sf3)
+                        sleep(2)
+                    else:
+                        print('3号充电桩找到,检查通过')
+                        sleep(1)
+                driver.find_element_by_accessibility_id('routPlanBack').click()
+                sleep(1)
+            else:
+                print('充电地图按钮未找到/不存在，请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图充电桩群里查看充电桩信息----结束:'+now)
 
@@ -9914,194 +9950,197 @@ class Weilai_test(unittest.TestCase):
         sleep(4)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            #搜索
-            driver.find_element_by_accessibility_id('搜索').click()
-            sleep(1)
-            pi=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField')
-            pi.click()
-            pi.send_keys('北京')
-            sleep(0.5)
-            driver.find_element_by_accessibility_id('Toolbar Done Button').click()
-            sleep(1)
-            #driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
-            driver.find_element_by_accessibility_id('北京南站').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('PERoutPlan').click()
-            sleep(8)
-            #上拉卡片
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-            sleep(2)
-            ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
-            if len(ch1) == 0:
-                print('路径卡片详细行程显示不正常,请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errRouteCard_R_tc096.png'
-                driver.get_screenshot_as_file(sf1)
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
                 sleep(2)
-            else:
-                print('路径卡片详细行程显示正常,检查通过')
-                sleep(2)
-                driver.find_elements_by_accessibility_id('routPlanLineRightArrow')[0].click()
+                driver.find_element_by_accessibility_id('充电地图').click()
                 sleep(4)
-                #上拉
-                ##driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':550,'toX':50,'toY':200,'duration':1.0})
-                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]').click()
-                sleep(3)
-                #详细功率
-                ##driver.find_element_by_xpath('//XCUIElementTypeImage[@name="pe_icon_right_arrow"]').click()
-                ##driver.find_element_by_accessibility_id('最快120度每小时').click()
-                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"度每小时")]').click()
-                sleep(1)
-                ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="详细功率"]')
-                if len(ch2) == 0:
-                    print('详细功率页面显示不正常,请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf2='../../test_report/ios/'+now+'_errPowerDetailPage_R_tc096.png'
-                    driver.get_screenshot_as_file(sf2)
-                    sleep(2)
-                else:
-                    print('详细功率页面显示正常,检查通过')
-                sleep(1)
-                #关闭详细功率
-                driver.find_element_by_accessibility_id('PE cancelClose').click()
+                #搜索
+                ###driver.find_element_by_accessibility_id('搜索').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":190, "y":56})
                 sleep(2)
-                #详细费率
-                #driver.find_elements_by_xpath('//XCUIElementTypeImage[@name="pe_icon_right_arrow"]')[1].click()
-                driver.find_element_by_accessibility_id('0.70 - 1.77元/度').click()
-                sleep(1)
-                ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="00:00-24:00,收费0.70 - 1.77元/度"]')
-                if len(ch3) == 0:
-                    print('收费规则页面显示不正常,请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf3='../../test_report/ios/'+now+'_errPayRulePage_R_tc096.png'
-                    driver.get_screenshot_as_file(sf3)
-                    sleep(2)
-                else:
-                    print('收费规则页面显示正常,检查通过')
-                sleep(1)
-                driver.find_element_by_accessibility_id('PE cancelClose').click()
-                sleep(1)
-                ##driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':650,'duration':1.0})
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
-                #下一站
-                driver.find_element_by_accessibility_id('PERoutPlanNext').click()
-                sleep(4)
-                chnext=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
-                if len(chnext) == 0:
-                    print('下一站充电站页面显示不正常,请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf3='../../test_report/ios/'+now+'_errNextPolePage_R_tc096.png'
-                    driver.get_screenshot_as_file(sf3)
-                    sleep(2)
-                else:
-                    print('下一站充电站页面显示正常,检查通过')
-                sleep(1)
-                #上一站
-                driver.find_element_by_accessibility_id('PERoutPlanLast').click()
-                sleep(4)
-                chlast=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
-                if len(chlast) == 0:
-                    print('上一站充电站页面显示不正常,请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf4='../../test_report/ios/'+now+'_errLastPolePage_R_tc096.png'
-                    driver.get_screenshot_as_file(sf4)
-                    sleep(2)
-                else:
-                    print('上一站充电站页面显示正常,检查通过')
-                sleep(1)
-                #完整路线
-                driver.find_element_by_accessibility_id('完整路线').click()
-                sleep(2)
-                print('切换完整路线成功')
-                sleep(2)
-                #+
-                driver.find_element_by_accessibility_id('pedoAddPoiIcon').click()
-                sleep(2)
-                p1=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField[2]')
-                p1.click()
-                p1.send_keys('南京')
+                pi=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                pi.click()
+                sleep(0.5)
+                pi.send_keys('北京')
                 sleep(0.5)
                 driver.find_element_by_accessibility_id('Toolbar Done Button').click()
                 sleep(1)
-                driver.find_element_by_accessibility_id('南京南站').click()
-                sleep(4)
-                #+
-                driver.find_element_by_accessibility_id('pedoAddPoiIcon').click()
-                sleep(1)
-                p2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField[3]')
-                p2.click()
-                p2.send_keys('合肥')
-                sleep(0.5)
-                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
-                sleep(1)
-                driver.find_element_by_accessibility_id('合肥南站').click()
-                sleep(6)
-                #+
-                driver.find_element_by_accessibility_id('pedoAddPoiIcon').click()
-                sleep(1)
-                p3=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField[4]')
-                p3.click()
-                p3.send_keys('郑州')
-                sleep(0.5)
-                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
-                sleep(1)
-                driver.find_element_by_accessibility_id('郑州站').click()
-                sleep(6)
-                #互换起终点
-                driver.find_element_by_accessibility_id('PEAddressChange').click()
-                sleep(9)
-                print('互换起终点成功')
+                #driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+                driver.find_element_by_accessibility_id('北京南站').click()
                 sleep(2)
+                driver.find_element_by_accessibility_id('PERoutPlan').click()
+                sleep(8)
                 #上拉卡片
-                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':200,'duration':1.0})
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
                 sleep(2)
-                """
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf='../../test_report/ios/'+now+'_AddrChanged_R_tc096.png'
-                driver.get_screenshot_as_file(sf)
-                sleep(2)
-                """
-                #下拉卡片
-                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':300,'toX':50,'toY':650,'duration':1.0})
-                sleep(2)
-                #过滤
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":376, "y":214})
-                #driver.find_element_by_accessibility_id('peMapFilter').click()
-                sleep(2)
-                driver.find_element_by_accessibility_id('换电站').click()
+                ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
+                if len(ch1) == 0:
+                    print('路径卡片详细行程显示不正常,请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errRouteCard_R_tc096.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(2)
+                else:
+                    print('路径卡片详细行程显示正常,检查通过')
+                    sleep(2)
+                    driver.find_elements_by_accessibility_id('routPlanLineRightArrow')[0].click()
+                    sleep(4)
+                    #上拉
+                    ##driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':550,'toX':50,'toY':200,'duration':1.0})
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]').click()
+                    sleep(3)
+                    #详细功率
+                    ##driver.find_element_by_xpath('//XCUIElementTypeImage[@name="pe_icon_right_arrow"]').click()
+                    ##driver.find_element_by_accessibility_id('最快120度每小时').click()
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"度每小时")]').click()
+                    sleep(1)
+                    ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="详细功率"]')
+                    if len(ch2) == 0:
+                        print('详细功率页面显示不正常,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errPowerDetailPage_R_tc096.png'
+                        driver.get_screenshot_as_file(sf2)
+                        sleep(2)
+                    else:
+                        print('详细功率页面显示正常,检查通过')
+                    sleep(1)
+                    #关闭详细功率
+                    driver.find_element_by_accessibility_id('PE cancelClose').click()
+                    sleep(2)
+                    #详细费率
+                    #driver.find_elements_by_xpath('//XCUIElementTypeImage[@name="pe_icon_right_arrow"]')[1].click()
+                    driver.find_element_by_accessibility_id('0.70 - 1.77元/度').click()
+                    sleep(1)
+                    ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="00:00-24:00,收费0.70 - 1.77元/度"]')
+                    if len(ch3) == 0:
+                        print('收费规则页面显示不正常,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf3='../../test_report/ios/'+now+'_errPayRulePage_R_tc096.png'
+                        driver.get_screenshot_as_file(sf3)
+                        sleep(2)
+                    else:
+                        print('收费规则页面显示正常,检查通过')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('PE cancelClose').click()
+                    sleep(1)
+                    ##driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':650,'duration':1.0})
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(2)
+                    #下一站
+                    driver.find_element_by_accessibility_id('PERoutPlanNext').click()
+                    sleep(4)
+                    chnext=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
+                    if len(chnext) == 0:
+                        print('下一站充电站页面显示不正常,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf3='../../test_report/ios/'+now+'_errNextPolePage_R_tc096.png'
+                        driver.get_screenshot_as_file(sf3)
+                        sleep(2)
+                    else:
+                        print('下一站充电站页面显示正常,检查通过')
+                    sleep(1)
+                    #上一站
+                    driver.find_element_by_accessibility_id('PERoutPlanLast').click()
+                    sleep(4)
+                    chlast=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
+                    if len(chlast) == 0:
+                        print('上一站充电站页面显示不正常,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf4='../../test_report/ios/'+now+'_errLastPolePage_R_tc096.png'
+                        driver.get_screenshot_as_file(sf4)
+                        sleep(2)
+                    else:
+                        print('上一站充电站页面显示正常,检查通过')
+                    sleep(1)
+                    #完整路线
+                    driver.find_element_by_accessibility_id('完整路线').click()
+                    sleep(2)
+                    print('切换完整路线成功')
+                    sleep(4)
+                    #+
+                    driver.find_element_by_accessibility_id('pedoAddPoiIcon').click()
+                    sleep(2)
+                    p1=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField[2]')
+                    p1.click()
+                    p1.send_keys('南京')
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('南京南站').click()
+                    sleep(4)
+                    #+
+                    driver.find_element_by_accessibility_id('pedoAddPoiIcon').click()
+                    sleep(1)
+                    p2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField[3]')
+                    p2.click()
+                    p2.send_keys('合肥')
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('合肥南站').click()
+                    sleep(6)
+                    #+
+                    driver.find_element_by_accessibility_id('pedoAddPoiIcon').click()
+                    sleep(1)
+                    p3=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField[4]')
+                    p3.click()
+                    p3.send_keys('郑州')
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('郑州站').click()
+                    sleep(6)
+                    #互换起终点
+                    driver.find_element_by_accessibility_id('PEAddressChange').click()
+                    sleep(13)
+                    print('互换起终点成功')
+                    sleep(2)
+                    #上拉卡片
+                    driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':200,'duration':1.0})
+                    sleep(2)
+                    """
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_AddrChanged_R_tc096.png'
+                    driver.get_screenshot_as_file(sf)
+                    sleep(2)
+                    """
+                    #下拉卡片
+                    driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':300,'toX':50,'toY':650,'duration':1.0})
+                    sleep(2)
+                    #过滤
+                    """
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":367, "y":122})
+                    #driver.find_element_by_accessibility_id('peMapFilter').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('换电站').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('交流慢充').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('确定').click()
+                    sleep(5)
+                    print('过滤充电类型完成')
+                    sleep(2)
+                    """
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(1)
+            else:
+                print('充电地图按钮未找到/不存在，请检查原因')
                 sleep(1)
-                driver.find_element_by_accessibility_id('交流慢充').click()
-                sleep(1)
-                driver.find_element_by_accessibility_id('完成').click()
-                sleep(5)
-                print('过滤充电类型完成')
-                sleep(2)
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图搜索及路径规划----结束:'+now)
 
@@ -10129,142 +10168,151 @@ class Weilai_test(unittest.TestCase):
         print('TC_爱车_充电地图路径规划页面功能检查----开始:'+now)
         sleep(1)
         #爱车
-        driver.find_element_by_accessibility_id('爱车').click()
+        driver.find_element_by_xpath('//XCUIElementTypeButton[@name="爱车"]').click()
         sleep(4)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
         sleep(2)
         cmap=driver.find_elements_by_accessibility_id('充电地图')
-        ch0=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
-        sleep(1)
-        if len(cmap) != 0 and ch0 == 'true':
-            print('充电地图按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('充电地图').click()
-            sleep(4)
-            #搜索
-            driver.find_element_by_accessibility_id('搜索').click()
-            sleep(1)
-            pi=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField')
-            pi.click()
-            pi.send_keys('北京')
-            sleep(0.5)
-            driver.find_element_by_accessibility_id('Toolbar Done Button').click()
-            sleep(1)
-            #driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
-            driver.find_element_by_accessibility_id('北京南站').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('PERoutPlan').click()
-            sleep(8)
-            #上拉卡片
-            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-            sleep(2)
-            ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
-            if len(ch1) == 0:
-                print('路径卡片详细行程显示不正常,请检查原因')
-                sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errRouteCard_R_tc097.png'
-                driver.get_screenshot_as_file(sf1)
+        if len(cmap) != 0:
+            ch0v=driver.find_element_by_accessibility_id('充电地图').get_attribute('visible')
+            if ch0v == 'true':
+                print('充电地图按钮找到')
                 sleep(2)
-            else:
-                print('路径卡片详细行程显示正常,检查通过')
-                sleep(1)
-                #下拉
-                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':600,'duration':1.0})
-                sleep(3)
-                #过滤
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":376, "y":174})
-                #driver.find_element_by_accessibility_id('peMapFilterSelect').click()
-                sleep(2)
-                """
-                driver.find_element_by_accessibility_id('换电站').click()
-                sleep(1)
-                driver.find_element_by_accessibility_id('交流慢充').click()
-                sleep(1)
-                """
-                driver.find_element_by_accessibility_id('完成').click()
-                sleep(6)
-                print('过滤充电类型完成')
-                sleep(2)
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
+                driver.find_element_by_accessibility_id('充电地图').click()
+                sleep(5)
                 #搜索
-                driver.find_element_by_accessibility_id('搜索').click()
-                sleep(1)
-                pi=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[1]/XCUIElementTypeTextField')
+                ###driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "搜索"').click()
+                ###driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeOther').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":190, "y":56})
+                sleep(2)
+                pi=driver.find_element_by_class_name('XCUIElementTypeTextField')
                 pi.click()
-                pi.send_keys('安阳服务区')
+                sleep(0.5)
+                pi.send_keys('北京')
                 sleep(0.5)
                 driver.find_element_by_accessibility_id('Toolbar Done Button').click()
                 sleep(1)
-                driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+                #driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+                driver.find_element_by_accessibility_id('北京南站').click()
                 sleep(2)
-                p=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="4"]')[1]
-                sleep(2)
-                #zoom
-                driver.execute_script('mobile:pinch',{'scale':1.9,'velocity':1.3,'element':p})
-                sleep(3)
-                #换电站
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":273, "y":450})
-                sleep(3)
-                #上拉
+                driver.find_element_by_accessibility_id('PERoutPlan').click()
+                sleep(8)
+                #上拉卡片
                 driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-                sleep(3)
-                ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"安阳服务区")]')
-                if len(ch3) == 0:
-                    print('换电站详情页面显示不正常,请检查原因')
+                sleep(2)
+                ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务区充电站")]')
+                if len(ch1) == 0:
+                    print('路径卡片详细行程显示不正常,请检查原因')
                     sleep(1)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf3='../../test_report/ios/'+now+'_errCallService_R_tc097.png'
-                    driver.get_screenshot_as_file(sf3)
+                    sf1='../../test_report/ios/'+now+'_errRouteCard_R_tc097.png'
+                    driver.get_screenshot_as_file(sf1)
                     sleep(2)
                 else:
-                    print('换电站详情页面显示正常,检查通过')
-                sleep(2)
-                #立即联系
-                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"立即联系")]').click()
-                sleep(2)
-                ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"021-67099903")]')
-                if len(ch2) == 0:
-                    print('联系电话显示不正常,请检查原因')
+                    print('路径卡片详细行程显示正常,检查通过')
                     sleep(1)
+                    #下拉
+                    driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':600,'duration':1.0})
+                    sleep(3)
+                    #过滤
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":376, "y":174})
+                    #driver.find_element_by_accessibility_id('peMapFilterSelect').click()
+                    sleep(2)
+                    """
+                    driver.find_element_by_accessibility_id('换电站').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('交流慢充').click()
+                    sleep(1)
+                    """
+                    driver.find_element_by_accessibility_id('完成').click()
+                    sleep(6)
+                    print('过滤充电类型完成')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(2)
+                    #搜索
+                    ###driver.find_element_by_accessibility_id('搜索').click()
+                    sleep(1)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":190, "y":56})
+                    sleep(2)
+                    pi=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                    pi.click()
+                    sleep(0.5)
+                    pi.send_keys('安阳服务区')
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                    sleep(1)
+                    driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+                    sleep(2)
+                    p=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="4"]')[0]
+                    sleep(2)
+                    #zoom
+                    driver.execute_script('mobile:pinch',{'scale':1.7,'velocity':1.3,'element':p})
+                    sleep(3)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf2='../../test_report/ios/'+now+'_errCallService_R_tc097.png'
-                    driver.get_screenshot_as_file(sf2)
+                    sf0='../../test_report/ios/'+now+'_ServiceStationZoom_R_tc097.png'
+                    driver.get_screenshot_as_file(sf0)
                     sleep(2)
-                else:
-                    print('联系电话显示正常,检查通过')
-                    sleep(1)
-                driver.find_element_by_accessibility_id('取消').click()
-                sleep(2)
-                #导航
-                driver.find_element_by_accessibility_id('locationNav').click()
-                sleep(2)
-                ch4=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"苹果地图")]')
-                if len(ch4) == 0:
-                    print('导航地图弹出页面显示不正常,请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf4='../../test_report/ios/'+now+'_errPilotMenu_R_tc097.png'
-                    driver.get_screenshot_as_file(sf4)
+                    #换电站"x":264, "y":300
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":296, "y":396})
+                    sleep(4)
+                    #上拉
+                    driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+                    sleep(3)
+                    ch3=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"安阳服务区")]')
+                    if len(ch3) == 0:
+                        print('换电站详情页面显示不正常,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf3='../../test_report/ios/'+now+'_errCallService_R_tc097.png'
+                        driver.get_screenshot_as_file(sf3)
+                        sleep(2)
+                    else:
+                        print('换电站详情页面显示正常,检查通过')
                     sleep(2)
-                else:
-                    print('导航地图弹出页面显示正常,检查通过')
-                    sleep(1)
+                    #立即联系
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"联系专员")]').click()
+                    sleep(2)
+                    ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"021-67099903")]')
+                    if len(ch2) == 0:
+                        print('联系电话显示不正常,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errCallService_R_tc097.png'
+                        driver.get_screenshot_as_file(sf2)
+                        sleep(2)
+                    else:
+                        print('联系电话显示正常,检查通过')
+                        sleep(1)
                     driver.find_element_by_accessibility_id('取消').click()
                     sleep(2)
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
-                driver.find_element_by_accessibility_id('routPlanBack').click()
-                sleep(2)
-        else:
-            print('充电地图按钮未找到/不存在，请检查原因')
-            sleep(2)
+                    #导航
+                    driver.find_element_by_accessibility_id('locationNav').click()
+                    sleep(2)
+                    ch4=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"苹果地图")]')
+                    if len(ch4) == 0:
+                        print('导航地图弹出页面显示不正常,请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf4='../../test_report/ios/'+now+'_errPilotMenu_R_tc097.png'
+                        driver.get_screenshot_as_file(sf4)
+                        sleep(2)
+                    else:
+                        print('导航地图弹出页面显示正常,检查通过')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('取消').click()
+                        sleep(2)
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('routPlanBack').click()
+                    sleep(1)
+            else:
+                print('充电地图按钮未找到/不存在，请检查原因')
+                sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_充电地图路径规划页面功能检查----结束:'+now)
 
@@ -10486,7 +10534,7 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_点击收藏按钮删除收藏的功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_takenote_tc101
 #Purpose:检查发现页面的写笔记功能
 #OS:iOS
@@ -10494,7 +10542,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/01]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_takenote_tc101(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_写笔记功能----step1检查发现首页右上角+号是否存在')
@@ -10522,6 +10570,8 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('从手机相册选择').click()
                 sleep(3)
                 driver.find_element_by_xpath('//XCUIElementTypeCell[@name="最近添加"]').click()
+                sleep(2)
+                driver.execute_script("mobile: scroll", {"direction": "up"})
                 sleep(2)
                 driver.find_elements_by_xpath('//XCUIElementTypeCell[contains(@name,"照片, 竖排")]')[0].click()
                 sleep(2)
@@ -10567,7 +10617,7 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('完成(9/9)').click()
                 sleep(3)
                 driver.find_element_by_accessibility_id('发布').click()
-                sleep(2)
+                sleep(3)
                 driver.find_element_by_accessibility_id('确定').click()
                 sleep(2.5)
                 #check toast
@@ -10645,7 +10695,7 @@ class Weilai_test(unittest.TestCase):
             now=time.strftime('%Y%m%d_%H%M%S')
             print('TC_发现_写笔记功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_takenotesave_tc102
 #Purpose:检查发现页面的写笔记中返回保留再发布功能
 #OS:iOS
@@ -10653,7 +10703,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/02]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_takenotesave_tc102(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_写笔记中返回保留再发布功能----step1检查发现首页右上角+号是否存在')
@@ -10681,6 +10731,8 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('从手机相册选择').click()
                 sleep(3)
                 driver.find_element_by_xpath('//XCUIElementTypeCell[@name="最近添加"]').click()
+                sleep(2)
+                driver.execute_script("mobile: scroll", {"direction": "up"})
                 sleep(2)
                 driver.find_elements_by_xpath('//XCUIElementTypeCell[contains(@name,"照片, 竖排")]')[0].click()
                 sleep(2)
@@ -10770,7 +10822,7 @@ class Weilai_test(unittest.TestCase):
             now=time.strftime('%Y%m%d_%H%M%S')
             print('TC_发现_写笔记中返回保留再发布功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_tryes6share_tc103
 #Purpose:检查发现页面的邀请试驾es6分享功能
 #OS:iOS
@@ -10778,7 +10830,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/02]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_tryes6share_tc103(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_写笔记中返回保留再发布功能----step1检查发现首页右上角+号是否存在')
@@ -10801,7 +10853,7 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('邀请试驾').click()
                 sleep(3)
                 #es6
-                sh=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeOther[1]/XCUIElementTypeImage')
+                sh=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeOther[1]')
                 sh.click()
                 sleep(2)
                 #微信
@@ -10810,7 +10862,7 @@ class Weilai_test(unittest.TestCase):
                     print('分享到微信按钮存在，检查通过')
                     sleep(2)
                     driver.find_element_by_accessibility_id('微信').click()
-                    sleep(6)
+                    sleep(8)
                     driver.find_element_by_accessibility_id('王小龙').click()
                     sleep(3)
                     words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
@@ -10820,7 +10872,7 @@ class Weilai_test(unittest.TestCase):
                         sleep(1)
                         now0=time.strftime('%Y%m%d_%H%M%S')
                         driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('邀请试驾es6分享微信好友:'+now0)
-                        sleep(1)
+                    sleep(1)
                     #发送
                     driver.find_element_by_accessibility_id('发送').click()
                     sleep(2)
@@ -10830,12 +10882,12 @@ class Weilai_test(unittest.TestCase):
                     save1=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save1) != 0:
                         print('分享微信好友成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享微信好友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorsharewechat_R_stg_tc103.png'
+                        sf1='../../test_report/ios/'+now+'_errsharewechat_R_stg_tc103.png'
                         driver.get_screenshot_as_file(sf1)
                     sleep(2)
                 else:
@@ -10851,9 +10903,9 @@ class Weilai_test(unittest.TestCase):
                     sleep(1)
                     driver.find_element_by_accessibility_id('朋友圈').click()
                     sleep(8)
-                    word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                    word2=driver.find_element_by_class_name('XCUIElementTypeTextView')
                     word2.click()
-                    sleep(1)
+                    sleep(0.5)
                     now2=time.strftime('%Y%m%d_%H%M%S')
                     word2.send_keys('邀请试驾es6分享朋友圈:'+now2)
                     sleep(1)
@@ -10875,12 +10927,12 @@ class Weilai_test(unittest.TestCase):
                     save2=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save2) != 0:
                         print('分享朋友圈成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享朋友圈失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorsharewechatpyq_R_stg_tc103.png'
+                        sf2='../../test_report/ios/'+now+'_errsharewechatpyq_R_stg_tc103.png'
                         driver.get_screenshot_as_file(sf2)
                     sleep(1)
                 else:
@@ -10895,7 +10947,7 @@ class Weilai_test(unittest.TestCase):
                     print('分享到微博按钮存在，检查通过')
                     sleep(2)
                     driver.find_element_by_accessibility_id('微博').click()
-                    sleep(6)
+                    sleep(7)
                     ad=driver.find_elements_by_accessibility_id('确定')
                     if len(ad) != 0:
                         driver.find_element_by_accessibility_id('确定').click()
@@ -10913,12 +10965,12 @@ class Weilai_test(unittest.TestCase):
                     save3=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save3) != 0:
                         print('分享微博成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享微博失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorsharewebo_R_stg_tc103.png'
+                        sf3='../../test_report/ios/'+now+'_errsharewebo_R_stg_tc103.png'
                         driver.get_screenshot_as_file(sf3)
                     sleep(1)
                 else:
@@ -10942,34 +10994,34 @@ class Weilai_test(unittest.TestCase):
                     save4=driver.find_elements_by_accessibility_id('分享成功')
                     if len(save4) != 0:
                         print('分享我的朋友成功')
-                        sleep(1)
+                        sleep(0.5)
                     else:
                         print('分享我的朋友失败，请检查原因')
-                        sleep(1)
+                        sleep(0.5)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorsharemyfriend_R_stg_tc103.png'
+                        sf4='../../test_report/ios/'+now+'_errsharemyfriend_R_stg_tc103.png'
                         driver.get_screenshot_as_file(sf4)
-                    sleep(2)
+                    sleep(1)
                 else:
                     print('分享到我的朋友按钮不存在，请检查原因')
-                    sleep(2)
+                    sleep(1)
                 driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-                sleep(2)
+                sleep(1)
             else:
                 print('邀请试驾按钮不存在，请检查原因')
-                sleep(2)
+                sleep(1)
             now=time.strftime('%Y%m%d_%H%M%S')
             print('TC_发现_邀请试驾es6分享功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_tryes8share_tc104
-#Purpose:检查发现页面的邀请试驾es6分享功能
+#Purpose:检查发现页面的邀请试驾es8分享功能
 #OS:iOS
 #Device:iPhone7 Plus
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/02]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_tryes8share_tc104(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:发现_写笔记中返回保留再发布功能----step1检查发现首页右上角+号是否存在')
@@ -10994,7 +11046,7 @@ class Weilai_test(unittest.TestCase):
                 driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
                 sleep(2)
                 #es8
-                sh=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]/XCUIElementTypeOther[2]/XCUIElementTypeImage')
+                sh=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]/XCUIElementTypeOther[2]')
                 sh.click()
                 sleep(2)
                 #微信
@@ -11028,7 +11080,7 @@ class Weilai_test(unittest.TestCase):
                         print('分享微信好友失败，请检查原因')
                         sleep(1)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf1='../../test_report/ios/'+now+'_errorsharewechat_R_stg_tc104.png'
+                        sf1='../../test_report/ios/'+now+'_errsharewechat_R_stg_tc104.png'
                         driver.get_screenshot_as_file(sf1)
                     sleep(2)
                 else:
@@ -11073,7 +11125,7 @@ class Weilai_test(unittest.TestCase):
                         print('分享朋友圈失败，请检查原因')
                         sleep(1)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf2='../../test_report/ios/'+now+'_errorsharewechatpyq_R_stg_tc104.png'
+                        sf2='../../test_report/ios/'+now+'_errsharewechatpyq_R_stg_tc104.png'
                         driver.get_screenshot_as_file(sf2)
                     sleep(1)
                 else:
@@ -11110,7 +11162,7 @@ class Weilai_test(unittest.TestCase):
                         print('分享微博失败，请检查原因')
                         sleep(1)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf3='../../test_report/ios/'+now+'_errorsharewebo_R_stg_tc104.png'
+                        sf3='../../test_report/ios/'+now+'_errsharewebo_R_stg_tc104.png'
                         driver.get_screenshot_as_file(sf3)
                     sleep(1)
                 else:
@@ -11139,7 +11191,7 @@ class Weilai_test(unittest.TestCase):
                         print('分享我的朋友失败，请检查原因')
                         sleep(1)
                         now=time.strftime('%Y%m%d_%H%M%S')
-                        sf4='../../test_report/ios/'+now+'_errorsharemyfriend_R_stg_tc104.png'
+                        sf4='../../test_report/ios/'+now+'_errsharemyfriend_R_stg_tc104.png'
                         driver.get_screenshot_as_file(sf4)
                     sleep(2)
                 else:
@@ -11153,67 +11205,65 @@ class Weilai_test(unittest.TestCase):
             now=time.strftime('%Y%m%d_%H%M%S')
             print('TC_发现_邀请试驾es8分享功能----结束:'+now)
 
-#*******************************************************
-#TC Name:test_faxian_tryes6noncarowner_tc105
-#Purpose:检查发现页面的非车主申请试驾es6功能
+#**********************************************************************************************************************
+#TC Name:test_wode_invitees6noncarowner_tc105
+#Purpose:检查我的页面的非车主邀请试驾es6功能
 #OS:iOS
 #Device:iPhone7 Plus
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
-#Modify History:created by Sam [2019/02/02]
-#*******************************************************
-    def test_faxian_tryes6noncarowner_tc105(self):
+#Modify History:created by Sam [2019/03/08]
+#***********************************************************************************************************************
+    def test_wode_invitees6noncarowner_tc105(self):
         driver=self.driver
-        print('TC_检查非车主手机号码登录APP，检查点:发现_写笔记中返回保留再发布功能----')
-        print('step1检查发现首页右上角+号是否存在')
-        print('step2检查邀请试驾按钮是否存在；step3点击邀请试驾；step4点击es6立即邀请')
-        print('step5检查提示框是否出现')
+        print('TC_检查非车主手机号码登录APP，检查点:我的_非车主邀请试驾es6功能----')
+        print('step1点击我的->邀请好友试驾')
+        print('step2检查es6立即邀请按钮是否存在；step3点击立即邀请')
+        print('step4检查提示框是否出现')
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_发现_非车主申请试驾es6功能----开始:'+now)
+        print('TC_我的_非车主邀请试驾es6功能----开始:'+now)
         sleep(1)
         bp_is_loggedin(self)
         sleep(1)
         bp_normalloginmp_notenoughscore(self)
         sleep(1)
-        #发现
-        driver.find_element_by_accessibility_id('发现').click()
+        #我的
+        driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
-        c1=bp_is_plusexist(self)
-        if c1 == True:
-            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="addPopMenu"]').click()
+        driver.find_element_by_accessibility_id('邀请好友试驾').click()
+        sleep(4)
+        #es6立即邀请
+        ches6=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]')
+        ches6v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]').get_attribute('visible')
+        sleep(1.5)
+        if len(ches6) != 0 and ches6v == 'true':
+            print('es6立即邀请找到')
             sleep(2)
-            #邀请试驾
-            c2=driver.find_elements_by_accessibility_id('申请试驾')
-            if len(c2) != 0:
-                driver.find_element_by_accessibility_id('申请试驾').click()
-                sleep(3)
-                #es6
-                sh=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeOther[1]/XCUIElementTypeImage')
-                sh.click()
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]').click()
+            sleep(2)
+            #alert
+            wh=driver.find_elements_by_accessibility_id('知道了')
+            if len(wh) != 0:
+                print('提示出现，检查通过')
                 sleep(2)
-                #alert
-                wh=driver.find_elements_by_accessibility_id('知道了')
-                if len(wh) != 0:
-                    print('提示出现，检查通过')
-                    sleep(2)
-                    driver.find_element_by_accessibility_id('知道了').click()
-                    sleep(2)
-                else:
-                    print('提示未出现，请检查原因')
-                    sleep(2)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf4='../../test_report/ios/'+now+'_errNoAlert_R_stg_tc105.png'
-                    driver.get_screenshot_as_file(sf4)
-                    sleep(2)
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                driver.find_element_by_accessibility_id('知道了').click()
                 sleep(2)
             else:
-                print('申请试驾按钮不存在，请检查原因')
+                print('提示未出现，请检查原因')
                 sleep(2)
-            now=time.strftime('%Y%m%d_%H%M%S')
-            print('TC_发现_非车主申请试驾es6功能----结束:'+now)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf4='../../test_report/ios/'+now+'_errNoAlert_R_stg_tc105.png'
+                driver.get_screenshot_as_file(sf4)
+                sleep(2)
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+            sleep(2)
+        else:
+            print('es6立即邀请按钮不存在/未找到，请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_非车主邀请试驾es6功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_faxian_tryes8noncarowner_tc106
 #Purpose:检查发现页面的非车主申请试驾es8功能
 #OS:iOS
@@ -11221,13 +11271,14 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/02]
-#*******************************************************
+#***********************************************************************************************************************
     def test_faxian_tryes8noncarowner_tc106(self):
         driver=self.driver
-        print('TC_检查非车主手机号码登录APP，检查点:发现_写笔记中返回保留再发布功能----')
+        print('TC_检查非车主手机号码登录APP，检查点:发现_非车主申请试驾es8功能')
         print('step1检查发现首页右上角+号是否存在')
-        print('step2检查邀请试驾按钮是否存在；step3点击邀请试驾；step4点击es8立即邀请')
-        print('step5检查提示框是否出现')
+        print('step2检查申请试驾按钮是否存在；step3点击申请试驾')
+        print('step4填写各种信息后点预约; step5检查预约信息是否出现')
+        print('step6返回后点发现页面右上角+号,再点击申请试驾,检查是否预约成功')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_非车主申请试驾es8功能----开始:'+now)
         sleep(1)
@@ -11313,7 +11364,7 @@ class Weilai_test(unittest.TestCase):
             now=time.strftime('%Y%m%d_%H%M%S')
             print('TC_发现_非车主申请试驾es8功能----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_giftorderdetail_tc107
 #Purpose:检查我的精品订单页面点击精品订单后弹出页面的各项功能
 #OS:iOS
@@ -11321,7 +11372,7 @@ class Weilai_test(unittest.TestCase):
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/15]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_giftorderdetail_tc107(self):
         driver=self.driver
         print('TC_检查用户模式打开APP，检查点:我的_精品订单详情页面元素检查和蔚来专员页面功能检查----')
@@ -11334,14 +11385,19 @@ class Weilai_test(unittest.TestCase):
         #我的
         driver.find_element_by_accessibility_id('我的').click()
         sleep(3)
-        #我的精品订单
-        driver.find_element_by_accessibility_id('我的精品订单').click()
+        #我的订单
+        driver.find_element_by_accessibility_id('我的订单').click()
         sleep(3)
-        driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"cake")]')[0].click()
+        driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "商品订单"').click()
+        sleep(3)
+        for i in range(1):
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+        sleep(2)
+        driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "cake"')[0].click()
         sleep(3)
         #检查精品订单详情页面的各个元素是否存在
         c1=fun_mygiftorderdetailui_check(self)
-        sleep(2)
+        sleep(1)
         if c1 == True:
             print('精品订单详情页面上各个被检查元素都检查完毕')
             sleep(1)
@@ -11361,14 +11417,14 @@ class Weilai_test(unittest.TestCase):
             ch=driver.find_elements_by_accessibility_id('在线咨询'+now0)
             if len(ch) != 0:
                 print('聊天文本存在，检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('聊天文本不存在，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf2='../../test_report/ios/'+now+'_errNoChatText_R_stg_tc107.png'
                 driver.get_screenshot_as_file(sf2)
-                sleep(2)
+            sleep(2)
             #发送表情
             edit.click()
             sleep(0.5)
@@ -11383,40 +11439,42 @@ class Weilai_test(unittest.TestCase):
             print('聊天发送表情完毕')
             sleep(1)
             #call
-            driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="蔚来专员"]/XCUIElementTypeButton[2]').click()
+            driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="在线小助手"]/XCUIElementTypeButton[2]').click()
             sleep(1)
             tt=driver.find_elements_by_accessibility_id('呼叫')
             if len(tt) != 0:
                 print('蔚来专员电话呼叫正常')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('蔚来专员电话呼叫不正常，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf1='../../test_report/ios/'+now+'_errCallSupport_R_stg_tc107.png'
                 driver.get_screenshot_as_file(sf1)
             sleep(2)
             driver.find_element_by_accessibility_id('取消').click()
-            sleep(2)
+            sleep(1)
             #返回
             driver.find_element_by_accessibility_id('chat back icon').click()
-            sleep(2)
+            sleep(1)
             #<
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":37, "y":42})
-            sleep(2)
+            sleep(1)
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":37, "y":42})
+            sleep(1)
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":37, "y":42})
-        sleep(2)
+        sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的_精品订单详情页面元素检查和蔚来专员页面功能检查----结束:'+now)
 
-#*******************************************************
+#***********************************************************************************************************************
 #TC Name:test_wode_onlinesupport_tc108
 #Purpose:我的页面在线支持功能检查
 #OS:iOS
 #Device:iPhone7 Plus
 #Post-conditions:N/A
 #Modify History:created by Sam [2019/02/14]
-#*******************************************************
+#***********************************************************************************************************************
     def test_wode_onlinesupport_tc108(self):
         driver=self.driver
         print('TC_检查手机号码登录APP，检查点:已登录账号发现——我的页面在线支持功能检查---')
@@ -11451,14 +11509,14 @@ class Weilai_test(unittest.TestCase):
         ch=driver.find_elements_by_accessibility_id('在线咨询'+now0)
         if len(ch) != 0:
             print('聊天文本存在，检查通过')
-            sleep(1)
+            sleep(0.5)
         else:
             print('聊天文本不存在，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
             sf2='../../test_report/ios/'+now+'_errNoChatText_R_stg_tc108.png'
             driver.get_screenshot_as_file(sf2)
-            sleep(2)
+        sleep(1)
         #发送表情
         edit.click()
         sleep(0.5)
@@ -11473,15 +11531,15 @@ class Weilai_test(unittest.TestCase):
         print('聊天发送表情完毕')
         sleep(1)
         #call
-        driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="蔚来专员"]/XCUIElementTypeButton[2]').click()
+        driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="在线小助手"]/XCUIElementTypeButton[2]').click()
         sleep(1)
         tt=driver.find_elements_by_accessibility_id('呼叫')
         if len(tt) != 0:
             print('蔚来专员电话呼叫正常')
-            sleep(1)
+            sleep(0.5)
         else:
             print('蔚来专员电话呼叫不正常，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
             sf1='../../test_report/ios/'+now+'_errCallSupport_R_stg_tc108.png'
             driver.get_screenshot_as_file(sf1)
@@ -11492,7 +11550,7 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('chat back icon').click()
         sleep(2)
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-        sleep(2)
+        sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_我的——在线支持页面功能检查----结束:'+now)
 
@@ -11516,7 +11574,7 @@ class Weilai_test(unittest.TestCase):
         #朋友
         driver.find_element_by_accessibility_id('朋友').click()
         sleep(6)
-        driver.find_element_by_xpath('//XCUIElementTypeNavigationBar[@name="朋友"]/XCUIElementTypeButton').click()
+        driver.find_element_by_accessibility_id('friends go friendlist').click()
         sleep(2)
         #点搜索栏
         edit=driver.find_element_by_class_name('XCUIElementTypeTextField')
@@ -11579,8 +11637,12 @@ class Weilai_test(unittest.TestCase):
         #发现
         driver.find_element_by_accessibility_id('发现').click()
         sleep(4)
+        for i in range(2):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':200,'duration':1.0})
+        sleep(2)
         #点赞
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]/XCUIElementTypeButton[1]').click()
         sleep(1)
         f1=bp_is_loginshow(self)
         if f1 == True:
@@ -11590,7 +11652,7 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
         sleep(4)
         #评论
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[3]').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]/XCUIElementTypeButton[3]').click()
         sleep(2)
         #评论栏
         driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我也来说~")]').click()
@@ -11611,7 +11673,7 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('发现').click()
         sleep(2)
         #1st article
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
         sleep(1)
         print('文章详细页面已正常显示')
         sleep(2)
@@ -11641,8 +11703,12 @@ class Weilai_test(unittest.TestCase):
         #发现
         driver.find_element_by_accessibility_id('发现').click()
         sleep(4)
+        for i in range(2):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':200,'duration':1.0})
+        sleep(2)
         #1st article
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
         sleep(2)
         #share
         #driver.find_element_by_accessibility_id('icon share gray background new').click()
@@ -11665,8 +11731,12 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         driver.find_element_by_accessibility_id('发现').click()
         sleep(2)
+        for i in range(2):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':200,'duration':1.0})
+        sleep(2)
         #1st article
-        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
         sleep(1)
         print('文章详细页面已正常显示')
         sleep(2)
@@ -11687,7 +11757,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:发现_点击体验页面的活动报名按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->体验页面')
         print('step4找到报名活动点击进入,点击报名按钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击体验页面的活动报名按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -11701,34 +11771,43 @@ class Weilai_test(unittest.TestCase):
         sleep(4)
         for i in range(2):
             driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
-            sleep(1)
         sleep(3)
         #小龙自动化3
-        driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
-        sleep(3)
-        #报名
-        joins=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="报名"]')
+        ch1=driver.find_elements_by_accessibility_id('小龙自动化3（请勿报名）')
         sleep(1)
-        if len(joins) != 0:
-            print('报名按钮存在,检查通过')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeLink[@name="报名"]').click()
-            sleep(1)
-            f1=bp_is_loginshow(self)
-            if f1 == True:
-                print('点击活动报名按钮弹出用户登陆页面检查正常')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').get_attribute('visible')
+            if ch1v == 'true':
+                driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
+                sleep(7)
+                #报名
+                joins=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="立即报名"]')
                 sleep(1)
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                if len(joins) != 0:
+                    print('报名按钮存在,检查通过')
+                    sleep(2)
+                    driver.find_element_by_xpath('//XCUIElementTypeLink[@name="立即报名"]').click()
+                    sleep(1)
+                    f1=bp_is_loginshow(self)
+                    if f1 == True:
+                        print('点击活动报名按钮弹出用户登陆页面检查正常')
+                        sleep(1)
+                        driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                        sleep(1)
+                        driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(2)
+                    """
+                    driver.find_element_by_accessibility_id('我的').click()
+                    sleep(2)
+                    bp_normalloginmp(self)
+                    sleep(1)
+                    """
+                else:
+                    print('报名按钮不存在,请检查原因')
+                    sleep(2)
+            else:
+                print('小龙自动化3未找到,请检查原因')
                 sleep(1)
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
-            sleep(2)
-            driver.find_element_by_accessibility_id('我的').click()
-            sleep(2)
-            bp_normalloginmp(self)
-            sleep(1)
-        else:
-            print('报名按钮不存在,请检查原因')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击体验页面的活动报名按钮的预期动作检查----结束:'+now)
 
@@ -11746,7 +11825,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:发现_点击体验页面的活动晒图按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->体验页面')
         print('step4找到晒图活动点击进入,点击晒图按钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击体验页面的活动晒图按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -11758,8 +11837,11 @@ class Weilai_test(unittest.TestCase):
         #体验
         driver.find_element_by_accessibility_id('体验').click()
         sleep(3)
-        driver.find_element_by_accessibility_id('NIO DAY 选座活动之最后一版').click()
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":207, "y":365})
         sleep(4)
+        ###暂无
+        #driver.find_element_by_accessibility_id('NIO DAY 选座活动之最后一版').click()
+        #sleep(4)
         #晒图
         show=driver.find_elements_by_xpath('//XCUIElementTypeLink[@name="晒图"]')
         sleep(1)
@@ -11776,10 +11858,12 @@ class Weilai_test(unittest.TestCase):
                 sleep(1)
                 driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
             sleep(2)
+            """
             driver.find_element_by_accessibility_id('我的').click()
             sleep(2)
             bp_normalloginmp(self)
             sleep(1)
+            """
         else:
             print('晒图按钮不存在,请检查原因')
             sleep(2)
@@ -11800,7 +11884,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面专题的点赞和评论按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->资讯页面')
         print('step4找到某专题:专题测试221点击进入,再点击某内容进入,再点赞按钮跳转页面是否弹出用户登陆页面')
-        print('step5点击评论按钮是否弹出用户登陆页面;step6用原来账号和验证码重新登录app')
+        print('step5点击评论按钮是否弹出用户登陆页面;#step6用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击专题的点赞和评论按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -11841,14 +11925,14 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         if len(ch) != 0:
             print('专题测试221存在/已找到')
-            sleep(1)
+            sleep(2)
             driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
             sleep(6)
             #1st content
             driver.find_element_by_xpath('//XCUIElementTypeOther[@name="专题测试221"]/XCUIElementTypeLink[1]').click()
             sleep(4)
             #点赞
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[48]').click()
+            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[58]').click()
             #382,703
             sleep(1)
             f1=bp_is_loginshow(self)
@@ -11856,11 +11940,11 @@ class Weilai_test(unittest.TestCase):
                 print('点击点赞按钮弹出用户登陆页面检查正常')
                 sleep(1)
                 driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-                sleep(1)
+                sleep(2)
             sleep(4)
             #评论
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[46]').click()
-            #341,703
+            ###driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[56]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":341, "y":703})
             sleep(1)
             f2=bp_is_loginshow(self)
             if f2 == True:
@@ -11877,10 +11961,12 @@ class Weilai_test(unittest.TestCase):
         sleep(2)
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":37, "y":42})
         sleep(1)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
-        sleep(2)
+        sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击专题的点赞和评论按钮的预期动作检查----结束:'+now)
 
@@ -11899,7 +11985,7 @@ class Weilai_test(unittest.TestCase):
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->资讯页面')
         print('step4找到某专题:专题测试221点击分享,再点击我的朋友,检查是否弹出用户登陆页面')
         print('step5点击某专题内容进入,再点击分享按钮,再点击我的朋友,检查是否弹出用户登陆页面')
-        print('step6用原来账号和验证码重新登录app')
+        print('#step6用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击专题和专题内容的分享我的朋友按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -11940,7 +12026,7 @@ class Weilai_test(unittest.TestCase):
             """
             #share
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":42})
-            sleep(2)
+            sleep(3)
             driver.find_element_by_accessibility_id('我的朋友').click()
             sleep(1)
             f1=bp_is_loginshow(self)
@@ -11951,10 +12037,10 @@ class Weilai_test(unittest.TestCase):
             sleep(2)
             #1st content专题内容
             driver.find_element_by_xpath('//XCUIElementTypeOther[@name="专题测试221"]/XCUIElementTypeLink[1]').click()
-            sleep(4)
+            sleep(6)
             #分享
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[2]').click()
-            #382,42
+            ###driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[2]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":42})
             sleep(2)
             driver.find_element_by_accessibility_id('我的朋友').click()
             sleep(1)
@@ -11974,10 +12060,12 @@ class Weilai_test(unittest.TestCase):
         else:
             print('专题:专题测试221不存在/未找到,请检查原因')
         sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
-        sleep(2)
+        sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击专题和专题内容的分享我的朋友按钮的预期动作检查----结束:'+now)
 
@@ -11995,7 +12083,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面UGC的点赞和评论按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->此刻页面')
         print('step4点击UGC进入,点击点赞按钮跳转页面检查是否弹出用户登陆页面;step5点击评论按钮,再点击评论输入栏检查是否弹出用户登陆页面')
-        print('step6用原来账号和验证码重新登录app')
+        print('#step6用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击UGC的点赞和评论按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12006,18 +12094,21 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         driver.find_element_by_accessibility_id('此刻').click()
         sleep(3)
-        u=driver.find_elements_by_class_name('XCUIElementTypeCell')
-        if len(u) != 0:
-            print('UGC存在，检查通过')
+        for i in range(0):
+            self.driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
+        sleep(3)
+        #SamSTG
+        ch1v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]').get_attribute('visible')
+        sleep(1)
+        if ch1v == 'true':
+            print('SamSTG的UGC文章存在，检查通过')
             sleep(2)
-            for i in range(1):
-                self.driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(2)
-            #SamSTG
             driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]').click()
-            sleep(3)
+            sleep(4)
             #点赞
-            driver.find_element_by_xpath('//XCUIElementTypeImage[@name="icon_dislike_new"]').click()
+            #driver.find_element_by_xpath('//XCUIElementTypeImage[@name="icon_dislike_new"]').click()
+            driver.find_element_by_accessibility_id('icon_dislike_new').click()
             sleep(1)
             f1=bp_is_loginshow(self)
             if f1 == True:
@@ -12027,11 +12118,13 @@ class Weilai_test(unittest.TestCase):
                 sleep(1)
             sleep(3)
             #评论
-            driver.find_element_by_xpath('//XCUIElementTypeImage[@name="icon_comment_new"]').click()
+            ###driver.find_element_by_xpath('//XCUIElementTypeImage[@name="icon_comment_new"]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":334, "y":712})
             sleep(3)
             #评论栏
-            driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeStaticText').click()
-            sleep(1)
+            ###driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeStaticText').click()
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我也来说～")]').click()
+            sleep(2)
             f2=bp_is_loginshow(self)
             if f2 == True:
                 print('点击评论输入栏弹出用户登陆页面检查正常')
@@ -12043,10 +12136,15 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('all page back grey icon').click()
                 #driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
             sleep(2)
+        else:
+            print('SamSTG的UGC文章未找到,请检查原因')
+            sleep(1)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击页面UGC的点赞和评论按钮的预期动作检查----结束:'+now)
 
@@ -12064,7 +12162,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面UGC的分享我的朋友按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->此刻页面')
         print('step4点击UGC进入,点击分享按钮,再点击我的朋友按钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击UGC的分享我的朋友按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12075,14 +12173,15 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         driver.find_element_by_accessibility_id('此刻').click()
         sleep(3)
-        u=driver.find_elements_by_class_name('XCUIElementTypeCell')
-        if len(u) != 0:
-            print('UGC存在，检查通过')
+        for i in range(0):
+            self.driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        #SamSTG
+        ch1v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]').get_attribute('visible')
+        sleep(1)
+        if ch1v == 'true':
+            print('SamSTG的UGC文章存在，检查通过')
             sleep(2)
-            for i in range(1):
-                self.driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(2)
-            #SamSTG
             driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]').click()
             sleep(3)
             #分享
@@ -12099,10 +12198,15 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('all page back grey icon').click()
                 #driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
             sleep(2)
+        else:
+            print('SamSTG的UGC文章未找到,请检查原因')
+            sleep(1)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击UGC的分享我的朋友按钮的预期动作检查----结束:'+now)
 
@@ -12120,7 +12224,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面UGC的举报按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->此刻页面')
         print('step4点击UGC进入,点击分享按钮,再点击举报钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击UGC的举报按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12131,14 +12235,15 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         driver.find_element_by_accessibility_id('此刻').click()
         sleep(3)
-        u=driver.find_elements_by_class_name('XCUIElementTypeCell')
-        if len(u) != 0:
-            print('UGC存在，检查通过')
+        for i in range(0):
+            self.driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        #SamSTG
+        ch1v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]').get_attribute('visible')
+        sleep(1)
+        if ch1v == 'true':
+            print('SamSTG的UGC文章存在，检查通过')
             sleep(2)
-            for i in range(1):
-                self.driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(2)
-            #SamSTG
             driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]').click()
             sleep(3)
             #分享
@@ -12155,10 +12260,15 @@ class Weilai_test(unittest.TestCase):
                 driver.find_element_by_accessibility_id('all page back grey icon').click()
                 #driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
             sleep(2)
+        else:
+            print('SamSTG的UGC文章未找到,请检查原因')
+            sleep(1)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击UGC的举报按钮的预期动作检查----结束:'+now)
 
@@ -12176,7 +12286,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面投票的点赞和评论按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->资讯页面')
         print('step4搜索找到小龙投票stg,点击进入投票页面,点击点赞按钮跳转页面检查是否弹出用户登陆页面')
-        print('step5点击评论按钮检查是否弹出用户登陆页面;step6用原来账号和验证码重新登录app')
+        print('step5点击评论按钮检查是否弹出用户登陆页面;#step6用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击投票页面的点赞和评论按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12231,10 +12341,12 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":37, "y":42})
             sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击投票页面的点赞和评论按钮的预期动作检查----结束:'+now)
 
@@ -12252,7 +12364,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面投票的分享我的朋友按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->资讯页面')
         print('step4搜索找到小龙投票stg,点击进入投票页面,再点击分享按钮->我的朋友按钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击投票的分享我的朋友按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12283,8 +12395,8 @@ class Weilai_test(unittest.TestCase):
             driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
             sleep(7)
             #分享
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[2]').click()
-            #(382,42)
+            ###driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[2]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":42})
             sleep(2)
             driver.find_element_by_accessibility_id('我的朋友').click()
             sleep(1)
@@ -12300,10 +12412,12 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('evaluate close').click()
         #37,42
         sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击投票的分享我的朋友按钮的预期动作检查----结束:'+now)
 
@@ -12321,7 +12435,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面直播的评论按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->资讯页面')
         print('step4搜索找到stg倒计时直播,点击进入直播页面')
-        print('step5点击评论输入栏检查是否弹出用户登陆页面;step6用原来账号和验证码重新登录app')
+        print('step5点击评论输入栏检查是否弹出用户登陆页面;#step6用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击直播的评论按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12366,10 +12480,12 @@ class Weilai_test(unittest.TestCase):
         #driver.execute_script("mobile: tap", {"touchCount":"1", "x":37, "y":42})
         driver.find_element_by_accessibility_id('evaluate close').click()
         sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击直播的评论按钮的预期动作检查----结束:'+now)
 
@@ -12387,7 +12503,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面直播的分享我的朋友按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现->资讯页面')
         print('step4搜索找到stg倒计时直播,点击进入直播页面,再点击分享按钮->我的朋友按钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击直播的分享我的朋友按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12437,10 +12553,12 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('evaluate close').click()
         #37,42
         sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击直播的分享我的朋友按钮的预期动作检查----结束:'+now)
 
@@ -12458,7 +12576,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击发现页面此刻的用户头像和关注按钮按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
         print('step3点击发现->此刻页面;step4点击用户头像检查是否弹出用户登陆页面')
-        print('step5点击关注按钮检查是否弹出用户登陆页面;step6用原来账号和验证码重新登录app')
+        print('#step5点击关注按钮检查是否弹出用户登陆页面;step6用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击此刻的用户头像和关注按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12487,10 +12605,12 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
         sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_发现_访客模式点击此刻的用户头像和关注按钮的预期动作检查----结束:'+now)
 
@@ -12508,7 +12628,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击爱车页面详细配置表的分享NIO好友按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击爱车页面')
         print('step4翻页点击详细配置表进入详细配置表页面,再点击分享按钮->我的朋友按钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击详细配置表的分享朋友按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12519,41 +12639,42 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         for i in range(4):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
         sleep(3)
         ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="详细配置表"]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="详细配置表"]').get_attribute('visible')
-        sleep(1)
-        if len(ch) != 0 and ch0 == 'true':
-            print('详细配置表按钮找到')
-            sleep(2)
-            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[6]').click()
-            #driver.find_element_by_accessibility_id('详细配置表').click()
-            sleep(6)
-            #分享
-            #share
-            driver.find_element_by_accessibility_id('nav share btn').click()
-            sleep(2)
-            #朋友
-            driver.find_element_by_accessibility_id('朋友').click()
-            sleep(1)
-            f2=bp_is_loginshow(self)
-            if f2 == True:
-                print('点击分享朋友按钮弹出用户登陆页面检查正常')
-                sleep(1)
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
-                sleep(1)
-                driver.find_element_by_accessibility_id('nav back btn').click()
-                #38,42
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="详细配置表"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('详细配置表按钮找到')
                 sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[7]').click()
+                #driver.find_element_by_accessibility_id('详细配置表').click()
+                sleep(8)
+                #分享
+                #share
+                driver.find_element_by_accessibility_id('nav share btn').click()
+                sleep(2)
+                #朋友
+                driver.find_element_by_accessibility_id('朋友').click()
+                sleep(1)
+                f2=bp_is_loginshow(self)
+                if f2 == True:
+                    print('点击分享朋友按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('nav back btn').click()
+                    #38,42
+                    sleep(2)
         else:
             print('详细配置表按钮未找到,请检查原因')
             sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击详细配置表的分享朋友按钮的预期动作检查----结束:'+now)
 
@@ -12649,7 +12770,7 @@ class Weilai_test(unittest.TestCase):
         print('TC_访客模式，检查点:点击爱车页面城市服务查询的分享NIO好友按钮是否跳转到用户登录页面')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击爱车页面')
         print('step4翻页点击城市服务查询进入城市服务查询页面,再点击分享按钮->我的朋友按钮检查是否弹出用户登陆页面')
-        print('step5用原来账号和验证码重新登录app')
+        print('#step5用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击城市服务查询页面的分享NIO好友按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12691,10 +12812,12 @@ class Weilai_test(unittest.TestCase):
         else:
             print('城市服务查询按钮未找到,请检查原因')
             sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击城市服务查询页面的分享NIO好友按钮的预期动作检查----结束:'+now)
 
@@ -12713,7 +12836,7 @@ class Weilai_test(unittest.TestCase):
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击爱车页面')
         print('step4翻页点击城市服务查询进入充电地图页面,再点击充电历史按钮检查是否弹出用户登陆页面')
         print('step5点击上报充电桩按钮检查是否弹出用户登陆页面;step6点击扫码加电按钮检查是否弹出用户登陆页面')
-        print('step7用原来账号和验证码重新登录app')
+        print('#step7用原来账号和验证码重新登录app')
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击充电地图页面的充电历史/上报充电桩/扫码加电按钮的预期动作检查----开始:'+now)
         sleep(1)
@@ -12769,10 +12892,12 @@ class Weilai_test(unittest.TestCase):
         else:
             print('充电地图按钮未找到,请检查原因')
             sleep(2)
+        """
         driver.find_element_by_accessibility_id('我的').click()
         sleep(2)
         bp_normalloginmp(self)
         sleep(1)
+        """
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击充电地图页面的充电历史/上报充电桩/扫码加电按钮的预期动作检查----结束:'+now)
 
@@ -12841,63 +12966,93 @@ class Weilai_test(unittest.TestCase):
 
 #*********************************************************************************************************************************
 #TC Name:test_faxian_infolikecomment_tc129
-#Purpose:检查用户模式点击发现页面资讯tab纯文章的点赞和评论功能
+#Purpose:检查用户模式点击发现页面资讯tab纯文章列表页的点赞和评论功能
 #OS:iOS
 #Device:iPhone7 Plus
 #Pre-conditions:用户已正常登录app/未登录
 #Post-conditions:N/A
-#Modify History:created by Sam [2019/02/25]
+#Modify History:created by Sam [2019/04/08]
 #*********************************************************************************************************************************
     def test_faxian_infolikecomment_tc129(self):
         driver=self.driver
-        print('TC_用户模式，检查点:发现_资讯tab纯文章的点赞和评论功能')
+        print('TC_用户模式，检查点:发现_资讯tab纯文章列表页的点赞和评论功能')
         print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现页面')
-        print('step4点击任一文章的点赞按钮跳转页面是否弹出用户登陆页面;step5点击任一文章的评论按钮后再点击评论输入栏是否弹出用户登陆页面')
-        print('step6用原来账号和验证码重新登录app再点击文章进入文章详细页面')
+        print('step4点击某纯文章的点赞按钮;step5点击文章详细页面的评论按钮后再输入评论文字点发送')
+        print('step6检查评论的文字是否存在')
+        print('step7返回点击点赞按钮,检查点赞后的点赞数是否为原点赞数+1')
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_发现_资讯tab纯文章的点赞和评论功能----开始:'+now)
+        print('TC_发现_资讯tab纯文章列表页的点赞和评论功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
         sleep(1)
         #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
         driver.find_element_by_accessibility_id('资讯').click()
-        sleep(4)
+        sleep(3)
+        for i in range(0):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(3)
         #看完 「斌哥给道服同事内部信」 不吐不快
+        #PGC-投票
         #评论
-        driver.execute_script("mobile: tap", {"touchCount":"1", "x":385, "y":594})
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":370, "y":566})
         sleep(4)
-        edit=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="看完 「斌哥给道服同事内部信」 不吐不快"]/XCUIElementTypeOther[12]/XCUIElementTypeStaticText')
-        edit.click()
-        sleep(0.5)
+        #评论按钮
+        ###driver.find_element_by_xpath('//XCUIElementTypeOther[@name="PGC-投票"]/XCUIElementTypeOther[63]').click()
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":341, "y":703})
+        sleep(3)
+        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="我也来说～"]').click()
+        sleep(1)
+        edit=driver.find_element_by_class_name('XCUIElementTypeTextView')
+        #edit.click()
+        #sleep(0.5)
         now0=time.strftime('%H%M%S')
-        edit.send_keys('Python评论资讯:'+now0)
-        t0='Python评论资讯:'+now0
+        edit.send_keys('Python评论资讯纯文章:'+now0)
+        t0='Python评论资讯纯文章:'+now0
         sleep(1)
         driver.find_element_by_accessibility_id('Send').click()
         sleep(1)
-        driver.execute_script("mobile: scroll", {"direction": "down"})
-        sleep(1)
-        title=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,t0)]')
+        #driver.execute_script("mobile: scroll", {"direction": "down"})
+        #sleep(1)
+        title=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,t0)]')
         if len(title) != 0:
             print('评论的文字检查通过')
-            sleep(1)
+            sleep(0.5)
         else:
             print('评论的文字检查失败，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
             sf1='../../test_report/ios/'+now+'_errComment_R_stg_tc129.png'
             driver.get_screenshot_as_file(sf1)
         sleep(1)
+        driver.find_element_by_accessibility_id('all page back grey icon').click()
+        sleep(2)
+        zan0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="PGC-投票"]/XCUIElementTypeOther[64]/XCUIElementTypeStaticText').get_attribute('value')
         #点赞
-        #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="看完 「斌哥给道服同事内部信」 不吐不快"]/XCUIElementTypeOther[44]')
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":703})
         sleep(2)
-        zan=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="看完 「斌哥给道服同事内部信」 不吐不快"]/XCUIElementTypeOther[45]/XCUIElementTypeStaticText').get_attribute('value')
+        zan=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="PGC-投票"]/XCUIElementTypeOther[64]/XCUIElementTypeStaticText').get_attribute('value')
+        print('原点赞数:'+zan0)
+        print('现点赞数:'+zan)
         #print(zan)
-        if zan == '1':
+        if zan == str(int(zan0)+1):
             print('点赞数+1,检查成功')
-            sleep(1)
+            sleep(0.5)
         else:
             print('点赞数检查失败，请检查原因')
-            sleep(1)
+            sleep(0.5)
             now=time.strftime('%Y%m%d_%H%M%S')
             sf2='../../test_report/ios/'+now+'_errLike_R_stg_tc129.png'
             driver.get_screenshot_as_file(sf2)
@@ -12905,7 +13060,7 @@ class Weilai_test(unittest.TestCase):
         driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
         sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_发现_资讯tab纯文章的点赞和评论功能----结束:'+now)
+        print('TC_发现_资讯tab纯文章列表页的点赞和评论功能----结束:'+now)
 
 #*********************************************************************************************************************************
 #TC Name:test_faxian_infovotelikecomment_tc130
@@ -12938,7 +13093,7 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         #search
         driver.find_element_by_accessibility_id('Search').click()  
-        sleep(3)
+        sleep(2)
         #小龙投票stg
         ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
         sleep(1)
@@ -12947,14 +13102,15 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
             sleep(7)
-            zan0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[48]/XCUIElementTypeStaticText').get_attribute('value')
+            zan0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[56]/XCUIElementTypeStaticText').get_attribute('value')
             sleep(1)
             print('原点赞数:'+zan0)
             sleep(0.5)
             #点赞
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[47]').click()
+            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[55]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":378, "y":703})
             sleep(1)
-            zan1=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[48]/XCUIElementTypeStaticText').get_attribute('value')
+            zan1=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="小龙投票stg"]/XCUIElementTypeOther[56]/XCUIElementTypeStaticText').get_attribute('value')
             sleep(1)
             print('现在点赞数:'+zan1)
             sleep(0.5)
@@ -12972,7 +13128,8 @@ class Weilai_test(unittest.TestCase):
                 driver.get_screenshot_as_file(sf2)
             sleep(2)
             #评论
-            driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[45]').click()
+            #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[53]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":328, "y":703})
             sleep(2)
             edit=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeStaticText')
             edit.click()
@@ -13010,21 +13167,22 @@ class Weilai_test(unittest.TestCase):
 
 #*********************************************************************************************************************************
 #TC Name:test_faxian_infospeciallikecomment_tc131
-#Purpose:检查用户模式点击发现页面专题类型文章的点赞和评论按钮的预期动作
+#Purpose:检查用户模式点击发现页面专题类型文章详情页的点赞和评论按钮的预期动作
 #OS:iOS
 #Device:iPhone7 Plus
 #Pre-conditions:用户已正常登录app
 #Post-conditions:N/A
-#Modify History:created by Sam [2019/02/25]
+#Modify History:created by Sam [2019/04/04]
 #*********************************************************************************************************************************
     def test_faxian_infospeciallikecomment_tc131(self):
         driver=self.driver
-        print('TC_用户模式，检查点:点击发现页面资讯tab专题类型文章的点赞和评论功能')
+        print('TC_用户模式，检查点:点击发现页面资讯tab专题类型文章详情页的点赞和评论功能')
         print('step1点击发现->资讯页面')
-        print('step2搜索找到专题测试221,点击进入专题页面;step3点击第一篇文章进入详细页面,再点击点赞按钮检查点赞数')
+        print('step2搜索找到专题测试221,点击进入专题页面')
+        print('step3点击第一篇文章进入详细页面,再点击点赞按钮检查点赞数')
         print('step4点击评论按钮,再输入评论内容点发送,检查评论文本是否正常')
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_发现_资讯tab专题类型文章的点赞和评论功能----开始:'+now)
+        print('TC_发现_资讯tab专题类型文章详情页的点赞和评论功能----开始:'+now)
         sleep(1)
         #发现
         driver.find_element_by_accessibility_id('资讯').click()
@@ -13039,7 +13197,7 @@ class Weilai_test(unittest.TestCase):
         sleep(1)
         #search
         driver.find_element_by_accessibility_id('Search').click()  
-        sleep(3)
+        sleep(2)
         #专题测试221
         ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
         sleep(1)
@@ -13050,39 +13208,40 @@ class Weilai_test(unittest.TestCase):
             sleep(6)
             #1st article
             driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="2019新年礼物安排上了，请签收"]').click()
-            sleep(4)
-            zan0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[44]/XCUIElementTypeStaticText').get_attribute('value')
+            sleep(5)
+            zan0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[70]/XCUIElementTypeStaticText').get_attribute('value')
             sleep(1)
             print('原点赞数:'+zan0)
             sleep(1)
             #点赞
-            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[43]').click()
+            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[69]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":703})
             sleep(1)
-            zan1=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[44]/XCUIElementTypeStaticText').get_attribute('value')
+            zan1=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[70]/XCUIElementTypeStaticText').get_attribute('value')
             sleep(1)
             print('现在点赞数:'+zan1)
             sleep(0.5)
             if zan1 == str(int(zan0)+1):
                 print('点赞数+1,检查正常')
-                sleep(1)
+                sleep(0.5)
             elif zan1 == str(int(zan0)-1):
                 print('点赞数-1,您已经点赞过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('点赞数检查失败，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf2='../../test_report/ios/'+now+'_errLike_R_stg_tc131.png'
                 driver.get_screenshot_as_file(sf2)
-            sleep(2)
+            sleep(3)
             #评论
-            driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"])[1]/XCUIElementTypeOther[41]').click()
-            ###driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="我也来说～"]').click()
+            ###driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[61]').click()
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "我也来说～"').click()
             sleep(1)
-            edit=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeStaticText')
+            edit=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTextView')
             ###edit=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="我也来说～"]')
-            edit.click()
-            sleep(0.5)
+            #edit.click()
+            #sleep(0.5)
             now0=time.strftime('%H%M%S')
             edit.send_keys('Python评论专题:'+now0)
             t0='Python评论专题:'+now0
@@ -13094,16 +13253,14 @@ class Weilai_test(unittest.TestCase):
             title=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,t0)]')
             if len(title) != 0:
                 print('评论的文字检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('评论的文字检查失败，请检查原因')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf1='../../test_report/ios/'+now+'_errComment_R_stg_tc131.png'
                 driver.get_screenshot_as_file(sf1)
             sleep(2)
-            driver.find_element_by_accessibility_id('all page back grey icon').click()
-            sleep(1)
             #driver.find_element_by_xpath('(//XCUIElementTypeOther[@name="小龙投票stg"])[1]/XCUIElementTypeOther[1]').click()
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
             sleep(1)
@@ -13113,7 +13270,7 @@ class Weilai_test(unittest.TestCase):
         driver.find_element_by_accessibility_id('evaluate close').click()
         sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_发现_资讯tab专题类型文章的点赞和评论功能----结束:'+now)
+        print('TC_发现_资讯tab专题类型文章详情页的点赞和评论功能----结束:'+now)
 
 #*********************************************************************************************************************************
 #TC Name:test_faxian_infovideocomment_tc132
@@ -13224,12 +13381,11 @@ class Weilai_test(unittest.TestCase):
             code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
             code.click()
             sleep(0.5)
-            #code.send_keys(f[1])
             code.send_keys('867129')
             sleep(0.5)
             #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
             driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
-            sleep(5)
+            sleep(6)
             #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":250,"toX":50,"toY":550,"duration":1.0})
             #driver.execute_script("mobile: scroll", {"direction": "up"})
             #sleep(1)
@@ -13253,10 +13409,10 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             if len(ch1) != 0 and len(ch2) != 0 and len(ch3) != 0:
                 print('朋友标题/朋友列表按钮/+号按钮存在,检查通过')
-                sleep(1)
+                sleep(0.5)
             else:
                 print('朋友标题/朋友列表按钮/+号按钮不存在,检查失败')
-                sleep(1)
+                sleep(0.5)
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf1='../../test_report/ios/'+now+'_errPengyou_R_stg_tc133.png'
                 driver.get_screenshot_as_file(sf1)
@@ -13357,52 +13513,61 @@ class Weilai_test(unittest.TestCase):
             sleep(1)
             driver.find_element_by_accessibility_id('friends go friendlist').click()
             sleep(2)
-            driver.find_element_by_accessibility_id('Sam2863stg').click()
-            sleep(2)
-            #...
-            driver.find_element_by_accessibility_id('icon more white').click()
-            sleep(1)
-            ch1=driver.find_elements_by_accessibility_id('取消关注')
-            if len(ch1) != 0:
-                print('取消关注按钮存在,检查通过')
-                sleep(1)
-                driver.find_element_by_accessibility_id('取消关注').click()
-                sleep(1)
-                #check the message of toast
-                n1=driver.find_elements_by_accessibility_id('取消成功')
-                if len(n1) != 0:
-                    print('取消关注的功能检查通过')
-                    sleep(1)
-                else:
-                    print('取消关注的功能检查失败，请检查原因')
-                    sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf2='../../test_report/ios/'+now+'_errCancelfollow_R_stg_tc135.png'
-                    driver.get_screenshot_as_file(sf2)
+            py=driver.find_elements_by_accessibility_id('Sam2863stg')
+            if len(py) != 0:
+                driver.find_element_by_accessibility_id('Sam2863stg').click()
                 sleep(2)
+                #...
                 driver.find_element_by_accessibility_id('icon more white').click()
-                sleep(2)
-                #+关注
-                driver.find_element_by_accessibility_id('关注').click()
                 sleep(1)
-                #check the message of toast
-                n2=driver.find_elements_by_accessibility_id('关注成功')
-                if len(n2) != 0:
-                    print('+关注的功能检查通过')
+                ch1=driver.find_elements_by_accessibility_id('取消关注')
+                if len(ch1) != 0:
+                    print('取消关注按钮存在,检查通过')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('取消关注').click()
+                    sleep(1)
+                    #check the message of toast
+                    n1=driver.find_elements_by_accessibility_id('取消成功')
+                    if len(n1) != 0:
+                        print('取消关注的功能检查通过')
+                        sleep(0.5)
+                    else:
+                        print('取消关注的功能检查失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errCancelfollow_R_stg_tc135.png'
+                        driver.get_screenshot_as_file(sf2)
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('icon more white').click()
+                    sleep(2)
+                    #+关注
+                    driver.find_element_by_accessibility_id('关注').click()
+                    sleep(1)
+                    #check the message of toast
+                    n2=driver.find_elements_by_accessibility_id('关注成功')
+                    if len(n2) != 0:
+                        print('+关注的功能检查通过')
+                        sleep(0.5)
+                    else:
+                        print('+关注的功能检查失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf3='../../test_report/ios/'+now+'_errFollow_R_stg_tc135.png'
+                        driver.get_screenshot_as_file(sf3)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('full screen back icon').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
                     sleep(1)
                 else:
-                    print('+关注的功能检查失败，请检查原因')
+                    print('取消关注按钮不存在,检查失败')
                     sleep(1)
-                    now=time.strftime('%Y%m%d_%H%M%S')
-                    sf3='../../test_report/ios/'+now+'_errFollow_R_stg_tc135.png'
-                    driver.get_screenshot_as_file(sf3)
-                sleep(1)
-                driver.find_element_by_accessibility_id('full screen back icon').click()
-                sleep(1)
-                driver.find_element_by_accessibility_id('all page back grey icon').click()
-                sleep(1)
             else:
-                print('取消关注按钮不存在,检查失败')
+                print('要取消关注的朋友不存在/未找到,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf0='../../test_report/ios/'+now+'_errNosuchfriend_R_stg_tc135.png'
+                driver.get_screenshot_as_file(sf0)
                 sleep(1)
         else:
             print('朋友列表按钮不存在,检查失败')
@@ -13439,70 +13604,71 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         for i in range(4):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
         sleep(3)
-        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="购买服务"]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="购买服务"]').get_attribute('visible')
-        sleep(1.5)
-        if len(ch) != 0 and ch0 == 'true':
-            print('购买服务按钮找到')
-            sleep(2)
-            ###driver.find_element_by_accessibility_id('购买服务').click()
-            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
-            sleep(3)
-            driver.find_element_by_accessibility_id('能量无忧套餐').click()
-            sleep(3)
-            driver.find_element_by_accessibility_id('立即购买').click()
-            sleep(1)
-            f1=bp_is_loginshow(self)
-            if f1 == True:
-                print('点击立即购买按钮弹出用户登陆页面检查正常')
-                sleep(1)
-                #正常登陆
-                mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
-                mobile_no.click()
-                sleep(0.5)
-                mobile_no.send_keys('98762396871')
-                sleep(1)
-                code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
-                code.click()
-                sleep(0.5)
-                #code.send_keys(f[1])
-                code.send_keys('867129')
-                sleep(0.5)
-                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
-                sleep(5)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').get_attribute('visible')
+            if ch0v == 'true':
+                print('购买服务按钮找到')
+                sleep(2)
+                ###driver.find_element_by_accessibility_id('购买服务').click()
+                driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
+                sleep(6)
+                driver.find_element_by_accessibility_id('能量无忧套餐').click()
+                sleep(3)
                 driver.find_element_by_accessibility_id('立即购买').click()
                 sleep(1)
-                name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"年套餐")]')
-                if len(name) != 0:
-                    print('能量无忧套餐选择页面显示正常！')
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击立即购买按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    #正常登陆
+                    mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                    mobile_no.click()
                     sleep(0.5)
+                    mobile_no.send_keys('98762396871')
+                    sleep(1)
+                    code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                    code.click()
+                    sleep(0.5)
+                    code.send_keys('867129')
+                    sleep(0.5)
+                    #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                    sleep(6)
+                    driver.find_element_by_accessibility_id('立即购买').click()
+                    sleep(1)
+                    name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"年套餐")]')
+                    if len(name) != 0:
+                        print('能量无忧套餐选择页面显示正常')
+                        sleep(0.5)
+                    else:
+                        print('能量无忧套餐选择页面显示不正常,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf='../../test_report/ios/'+now+'_errEnergySuite_R_stg_tc136.png'
+                        driver.get_screenshot_as_file(sf)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('closeEva').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('circular back').click()
+                    sleep(1)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(1)
                 else:
-                    print('能量无忧套餐选择页面显示不正常,请检查原因！')
+                    print('点击立即购买按钮弹出用户登陆页面检查失败')
                     sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf='../../test_report/ios/'+now+'_errEnergySuite_R_stg_tc136.png'
-                    driver.get_screenshot_as_file(sf)
-                sleep(1)
-                driver.find_element_by_accessibility_id('closeEva').click()
-                sleep(1)
-                driver.find_element_by_accessibility_id('circular back').click()
-                sleep(1)
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sf1='../../test_report/ios/'+now+'_errBuyNow_R_stg_tc136.png'
+                    driver.get_screenshot_as_file(sf1)
                 sleep(1)
             else:
-                print('点击立即购买按钮弹出用户登陆页面检查失败')
+                print('购买服务按钮不可见,请检查原因')
                 sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errBuyNow_R_stg_tc136.png'
-                driver.get_screenshot_as_file(sf1)
-            sleep(2)
         else:
             print('购买服务按钮未找到,请检查原因')
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击车商城的能量无忧套餐的立即购买按钮验证----结束:'+now)
 
@@ -13531,71 +13697,71 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         for i in range(4):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
         sleep(3)
-        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="购买服务"]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="购买服务"]').get_attribute('visible')
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"购买服务")]')
         sleep(1.5)
-        if len(ch) != 0 and ch0 == 'true':
-            print('购买服务按钮找到')
-            sleep(2)
-            ###driver.find_element_by_accessibility_id('购买服务').click()
-            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('服务无忧套餐').click()
-            sleep(2)
-            #提交申请
-            driver.find_element_by_accessibility_id('提交申请').click()
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').get_attribute('visible')
             sleep(1)
-            f1=bp_is_loginshow(self)
-            if f1 == True:
-                print('点击提交申请按钮弹出用户登陆页面检查正常')
-                sleep(1)
-                #正常登陆
-                mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
-                mobile_no.click()
-                sleep(0.5)
-                mobile_no.send_keys('98762396871')
-                sleep(1)
-                code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
-                code.click()
-                sleep(0.5)
-                #code.send_keys(f[1])
-                code.send_keys('867129')
-                sleep(0.5)
-                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
-                sleep(5)
+            if ch0v == 'true':
+                print('购买服务按钮找到')
+                sleep(2)
+                #购买服务
+                driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('服务无忧套餐').click()
+                sleep(3)
+                #提交申请
                 driver.find_element_by_accessibility_id('提交申请').click()
                 sleep(1)
-                name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"年套餐")]')
-                if len(name) != 0:
-                    print('服务无忧套餐选择页面显示正常！')
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击提交申请按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    #正常登陆
+                    mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                    mobile_no.click()
                     sleep(0.5)
+                    mobile_no.send_keys('98762396871')
+                    sleep(1)
+                    code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                    code.click()
+                    sleep(0.5)
+                    code.send_keys('867129')
+                    sleep(0.5)
+                    #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                    sleep(6)
+                    driver.find_element_by_accessibility_id('提交申请').click()
+                    sleep(1)
+                    name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"年套餐")]')
+                    if len(name) != 0:
+                        print('服务无忧套餐选择页面显示正常')
+                        sleep(0.5)
+                    else:
+                        print('服务无忧套餐选择页面显示不正常,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf='../../test_report/ios/'+now+'_errServiceSuite_R_stg_tc137.png'
+                        driver.get_screenshot_as_file(sf)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('closeEva').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('circular back').click()
+                    sleep(1)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(1)
                 else:
-                    print('服务无忧套餐选择页面显示不正常,请检查原因！')
-                    sleep(0.5)
+                    print('点击提交申请按钮弹出用户登陆页面检查失败')
+                    sleep(1)
                     now=time.strftime('%Y%m%d_%H%M%S')
-                    sf='../../test_report/ios/'+now+'_errServiceSuite_R_stg_tc137.png'
-                    driver.get_screenshot_as_file(sf)
-                sleep(1)
-                driver.find_element_by_accessibility_id('closeEva').click()
-                sleep(1)
-                driver.find_element_by_accessibility_id('circular back').click()
-                sleep(1)
-                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sf1='../../test_report/ios/'+now+'_errBuyNow_R_stg_tc137.png'
+                    driver.get_screenshot_as_file(sf1)
                 sleep(1)
             else:
-                print('点击提交申请按钮弹出用户登陆页面检查失败')
+                print('购买服务按钮未找到,请检查原因')
                 sleep(1)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errBuyNow_R_stg_tc137.png'
-                driver.get_screenshot_as_file(sf1)
-            sleep(2)
-        else:
-            print('购买服务按钮未找到,请检查原因')
-            sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击车商城的服务无忧套餐的提交申请按钮验证----结束:'+now)
 
@@ -13625,15 +13791,14 @@ class Weilai_test(unittest.TestCase):
         for i in range(4):
             driver.execute_script("mobile: scroll", {"direction": "down"})
             sleep(1)
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
         sleep(3)
-        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="购买服务"]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="购买服务"]').get_attribute('visible')
-        sleep(1.5)
-        if len(ch) != 0 and ch0 == 'true':
+        ch0v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').get_attribute('visible')
+        sleep(1)
+        if ch0v == 'true':
             print('购买服务按钮找到')
             sleep(2)
-            ###driver.find_element_by_accessibility_id('购买服务').click()
+            #购买服务
             driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
             sleep(2)
             driver.find_element_by_accessibility_id('一键加电单次券').click()
@@ -13654,28 +13819,29 @@ class Weilai_test(unittest.TestCase):
                 code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
                 code.click()
                 sleep(0.5)
-                #code.send_keys(f[1])
                 code.send_keys('867129')
                 sleep(0.5)
                 #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
                 driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
-                sleep(5)
+                sleep(6)
                 driver.find_element_by_accessibility_id('立即购买').click()
-                sleep(1)
+                sleep(2)
                 name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"确认订单")]')
                 if len(name) != 0:
-                    print('一键加电单次券选择页面显示正常！')
+                    print('一键加电单次券选择页面显示正常')
                     sleep(0.5)
                 else:
-                    print('一键加电单次券选择页面显示不正常,请检查原因！')
+                    print('一键加电单次券选择页面显示不正常,请检查原因')
                     sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
                     sf='../../test_report/ios/'+now+'_errOnekey_R_stg_tc138.png'
                     driver.get_screenshot_as_file(sf)
                 sleep(1)
-                driver.find_element_by_accessibility_id('back').click()
+                #driver.find_element_by_accessibility_id('back').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
                 sleep(1)
-                driver.find_element_by_accessibility_id('circular back').click()
+                #driver.find_element_by_accessibility_id('circular back').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
                 sleep(1)
                 driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
                 sleep(1)
@@ -13685,10 +13851,10 @@ class Weilai_test(unittest.TestCase):
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf1='../../test_report/ios/'+now+'_errBuyNow_R_stg_tc138.png'
                 driver.get_screenshot_as_file(sf1)
-            sleep(2)
+            sleep(1)
         else:
             print('购买服务按钮未找到,请检查原因')
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击车商城的一键加电单次券的立即购买按钮验证----结束:'+now)
 
@@ -13717,18 +13883,16 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         for i in range(4):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
-        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
-        sleep(3)
-        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="购买附件"]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="购买附件"]').get_attribute('visible')
-        sleep(1.5)
-        if len(ch) != 0 and ch0 == 'true':
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(4)
+        ch0v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[1]').get_attribute('visible')
+        sleep(1)
+        if ch0v == 'true':
             print('购买服务按钮找到')
             sleep(2)
-            ###driver.find_element_by_accessibility_id('购买附件').click()
+            #购买附件
             driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[1]').click()
-            sleep(2)
+            sleep(4)
             #点任意车辆附件
             driver.find_element_by_accessibility_id('便携式充电枪').click()
             sleep(4)
@@ -13759,20 +13923,23 @@ class Weilai_test(unittest.TestCase):
                 sleep(1)
                 name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"购车订单号")]')
                 if len(name) != 0:
-                    print('车辆附件订单选择页面显示正常！')
+                    print('车辆附件订单选择页面显示正常')
                     sleep(0.5)
                 else:
-                    print('车辆附件订单选择页面显示不正常,请检查原因！')
+                    print('车辆附件订单选择页面显示不正常,请检查原因')
                     sleep(0.5)
                     now=time.strftime('%Y%m%d_%H%M%S')
                     sf='../../test_report/ios/'+now+'_errAccessory_R_stg_tc139.png'
                     driver.get_screenshot_as_file(sf)
                 sleep(1)
-                driver.find_element_by_accessibility_id('back white shadow').click()
+                #driver.find_element_by_accessibility_id('back white shadow').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
                 sleep(1)
-                driver.find_element_by_accessibility_id('back white shadow').click()
+                #driver.find_element_by_accessibility_id('back white shadow').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
                 sleep(1)
-                driver.find_element_by_accessibility_id('back black clear').click()
+                #driver.find_element_by_accessibility_id('back').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
                 sleep(1)
             else:
                 print('点击立即购买按钮弹出用户登陆页面检查失败')
@@ -13780,10 +13947,10 @@ class Weilai_test(unittest.TestCase):
                 now=time.strftime('%Y%m%d_%H%M%S')
                 sf1='../../test_report/ios/'+now+'_errBuyNow_R_stg_tc138.png'
                 driver.get_screenshot_as_file(sf1)
-            sleep(2)
+            sleep(1)
         else:
             print('购买服务按钮未找到,请检查原因')
-            sleep(2)
+            sleep(1)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_访客模式点击购买附件的便携式充电枪的立即购买按钮验证----结束:'+now)
 
@@ -13811,88 +13978,88 @@ class Weilai_test(unittest.TestCase):
         sleep(3)
         for i in range(3):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
-        sleep(4)
+        sleep(3)
         #xpath('//XCUIElementTypeStaticText[@name="购买服务"]')
-        ch=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').get_attribute('visible')
-        sleep(1.5)
-        if len(ch) != 0 and ch0 == 'true':
-            print('购买服务按钮找到')
-            sleep(2)
-            ###driver.find_element_by_accessibility_id('购买服务').click()
-            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('能量无忧套餐').click()
-            sleep(3)
-            name0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"能量无忧套餐")]')
-            if len(name0) != 0:
-                print('能量无忧套餐页面显示正常！')
-                sleep(0.5)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[2]')
+        sleep(1)
+        if len(ch) != 0:
+            chv=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[2]').get_attribute('visible')
+            if chv == 'true':
+                print('购买服务按钮找到')
+                sleep(2)
+                #购买服务
+                driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[8]/XCUIElementTypeButton[2]').click()
+                sleep(6)
+                driver.find_element_by_accessibility_id('能量无忧套餐').click()
+                sleep(3)
+                name0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"能量无忧套餐")]')
+                if len(name0) != 0:
+                    print('能量无忧套餐页面显示正常！')
+                    sleep(0.5)
+                else:
+                    print('服务无忧套餐页面显示不正常,请检查原因！')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf0='../../test_report/ios/'+now+'_errEnergySuite_R_stg_tc140.png'
+                    driver.get_screenshot_as_file(sf0)
+                sleep(1)
+                driver.find_element_by_accessibility_id('circular back').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('服务无忧套餐').click()
+                sleep(3)
+                name1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务无忧套餐")]')
+                if len(name1) != 0:
+                    print('服务无忧套餐页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('服务无忧套餐页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errServiceSuite_R_stg_tc140.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+                driver.find_element_by_accessibility_id('circular back').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('车辆附件').click()
+                sleep(2)
+                #便携式充电枪
+                driver.find_element_by_accessibility_id('便携式充电枪').click()
+                sleep(4)
+                ch0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"便携式充电枪")]')
+                if len(ch0) != 0:
+                    print('便携式充电枪页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('便携式充电枪页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errRechargeGun_R_stg_tc140.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(1)
+                driver.find_element_by_accessibility_id('back white shadow').click()
+                sleep(2)
+                #便携式充电枪
+                driver.find_element_by_accessibility_id('NIO原厂定制车窗隔热膜').click()
+                sleep(4)
+                ch0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"NIO原厂定制车窗隔热膜")]')
+                if len(ch0) != 0:
+                    print('NIO原厂定制车窗隔热膜页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('NIO原厂定制车窗隔热膜页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errHeatfreeCover_R_stg_tc140.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(1)
+                driver.find_element_by_accessibility_id('back white shadow').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('back').click()
+                sleep(2)
             else:
-                print('服务无忧套餐页面显示不正常,请检查原因！')
-                sleep(0.5)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf0='../../test_report/ios/'+now+'_errEnergySuite_R_stg_tc140.png'
-                driver.get_screenshot_as_file(sf0)
-            sleep(1)
-            driver.find_element_by_accessibility_id('circular back').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('服务无忧套餐').click()
-            sleep(3)
-            name1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务无忧套餐")]')
-            if len(name1) != 0:
-                print('服务无忧套餐页面显示正常！')
-                sleep(0.5)
-            else:
-                print('服务无忧套餐页面显示不正常,请检查原因！')
-                sleep(0.5)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf1='../../test_report/ios/'+now+'_errServiceSuite_R_stg_tc140.png'
-                driver.get_screenshot_as_file(sf1)
-            sleep(1)
-            driver.find_element_by_accessibility_id('circular back').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('车辆附件').click()
-            sleep(2)
-            #便携式充电枪
-            driver.find_element_by_accessibility_id('便携式充电枪').click()
-            sleep(4)
-            ch0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"便携式充电枪")]')
-            if len(ch0) != 0:
-                print('便携式充电枪页面显示正常！')
-                sleep(0.5)
-            else:
-                print('便携式充电枪页面显示不正常,请检查原因！')
-                sleep(0.5)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf2='../../test_report/ios/'+now+'_errRechargeGun_R_stg_tc140.png'
-                driver.get_screenshot_as_file(sf2)
-            sleep(1)
-            driver.find_element_by_accessibility_id('back white shadow').click()
-            sleep(2)
-            #便携式充电枪
-            driver.find_element_by_accessibility_id('NIO原厂定制车窗隔热膜').click()
-            sleep(4)
-            ch0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"NIO原厂定制车窗隔热膜")]')
-            if len(ch0) != 0:
-                print('NIO原厂定制车窗隔热膜页面显示正常！')
-                sleep(0.5)
-            else:
-                print('NIO原厂定制车窗隔热膜页面显示不正常,请检查原因！')
-                sleep(0.5)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf3='../../test_report/ios/'+now+'_errHeatfreeCover_R_stg_tc140.png'
-                driver.get_screenshot_as_file(sf3)
-            sleep(1)
-            driver.find_element_by_accessibility_id('back white shadow').click()
-            sleep(2)
-            driver.find_element_by_accessibility_id('back black clear').click()
-            sleep(2)
-        else:
-            print('购买服务按钮未找到,请检查原因')
-            sleep(2)
+                print('购买服务按钮未找到,请检查原因')
+                sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_用户模式点击车商城的购买服务/车辆附件下2个按钮分别检查页面是否显示正常----结束:'+now)
 
@@ -13913,9 +14080,18 @@ class Weilai_test(unittest.TestCase):
         now=time.strftime('%Y%m%d_%H%M%S')
         print('TC_爱车_车主模式使用一键维保功能----开始:'+now)
         sleep(1)
-        bp_is_loggedin(self)
-        sleep(1)
-        bp_normalloginmp_carowner(self)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6988")]')
+        if len(name) != 0:
+            print('认证用户已登录')
+            sleep(0.5)
+        else:
+            print('认证用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
         sleep(1)
         #爱车
         driver.find_element_by_accessibility_id('爱车').click()
@@ -13923,53 +14099,7876 @@ class Weilai_test(unittest.TestCase):
         #服务安全密码
         pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
         if len(pin) != 0:
-            driver.find_element_by_accessibility_id('1').click()
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.3)
-            driver.find_element_by_accessibility_id('1').click()
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
             sleep(0.3)
-            driver.find_element_by_accessibility_id('2').click()
-            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
             sleep(0.3)
-            driver.find_element_by_accessibility_id('2').click()
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
             sleep(0.3)
-            driver.find_element_by_accessibility_id('3').click()
-            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.3)
-            driver.find_element_by_accessibility_id('3').click()
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
             sleep(0.3)
+        sleep(4)
+        #refresh
+        #driver.execute_script("mobile: scroll", {"direction": "up"})
+        #sleep(2)
+        for i in range(1):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
+        sleep(3)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="一键维保"]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="一键维保"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('一键维保按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('一键维保').click()
+                #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
+                sleep(14)
+                name0=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "立即申请服务无忧套餐"')
+                if len(name0) != 0:
+                    print('一键维保页面显示正常,检查通过')
+                    sleep(0.5)
+                else:
+                    print('一键维保页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf0='../../test_report/ios/'+now+'_errOnekeyMaintain_R_stg_tc141.png'
+                    driver.get_screenshot_as_file(sf0)
+                sleep(1)
+                driver.find_element_by_accessibility_id('back b white').click()
+                sleep(2)
+            else:
+                print('一键维保按钮未找到,请检查原因')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_车主模式使用一键维保功能----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorknow2buyes8_tc142
+#Purpose:检查访客模式了解和订购ES8点击立即预订的流程
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/04]
+#*********************************************************************************************************************************
+    def test_aiche_visitorknow2buyes8_tc142(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:点击了解和订购ES8的立即购买按钮是否跳转到用户登录页面')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到了解和订购ES8,点击进入,再点击订购ES8,继续下去直到点击立即预订检查是否弹出用户登陆页面')
+        print('step4正常登录用户账号,点击立即预订继续下去检查微信支付显示是否正常')
+        print('step5点击返回键,回到我的车辆订单页面检查待支付意向金订单是否存在')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式了解和订购ES8点击立即预订的流程----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(4)
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="了解和订购ES8"]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeButton[@name="了解和订购ES8"]').get_attribute('visible')
+        sleep(2)
+        if ch0 == 'true':
+            print('了解和订购ES8按钮找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="了解和订购ES8"]').click()
+            sleep(9)
+            #订购ES8
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="订购ES8"]').click()
+            sleep(5)
+            driver.find_element_by_accessibility_id('六座版').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('个性化配置').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('轮毂').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('内饰').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('钥匙').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('选装').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('预览配置').click()
+            sleep(2)
+            #立即预订
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+            sleep(1)
+            f1=bp_is_loginshow(self)
+            if f1 == True:
+                print('点击立即预订按钮弹出用户登陆页面检查正常')
+                sleep(1)
+                #正常登陆
+                mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                mobile_no.click()
+                sleep(0.5)
+                mobile_no.send_keys('98762396871')
+                sleep(1)
+                code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                code.click()
+                sleep(0.5)
+                code.send_keys('867129')
+                sleep(0.5)
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                sleep(6)
+                driver.find_element_by_accessibility_id('立即预订').click()
+                #driver.execute_script("mobile: tap", {"touchCount":"1", "x":291, "y":701})
+                sleep(7)
+                #
+                name=driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                name.click()
+                sleep(0.5)
+                name.set_value('测试者')
+                sleep(0.5)
+                #完成
+                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"支付意向金¥")]').click()
+                sleep(5)                               
+                pay1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                if len(pay1) != 0:
+                    print('微信支付存在,检查通过')
+                    sleep(0.5)
+                else:
+                    print('微信支付不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errPayment_R_stg_tc142.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(2)
+                #driver.find_element_by_accessibility_id('back').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(2)
+                #driver.find_element_by_accessibility_id('navigationbar btn back black1').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的订单').click()
+                sleep(3)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "购车订单"').click()
+                sleep(4)
+                #待支付意向金
+                ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+                if len(ch) != 2:
+                    print('我的车辆订单里待支付意向金订单检查通过')
+                    sleep(0.5)
+                else:
+                    print('我的车辆订单里待支付意向金订单不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errWaitingOrder_R_stg_tc142.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(2)
+            else:
+                print('点击立即预订按钮弹出用户登陆页面检查失败')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errOrderNow_R_stg_tc142.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+        else:
+            print('了解和订购ES8按钮未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式了解和订购ES8点击立即预订的流程----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_wode_canceldeletewait2payorder_tc143
+#Purpose:检查用户模式取消并删除待支付意向金订单的流程
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/04]
+#*********************************************************************************************************************************
+    def test_wode_canceldeletewait2payorder_tc143(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:我的车辆订单里取消并删除待支付意向金订单')
+        print('step1点击我的')
+        print('step2点击我的车辆订单,找到待支付意向金订单,点击进入,再点击改变购买计划,选择原因')
+        print('step3点击删除订单确定后检查改待支付意向金订单显示是否还存在')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_我的车辆订单里取消并删除待支付意向金订单的流程----开始:'+now)
+        sleep(1)
+        #我的
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('我的订单').click()
+        sleep(4)
+        driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "购车订单"').click()
+        sleep(4)
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]').get_attribute('visible')
+        sleep(2)
+        if ch0 == 'true':
+            print('待支付意向金订单找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]').click()
+            sleep(4)
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="改变购买计划"]').click()
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="确认取消"]').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('无法安装充电桩').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('删除订单').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('确定删除').click()
+            sleep(6)
+            #待支付意向金
+            ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+            if len(ch2) == 2:
+                print('取消并删除待支付意向金订单检查通过')
+                sleep(0.5)
+            else:
+                print('取消并删除待支付意向金订单检查失败,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf='../../test_report/ios/'+now+'_errDeleteOrder_R_stg_tc143.png'
+                driver.get_screenshot_as_file(sf)
+            sleep(1)
+            driver.find_element_by_accessibility_id('icon back').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('icon back').click()
+            sleep(2)
+        else:
+            print('待支付意向金订单未找到,无法做取消订单/删除订单的操作')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_我的车辆订单里取消并删除待支付意向金订单的流程----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorconfignowes8_tc144
+#Purpose:检查访客模式ES8的立即配置点击立即预订的流程
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/04]
+#*********************************************************************************************************************************
+    def test_aiche_visitorconfignowes8_tc144(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:点击了解和订购ES8的立即购买按钮是否跳转到用户登录页面')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到了解和订购ES8,点击进入,再点击订购ES8,继续下去直到点击立即预订检查是否弹出用户登陆页面')
+        print('step4正常登录用户账号,点击立即预订继续下去检查微信支付显示是否正常')
+        print('step5点击返回键,回到我的车辆订单页面检查待支付意向金订单是否存在')
+        print('step6取消并删除待支付意向金订单')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES8的立即配置点击立即预订的流程----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(1):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(4)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeButton')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeButton').get_attribute('visible')
+            sleep(1)
+            if ch0v == 'true':
+                print('ES8的立即配置按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeButton').click()
+                sleep(9)
+                driver.find_element_by_accessibility_id('六座版').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('个性化配置').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('轮毂').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('内饰').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('钥匙').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('选装').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('预览配置').click()
+                sleep(3)
+                #立即预订
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                sleep(1)
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击立即预订按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    #正常登陆
+                    mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                    mobile_no.click()
+                    sleep(0.5)
+                    mobile_no.send_keys('98762396871')
+                    sleep(1)
+                    code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                    code.click()
+                    sleep(0.5)
+                    code.send_keys('867129')
+                    sleep(0.5)
+                    #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                    sleep(6)
+                    driver.find_element_by_accessibility_id('立即预订').click()
+                    sleep(7)
+                    #
+                    name=driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                    name.click()
+                    sleep(0.5)
+                    name.send_keys('李宁')
+                    sleep(0.5)
+                    #完成
+                    driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                    sleep(2)
+                    #上牌城市x
+                    driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"支付意向金¥")]').click()
+                    sleep(3)                               
+                    pay1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                    if len(pay1) != 0:
+                        print('微信支付存在,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('微信支付不存在,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf='../../test_report/ios/'+now+'_errPayment_R_stg_tc144.png'
+                        driver.get_screenshot_as_file(sf)
+                    sleep(1)
+                    #driver.find_element_by_accessibility_id('back').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                    sleep(2)
+                    #driver.find_element_by_accessibility_id('navigationbar btn back black1').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我的').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我的订单').click()
+                    sleep(3)
+                    driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "购车订单"').click()
+                    sleep(4)
+                    #待支付意向金
+                    ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+                    if len(ch) != 2:
+                        print('我的车辆订单里待支付意向金订单检查通过')
+                        sleep(0.5)
+                    else:
+                        print('我的车辆订单里待支付意向金订单不存在,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf='../../test_report/ios/'+now+'_errUnpaidOrder_R_stg_tc144.png'
+                        driver.get_screenshot_as_file(sf)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('icon back').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('icon back').click()
+                    sleep(1)
+                    bp_canceldeletewait2payorder(self)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('icon back').click()
+                    sleep(1)
+                else:
+                    print('点击立即预订按钮弹出用户登陆页面检查失败')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errOrderNow_R_stg_tc144.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+            else:
+                print('ES8的立即配置按钮未找到,请检查原因')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES8的立即配置点击立即预订的流程----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorknow2buyes6_tc145
+#Purpose:检查访客模式了解和订购ES6点击立即预订的流程
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/04]
+#*********************************************************************************************************************************
+    def test_aiche_visitorknow2buyes6_tc145(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:点击了解和订购ES6的立即购买按钮是否跳转到用户登录页面')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到了解和订购ES6,点击进入,再点击订购ES6,继续下去直到点击立即预订检查是否弹出用户登陆页面')
+        print('step4正常登录用户账号,点击立即预订继续下去检查微信支付显示是否正常')
+        print('step5点击返回键,回到我的车辆订单页面检查待支付意向金订单是否存在')
+        print('step6取消并删除待支付意向金订单')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式了解和订购ES6点击立即预订的流程----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(4)
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="了解和订购ES6"]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeButton[@name="了解和订购ES6"]').get_attribute('visible')
+        sleep(2)
+        if ch0 == 'true':
+            print('了解和订购ES6按钮找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="了解和订购ES6"]').click()
+            sleep(9)
+            #订购ES6
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="订购ES6"]').click()
+            sleep(4)
+            driver.find_element_by_accessibility_id('首发纪念版').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('个性化配置').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('轮毂').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('内饰').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('钥匙').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('选装').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('预览配置').click()
+            sleep(2)
+            #立即预订
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+            sleep(1)
+            f1=bp_is_loginshow(self)
+            if f1 == True:
+                print('点击立即预订按钮弹出用户登陆页面检查正常')
+                sleep(1)
+                #正常登陆
+                mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                mobile_no.click()
+                sleep(0.5)
+                mobile_no.send_keys('98762396871')
+                sleep(1)
+                code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                code.click()
+                sleep(0.5)
+                code.send_keys('867129')
+                sleep(1)
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                sleep(6)
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                #driver.execute_script("mobile: tap", {"touchCount":"1", "x":291, "y":701})
+                sleep(7)
+                #
+                name=driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                name.click()
+                sleep(0.5)
+                name.send_keys('吴京')
+                sleep(0.5)
+                #完成
+                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                sleep(1)
+                driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"支付意向金¥")]').click()
+                sleep(5)                               
+                pay1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                if len(pay1) != 0:
+                    print('微信支付存在,检查通过')
+                    sleep(0.5)
+                else:
+                    print('微信支付不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errPayment_R_stg_tc145.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的订单').click()
+                sleep(3)
+                #待支付意向金
+                ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+                if len(ch) != 0:
+                    print('我的车辆订单里待支付意向金订单检查通过')
+                    sleep(0.5)
+                else:
+                    print('我的车辆订单里待支付意向金订单不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errWaitingOrder_R_stg_tc145.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(2)
+                bp_canceldeletewait2payorder(self)
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(1)
+            else:
+                print('点击立即预订按钮弹出用户登陆页面检查失败')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errOrderNow_R_stg_tc145.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+        else:
+            print('了解和订购ES6按钮未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式了解和订购ES6点击立即预订的流程----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorconfignowes6_tc146
+#Purpose:检查访客模式ES6的立即配置点击立即预订的流程
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/04]
+#*********************************************************************************************************************************
+    def test_aiche_visitorconfignowes6_tc146(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:ES6的立即配置点击立即预订的流程')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到了解和订购ES8,点击进入,再点击订购ES6,继续下去直到点击立即预订检查是否弹出用户登陆页面')
+        print('step4正常登录用户账号,点击立即预订继续下去检查微信支付显示是否正常')
+        print('step5点击返回键,回到我的车辆订单页面检查待支付意向金订单是否存在')
+        print('step6取消并删除待支付意向金订单')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES6的立即配置点击立即预订的流程----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(1):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(4)
+        #立即配置
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeButton')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeButton').get_attribute('visible')
+            sleep(1)
+            if ch0v == 'true':
+                print('ES6的立即配置按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeButton').click()
+                sleep(5)
+                driver.find_element_by_accessibility_id('首发纪念版').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('个性化配置').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('轮毂').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('内饰').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('钥匙').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('选装').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('预览配置').click()
+                sleep(3)
+                #立即预订
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.find_element_by_accessibility_id('立即预订').click()
+                sleep(1)
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击立即预订按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    #正常登陆
+                    mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                    mobile_no.click()
+                    sleep(0.5)
+                    #积分不足用户手机号
+                    ##mobile_no.send_keys('98762396986')
+                    mobile_no.send_keys('98762396871')
+                    sleep(1)
+                    code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                    code.click()
+                    sleep(0.5)
+                    ##code.send_keys('418253')
+                    code.send_keys('867129')
+                    sleep(1)
+                    #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                    sleep(6)
+                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                    sleep(7)
+                    #
+                    name=driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                    ###name=driver.find_element_by_ios_class_chain('XCUIElementTypeOther[1]/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                    name.click()
+                    sleep(1)
+                    name.set_value('李斯')
+                    sleep(0.5)
+                    #完成
+                    driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                    sleep(2)
+                    #上牌城市x
+                    driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"支付意向金¥")]').click()
+                    sleep(5)                               
+                    pay1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                    if len(pay1) != 0:
+                        print('微信支付存在,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('微信支付不存在,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf='../../test_report/ios/'+now+'_errPayment_R_stg_tc144.png'
+                        driver.get_screenshot_as_file(sf)
+                    sleep(1)
+                    #driver.find_element_by_accessibility_id('back').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                    sleep(2)
+                    #driver.find_element_by_accessibility_id('icon back').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我的').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我的订单').click()
+                    sleep(3)
+                    #待支付意向金
+                    ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+                    if len(ch) != 0:
+                        print('我的车辆订单里待支付意向金订单检查通过')
+                        sleep(0.5)
+                    else:
+                        print('我的车辆订单里待支付意向金订单不存在,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf='../../test_report/ios/'+now+'_errWaitingOrder_R_stg_tc146.png'
+                        driver.get_screenshot_as_file(sf)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('icon back').click()
+                    sleep(2)
+                    bp_canceldeletewait2payorder(self)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('icon back').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('icon back').click()
+                    sleep(1)
+                else:
+                    print('点击立即预订按钮弹出用户登陆页面检查失败')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errOrderNow_R_stg_tc146.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+            else:
+                print('ES6的立即配置按钮未找到,请检查原因')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES6的立即配置点击立即预订的流程----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorguide4buyes8_tc147
+#Purpose:检查访客模式请了解，很重要的ES8购车指南的点击收藏/评论/点赞/分享你的朋友按钮的预期动作
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/04]
+#*********************************************************************************************************************************
+    def test_aiche_visitorguide4buyes8_tc147(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:ES8购车指南点击收藏/评论/点赞/分享你的朋友按钮的预期动作')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到查看全部,点击进入,再点击ES8购车指南,点击收藏按钮检查是否弹出用户登陆页面')
+        print('step4点击评论按钮检查是否弹出用户登陆页面')
+        print('step5点击点赞按钮检查是否弹出用户登陆页面')
+        print('step6点击分享你的朋友按钮检查是否弹出用户登陆页面')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES8购车指南点击收藏/评论/点赞/分享你的朋友按钮的预期动作----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(3):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(4)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('查看全部按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').click()
+                sleep(8)
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                driver.find_element_by_accessibility_id('ES8购车指南').click()
+                sleep(3)
+                #收藏
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":274, "y":703})
+                sleep(1)
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击收藏按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #评论
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":321, "y":703})
+                sleep(1)
+                f2=bp_is_loginshow(self)
+                if f2 == True:
+                    print('点击评论按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #点赞
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":375, "y":703})
+                sleep(1)
+                f3=bp_is_loginshow(self)
+                if f3 == True:
+                    print('点击点赞按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #分享
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":42})
+                sleep(1)
+                driver.find_element_by_accessibility_id('我的朋友').click()
+                sleep(2)
+                f4=bp_is_loginshow(self)
+                if f4 == True:
+                    print('点击分享我的朋友按钮弹出用户登陆页面检查正常')
+                    sleep(2)
+                    """
+                    #正常登陆
+                    mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                    mobile_no.click()
+                    sleep(0.5)
+                    mobile_no.send_keys('98762396871')
+                    sleep(1)
+                    code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                    code.click()
+                    sleep(0.5)
+                    #code.send_keys(f[1])
+                    code.send_keys('867129')
+                    sleep(0.5)
+                    #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                    sleep(5)                             
+                    ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"您要找的页面不见了")]')
+                    if len(ch1) != 0:
+                        print('ES8购车指南文章详情页面显示正常,检查通过！')
+                        sleep(0.5)
+                    else:
+                        print('ES8购车指南文章详情页面显示不正常,请检查原因！')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf='../../test_report/ios/'+now+'_errPayment_R_stg_tc147.png'
+                        driver.get_screenshot_as_file(sf)
+                    sleep(1)
+                    #back
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(2)
+                    """
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(2)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(2)
+        else:
+            print('查看全部按钮未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES8购车指南点击收藏/评论/点赞/分享你的朋友按钮的预期动作----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorguide4buyes6_tc148
+#Purpose:检查访客模式请了解，很重要的ES6购车指南的点击收藏/评论/点赞/分享你的朋友按钮的预期动作
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/04]
+#*********************************************************************************************************************************
+    def test_aiche_visitorguide4buyes6_tc148(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:ES8购车指南点击收藏/评论/点赞/分享你的朋友按钮的预期动作')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到查看全部,点击进入,再点击ES6购车指南,点击收藏按钮检查是否弹出用户登陆页面')
+        print('step4点击评论按钮检查是否弹出用户登陆页面')
+        print('step5点击点赞按钮检查是否弹出用户登陆页面')
+        print('step6点击分享你的朋友按钮检查是否弹出用户登陆页面')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES6购车指南点击收藏/评论/点赞/分享你的朋友按钮的预期动作----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(3):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('查看全部按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').click()
+                sleep(8)
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                driver.find_element_by_accessibility_id('ES6购车指南').click()
+                sleep(3)
+                #收藏
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":274, "y":703})
+                sleep(1)
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击收藏按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #评论
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":321, "y":703})
+                sleep(1)
+                f2=bp_is_loginshow(self)
+                if f2 == True:
+                    print('点击评论按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #点赞
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":375, "y":703})
+                sleep(1)
+                f3=bp_is_loginshow(self)
+                if f3 == True:
+                    print('点击点赞按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #分享
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":42})
+                sleep(1)
+                driver.find_element_by_accessibility_id('我的朋友').click()
+                sleep(2)
+                f4=bp_is_loginshow(self)
+                if f4 == True:
+                    print('点击分享我的朋友按钮弹出用户登陆页面检查正常')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(1)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(1)
+        else:
+            print('查看全部按钮未找到,请检查原因')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES6购车指南点击收藏/评论/点赞/分享你的朋友按钮的预期动作----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorbatteryrent4es8_tc149
+#Purpose:检查访客模式请了解，很重要的ES8电池租用方案的点击收藏/评论/点赞/分享你的朋友按钮的预期动作
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/05]
+#*********************************************************************************************************************************
+    def test_aiche_visitorbatteryrent4es8_tc149(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:ES8电池租用方案点击收藏/评论/点赞/分享你的朋友按钮的预期动作')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到查看全部,点击进入,再点击ES8电池租用方案,点击收藏按钮检查是否弹出用户登陆页面')
+        print('step4点击评论按钮检查是否弹出用户登陆页面')
+        print('step5点击点赞按钮检查是否弹出用户登陆页面')
+        print('step6点击分享你的朋友按钮检查是否弹出用户登陆页面')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES8电池租用方案点击收藏/评论/点赞/分享你的朋友按钮的预期动作----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(3):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('查看全部按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').click()
+                sleep(8)
+                for i in range(3):
+                    driver.execute_script("mobile: scroll", {"direction": "down"})
+                    sleep(1)
+                sleep(2)
+                driver.find_element_by_accessibility_id('ES8电池租用方案解读 | 请了解，很重要').click()
+                sleep(5)
+                #收藏
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":274, "y":703})
+                sleep(1)
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击收藏按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #评论
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":321, "y":703})
+                sleep(1)
+                f2=bp_is_loginshow(self)
+                if f2 == True:
+                    print('点击评论按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #点赞
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":375, "y":703})
+                sleep(1)
+                f3=bp_is_loginshow(self)
+                if f3 == True:
+                    print('点击点赞按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #分享
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":42})
+                sleep(1)
+                driver.find_element_by_accessibility_id('我的朋友').click()
+                sleep(2)
+                f4=bp_is_loginshow(self)
+                if f4 == True:
+                    print('点击分享我的朋友按钮弹出用户登陆页面检查正常')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(1)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(1)
+        else:
+            print('查看全部按钮未找到,请检查原因')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式ES8电池租用方案点击收藏/评论/点赞/分享你的朋友按钮的预期动作----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitor3minknow3cores_tc150
+#Purpose:检查访客模式请了解，很重要的3分钟快速解读服务套餐3大核心价值的点击收藏/评论/点赞/分享你的朋友按钮的预期动作
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/05]
+#*********************************************************************************************************************************
+    def test_aiche_visitor3minknow3cores_tc150(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:3分钟快速解读服务套餐3大核心价值点击收藏/评论/点赞/分享你的朋友按钮的预期动作')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到查看全部,点击进入,再点击3分钟快速解读服务套餐3大核心价值,点击收藏按钮检查是否弹出用户登陆页面')
+        print('step4点击评论按钮检查是否弹出用户登陆页面')
+        print('step5点击点赞按钮检查是否弹出用户登陆页面')
+        print('step6点击分享你的朋友按钮检查是否弹出用户登陆页面')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式3分钟快速解读服务套餐3大核心价值点击收藏/评论/点赞/分享你的朋友按钮的预期动作----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(3):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('查看全部按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="查看全部"]').click()
+                sleep(8)
+                for i in range(2):
+                    driver.execute_script("mobile: scroll", {"direction": "down"})
+                    sleep(1)
+                sleep(2)
+                driver.find_element_by_accessibility_id('3分钟快速解读服务套餐3大核心价值').click()
+                sleep(6)
+                #收藏
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":274, "y":703})
+                sleep(1)
+                f1=bp_is_loginshow(self)
+                if f1 == True:
+                    print('点击收藏按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #评论
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":321, "y":703})
+                sleep(1)
+                f2=bp_is_loginshow(self)
+                if f2 == True:
+                    print('点击评论按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #点赞
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":375, "y":703})
+                sleep(1)
+                f3=bp_is_loginshow(self)
+                if f3 == True:
+                    print('点击点赞按钮弹出用户登陆页面检查正常')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #分享
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":42})
+                sleep(1)
+                driver.find_element_by_accessibility_id('我的朋友').click()
+                sleep(2)
+                f4=bp_is_loginshow(self)
+                if f4 == True:
+                    print('点击分享我的朋友按钮弹出用户登陆页面检查正常')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(1)
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                sleep(1)
+        else:
+            print('查看全部按钮未找到,请检查原因')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式3分钟快速解读服务套餐3大核心价值点击收藏/评论/点赞/分享你的朋友按钮的预期动作----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorworryburden_tc151
+#Purpose:检查访客模式担心价格负担重的点击分享朋友按钮的预期动作
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/05]
+#*********************************************************************************************************************************
+    def test_aiche_visitorworryburden_tc151(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:担心价格负担重点击分享朋友按钮的预期动作')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到担心价格负担重,点击进入,再点击分享按钮,点击分享朋友按钮是否弹出用户登陆页面')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式担心价格负担重点击分享朋友按钮的预期动作----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(5)
+        for i in range(2):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(1)
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="担心价格负担重？"]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="担心价格负担重？"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('担心价格负担重找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="担心价格负担重？"]').click()
+                sleep(6)
+                #分享
+                share=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="nav share btn"]')
+                if len(share) != 0:
+                    print('分享按钮存在,检查通过')
+                    sleep(1)
+                    driver.find_element_by_xpath('//XCUIElementTypeButton[@name="nav share btn"]').click()
+                    #driver.execute_script("mobile: tap", {"touchCount":"1", "x":377, "y":42})
+                    sleep(1)
+                    fr=driver.find_elements_by_accessibility_id('朋友')
+                    if len(fr) != 0:
+                        print('分享朋友按钮存在,检查通过')
+                        sleep(1)
+                        driver.find_element_by_accessibility_id('朋友').click()
+                        sleep(1)
+                        f4=bp_is_loginshow(self)
+                        if f4 == True:
+                            print('点击分享朋友按钮弹出用户登陆页面检查通过')
+                            sleep(2)
+                            driver.find_element_by_accessibility_id('all page back grey icon').click()
+                            sleep(1)
+                            #driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    else:
+                        print('分享朋友按钮不存在,请检查原因')
+                        sleep(1)
+                else:
+                    print('分享按钮不存在,请检查原因')
+                    sleep(1)
+                driver.find_element_by_accessibility_id('nav back btn').click()
+                sleep(1)
+        else:
+            print('担心价格负担重未找到,请检查原因')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式担心价格负担重点击分享朋友按钮的预期动作----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_visitorusecarworry_tc152
+#Purpose:检查访客模式电动车使用焦虑的点击分享朋友按钮的预期动作
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登陆
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/05]
+#*********************************************************************************************************************************
+    def test_aiche_visitorusecarworry_tc152(self):
+        driver=self.driver
+        print('TC_访客模式，检查点:有电动车使用焦虑点击分享朋友按钮的预期动作')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号')
+        print('step3点击爱车,找到有电动车使用焦虑,点击进入,再点击分享按钮,点击分享朋友按钮是否弹出用户登陆页面')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式有电动车使用焦虑点击分享朋友按钮的预期动作----开始:'+now)
+        sleep(1)
+        bp_is_loggedin(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(5)
+        for i in range(2):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(1)
+        #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':300,'duration':1.0})
+        sleep(4)
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="有电动车使用焦虑？"]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="有电动车使用焦虑？"]').get_attribute('visible')
+        sleep(1.5)
+        if ch0 == 'true':
+            print('有电动车使用焦虑找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="有电动车使用焦虑？"]').click()
+            sleep(6)
+            #分享
+            share=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="nav share btn"]')
+            if len(share) != 0:
+                print('分享按钮存在,检查通过')
+                sleep(1)
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="nav share btn"]').click()
+                #driver.execute_script("mobile: tap", {"touchCount":"1", "x":377, "y":42})
+                sleep(1)
+                fr=driver.find_elements_by_accessibility_id('朋友')
+                if len(fr) != 0:
+                    print('分享朋友按钮存在,检查通过')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('朋友').click()
+                    sleep(1)
+                    f4=bp_is_loginshow(self)
+                    if f4 == True:
+                        print('点击分享朋友按钮弹出用户登陆页面检查通过')
+                        sleep(2)
+                        driver.find_element_by_accessibility_id('all page back grey icon').click()
+                        sleep(1)
+                        #driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                else:
+                    print('分享朋友按钮不存在,请检查原因')
+                    sleep(1)
+            else:
+                print('分享按钮不存在,请检查原因')
+                sleep(1)
+            driver.find_element_by_accessibility_id('nav back btn').click()
+            sleep(1)
+        else:
+            print('有电动车使用焦虑未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_访客模式有电动车使用焦虑点击分享朋友按钮的预期动作----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_know2buyes8_tc153
+#Purpose:检查用户模式了解和订购ES8里订购ES8的流程
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/05]
+#*********************************************************************************************************************************
+    def test_aiche_know2buyes8_tc153(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:点击了解和订购ES8的立即购买按钮是否跳转到用户登录页面')
+        print('step1检查用户是否已经登录;step2如果用户未登录则先登录原来账号')
+        print('step3点击爱车,找到了解和订购ES8,点击进入,再点击订购ES8')
+        print('step4继续下去直到点击立即预订检查微信支付显示是否正常')
+        print('step5点击返回键,回到我的车辆订单页面检查待支付意向金订单是否存在')
+        print('step6在我的车辆订单页面里取消并删除待支付意向金订单')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_用户模式了解和订购ES8里订购ES8的流程----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        login=driver.find_elements_by_accessibility_id('注册/登录')
+        if len(login) == 0:
+            print('----用户已经登录----')
+        else:
+            print('----用户未登录----')
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(4):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(3)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]').get_attribute('visible')
+            if ch0v == 'true':
+                print('了解和订购ES8图片找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[10]').click()
+                sleep(9)
+                #订购ES8
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="订购ES8"]').click()
+                sleep(4)
+                driver.find_element_by_accessibility_id('六座版').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('个性化配置').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('轮毂').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('内饰').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('钥匙').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('选装').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('预览配置').click()
+                sleep(2)
+                #立即预订
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                sleep(7)
+                #姓名
+                name=driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                name.click()
+                sleep(0.5)
+                name.set_value('张涵予')
+                sleep(0.5)
+                #完成
+                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"支付意向金¥")]').click()
+                sleep(5)                               
+                pay1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                if len(pay1) != 0:
+                    print('微信支付存在,检查通过')
+                    sleep(0.5)
+                else:
+                    print('微信支付不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errPayment_R_stg_tc153.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的订单').click()
+                sleep(3)
+                #待支付意向金
+                ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+                if len(ch) != 0:
+                    print('我的车辆订单里待支付意向金订单检查通过')
+                    sleep(0.5)
+                else:
+                    print('我的车辆订单里待支付意向金订单不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errWaitingOrder_R_stg_tc153.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(2)
+                bp_canceldeletewait2payorder(self)
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(1)
+            else:
+                print('了解和订购ES8图片未找到,请检查原因')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_用户模式了解和订购ES8里订购ES8的流程----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_know2buyes6_tc154
+#Purpose:用户模式了解和订购ES6里订购ES6的流程
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/05]
+#*********************************************************************************************************************************
+    def test_aiche_know2buyes6_tc154(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:点击了解和订购ES6的立即购买按钮是否跳转到用户登录页面')
+        print('step1检查用户是否已经登录;step2如果用户未登录则先登录原来账号')
+        print('step3点击爱车,找到了解和订购ES6,点击进入,再点击订购ES6')
+        print('step4继续下去直到点击立即预订检查微信支付显示是否正常')
+        print('step5点击返回键,回到我的车辆订单页面检查待支付意向金订单是否存在')
+        print('step6取消并删除待支付意向金订单')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_用户模式了解和订购ES6里订购ES6的流程----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        login=driver.find_elements_by_accessibility_id('注册/登录')
+        if len(login) == 0:
+            print('----用户已经登录----')
+        else:
+            print('----用户未登录----')
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(3)
+        for i in range(4):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(3)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[9]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[9]').get_attribute('visible')
+            if ch0v == 'true':
+                print('了解和订购ES6图片找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeCell[9]').click()
+                sleep(9)
+                #订购ES6
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="订购ES6"]').click()
+                sleep(4)
+                driver.find_element_by_accessibility_id('首发纪念版').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('个性化配置').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('轮毂').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('内饰').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('钥匙').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('选装').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('预览配置').click()
+                sleep(3)
+                #立即预订
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="立即预订"]').click()
+                sleep(8)
+                #姓名name=driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeTextView[1]')
+                name=driver.find_elements_by_class_name('XCUIElementTypeTextView')[0]
+                name.click()
+                sleep(0.5)
+                name.send_keys('吴京')
+                sleep(0.5)
+                #完成
+                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                sleep(1)
+                driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"支付意向金¥")]').click()
+                sleep(3)                               
+                pay1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                if len(pay1) != 0:
+                    print('微信支付存在,检查通过')
+                    sleep(0.5)
+                else:
+                    print('微信支付不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errPayment_R_stg_tc154.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('我的订单').click()
+                sleep(4)
+                #待支付意向金
+                ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待支付意向金")]')
+                if len(ch) != 0:
+                    print('我的车辆订单里待支付意向金订单检查通过')
+                    sleep(0.5)
+                else:
+                    print('我的车辆订单里待支付意向金订单不存在,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errWaitingOrder_R_stg_tc154.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(2)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(2)
+                bp_canceldeletewait2payorder(self)
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('icon back').click()
+                sleep(1)
+            else:
+                print('了解和订购ES6图片未找到,请检查原因')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_用户模式了解和订购ES6里订购ES6的流程----结束:'+now)
+
+#*******************************************************
+#TC Name:test_wode_invitees8noncarowner_tc155
+#Purpose:检查我的页面的非车主邀请试驾es8功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/08]
+#*******************************************************
+    def test_wode_invitees8noncarowner_tc155(self):
+        driver=self.driver
+        print('TC_检查非车主手机号码登录APP，检查点:我的_非车主邀请试驾es8功能----')
+        print('step1点击我的->邀请好友试驾')
+        print('step2检查es8立即邀请按钮是否存在；step3点击立即邀请')
+        print('step4检查提示框是否出现')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_非车主邀请试驾es8功能----开始:'+now)
+        sleep(1)
+        """
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp_notenoughscore(self)
+        sleep(1)
+        """
+        #我的
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('邀请好友试驾').click()
+        sleep(4)
+        driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        #es8立即邀请
+        ches8=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]')
+        ches8v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').get_attribute('visible')
+        sleep(1.5)
+        if len(ches8) != 0 and ches8v == 'true':
+            print('es8立即邀请找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
+            sleep(2)
+            #alert
+            wh=driver.find_elements_by_accessibility_id('知道了')
+            if len(wh) != 0:
+                print('提示出现，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('知道了').click()
+                sleep(2)
+            else:
+                print('提示未出现，请检查原因')
+                sleep(2)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf4='../../test_report/ios/'+now+'_errNoAlert_R_stg_tc155.png'
+                driver.get_screenshot_as_file(sf4)
+                sleep(2)
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+            sleep(2)
+        else:
+            print('es8立即邀请按钮不存在/未找到，请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_非车主邀请试驾es8功能----结束:'+now)
+
+#*******************************************************
+#TC Name:test_wode_invitees8noncarowner_tc156
+#Purpose:检查我的页面的车主邀请试驾es8功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/08]
+#*******************************************************
+    def test_wode_invitees8noncarowner_tc156(self):
+        driver=self.driver
+        print('TC_检查车主手机号码登录APP，检查点:我的_车主邀请试驾es8功能----')
+        print('step1点击我的->邀请好友试驾;step2点击es8立即邀请')
+        print('step3分享微信并检查是否分享成功;step4分享朋友圈并检查是否分享成功')
+        print('step5分享微博并检查是否分享成功;step6分享我的朋友并检查是否分享成功')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_车主邀请试驾es8功能----开始:'+now)
+        sleep(1)
+        """
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp(self)
+        sleep(1)
+        """
+        #我的
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('邀请好友试驾').click()
+        sleep(4)
+        driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        #es8立即邀请
+        ches8=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]')
+        ches8v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').get_attribute('visible')
+        sleep(1.5)
+        if len(ches8) != 0 and ches8v == 'true':
+            print('es8立即邀请找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
+            sleep(2)
+            #微信
+            wh=driver.find_elements_by_accessibility_id('微信')
+            if len(wh) != 0:
+                print('分享到微信好友按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('微信').click()
+                sleep(6)
+                driver.find_element_by_accessibility_id('王小龙').click()
+                sleep(3)
+                words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                sleep(2)
+                if len(words) != 0:
+                    words[0].click()
+                    sleep(1)
+                    now0=time.strftime('%Y%m%d_%H%M%S')
+                    driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('ES8立即邀请微信好友:'+now0)
+                    sleep(1)
+                #发送
+                driver.find_element_by_accessibility_id('发送').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('返回蔚来').click()
+                sleep(1)
+                #检查toast
+                save1=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save1) != 0:
+                    print('分享微信成功')
+                    sleep(1)
+                else:
+                    print('分享微信好友失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errGiftsharewechat_R_stg_tc156.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+            else:
+                print('分享到微信按钮不存在，请检查原因')
+            sleep(2)
+            #share
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
+            sleep(2)
+            #朋友圈
+            pyq=driver.find_elements_by_accessibility_id('朋友圈')
+            if len(pyq) != 0:
+                print('分享到微信朋友圈按钮存在，检查通过')
+                sleep(1)
+                driver.find_element_by_accessibility_id('朋友圈').click()
+                sleep(9)
+                word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                word2.click()
+                sleep(1)
+                now2=time.strftime('%Y%m%d_%H%M%S')
+                word2.send_keys('人生苦短我的ES8订单微信朋友圈:'+now2)
+                sleep(1)
+                driver.find_element_by_accessibility_id('表情').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                sleep(1)
+                #私密, 仅自己可见
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成').click()
+                sleep(2)
+                #发表
+                driver.find_element_by_accessibility_id('发表').click()
+                sleep(1)
+                #检查toast
+                save2=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save2) != 0:
+                    print('分享朋友圈成功')
+                    sleep(1)
+                else:
+                    print('分享朋友圈失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errGiftsharewechatpyq_R_stg_t156.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+            else:
+                print('分享到朋友圈按钮不存在，请检查原因')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
+            sleep(2)
+            wb=driver.find_elements_by_accessibility_id('微博')
+            if len(wb) != 0:
+                print('分享到微博按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('微博').click()
+                sleep(6)
+                ad=driver.find_elements_by_accessibility_id('确定')
+                if len(ad) != 0:
+                    driver.find_element_by_accessibility_id('确定').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('发送到分组').click()
+                sleep(2)
+                #仅自己可见
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                sleep(2)
+                #发送
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
+                sleep(1)
+                #检查toast
+                save3=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save3) != 0:
+                    print('分享微博成功')
+                    sleep(1)
+                else:
+                    print('分享微博失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errGiftsharewebo_R_stg_tc156.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(1)
+            else:
+                print('分享到微博按钮不存在，请检查原因')
+            sleep(2)
+            #share
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
+            sleep(2)
+            #朋友
+            mf=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="我的朋友"]')
+            if len(mf) != 0:
+                print('分享到我的朋友按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="我的朋友"]').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('朋友').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
+                sleep(1)
+                #检查toast
+                save4=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save4) != 0:
+                    print('分享我的朋友成功')
+                    sleep(1)
+                else:
+                    print('分享我的朋友失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errGiftsharemyfriend_R_stg_tc156.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(1)
+            else:
+                print('分享到我的朋友按钮不存在，请检查原因')
+                sleep(2)
+        else:
+            print('es8立即邀请按钮不存在/未找到，请检查原因')
+            sleep(2)
+        #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':31, 'y':42})
+        driver.find_element_by_accessibility_id('all page back grey icon').click()   
+        sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_车主邀请试驾es8功能----结束:'+now)
+
+#*******************************************************
+#TC Name:test_wode_invitees6noncarowner_tc157
+#Purpose:检查我的页面的车主邀请试驾es6功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/08]
+#*******************************************************
+    def test_wode_invitees6noncarowner_tc157(self):
+        driver=self.driver
+        print('TC_检查车主手机号码登录APP，检查点:我的_车主邀请试驾es6功能----')
+        print('step1点击我的->邀请好友试驾;step2点击es6立即邀请')
+        print('step3分享微信并检查是否分享成功;step4分享朋友圈并检查是否分享成功')
+        print('step5分享微博并检查是否分享成功;step6分享我的朋友并检查是否分享成功')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_车主邀请试驾es6功能----开始:'+now)
+        sleep(1)
+        """
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp(self)
+        sleep(1)
+        """
+        #我的
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('邀请好友试驾').click()
+        sleep(4)
+        #es6立即邀请
+        ches6=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]')
+        ches6v=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]').get_attribute('visible')
+        sleep(1.5)
+        if len(ches6) != 0 and ches6v == 'true':
+            print('es6立即邀请找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]').click()
+            sleep(2)
+            #微信
+            wh=driver.find_elements_by_accessibility_id('微信')
+            if len(wh) != 0:
+                print('分享到微信好友按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('微信').click()
+                sleep(6)
+                driver.find_element_by_accessibility_id('王小龙').click()
+                sleep(3)
+                words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                sleep(2)
+                if len(words) != 0:
+                    words[0].click()
+                    sleep(1)
+                    now0=time.strftime('%Y%m%d_%H%M%S')
+                    driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('ES6立即邀请微信好友:'+now0)
+                    sleep(1)
+                #发送
+                driver.find_element_by_accessibility_id('发送').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('返回蔚来').click()
+                sleep(1)
+                #检查toast
+                save1=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save1) != 0:
+                    print('分享微信成功')
+                    sleep(1)
+                else:
+                    print('分享微信好友失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errGiftsharewechat_R_stg_tc157.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+            else:
+                print('分享到微信按钮不存在，请检查原因')
+            sleep(2)
+            #share
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]').click()
+            sleep(2)
+            #朋友圈
+            pyq=driver.find_elements_by_accessibility_id('朋友圈')
+            if len(pyq) != 0:
+                print('分享到微信朋友圈按钮存在，检查通过')
+                sleep(1)
+                driver.find_element_by_accessibility_id('朋友圈').click()
+                sleep(9)
+                word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                word2.click()
+                sleep(1)
+                now2=time.strftime('%Y%m%d_%H%M%S')
+                word2.send_keys('人生苦短我的ES8订单微信朋友圈:'+now2)
+                sleep(1)
+                driver.find_element_by_accessibility_id('表情').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                sleep(1)
+                #私密, 仅自己可见
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成').click()
+                sleep(2)
+                #发表
+                driver.find_element_by_accessibility_id('发表').click()
+                sleep(1)
+                #检查toast
+                save2=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save2) != 0:
+                    print('分享朋友圈成功')
+                    sleep(1)
+                else:
+                    print('分享朋友圈失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errGiftsharewechatpyq_R_stg_tc157.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+            else:
+                print('分享到朋友圈按钮不存在，请检查原因')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]').click()
+            sleep(2)
+            wb=driver.find_elements_by_accessibility_id('微博')
+            if len(wb) != 0:
+                print('分享到微博按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('微博').click()
+                sleep(7)
+                ad=driver.find_elements_by_accessibility_id('确定')
+                if len(ad) != 0:
+                    driver.find_element_by_accessibility_id('确定').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('发送到分组').click()
+                sleep(2)
+                #仅自己可见
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                sleep(2)
+                #发送
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
+                sleep(1)
+                #检查toast
+                save3=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save3) != 0:
+                    print('分享微博成功')
+                    sleep(1)
+                else:
+                    print('分享微博失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errGiftsharewebo_R_stg_tc157.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(1)
+            else:
+                print('分享到微博按钮不存在，请检查原因')
+            sleep(2)
+            #share
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]').click()
+            sleep(2)
+            #朋友
+            mf=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="我的朋友"]')
+            if len(mf) != 0:
+                print('分享到我的朋友按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="我的朋友"]').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('朋友').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8837")]').click()
+                sleep(1)
+                #检查toast
+                save4=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save4) != 0:
+                    print('分享我的朋友成功')
+                    sleep(1)
+                else:
+                    print('分享我的朋友失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errGiftsharemyfriend_R_stg_tc157.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(1)
+            else:
+                print('分享到我的朋友按钮不存在，请检查原因')
+                sleep(2)
+        else:
+            print('es6立即邀请按钮不存在/未找到，请检查原因')
+            sleep(2)
+        #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':31, 'y':42})
+        driver.find_element_by_accessibility_id('all page back grey icon').click()   
+        sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_车主邀请试驾es6功能----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_rescue4carowner_tc158
+#Purpose:检查车主模式点击爱车下的事故救援按钮分别检查页面是否显示正常
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/11]
+#*********************************************************************************************************************************
+    def test_aiche_rescue4carowner_tc158(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:车主模式使用一键维保功能')
+        print('step1先退出原账号,再用车主账号登陆')
+        print('step2爱车页面找到事故救援按钮后点击判断蔚来服务热线弹窗是否显示正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_车主模式使用事故救援功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6988")]')
+        if len(name) != 0:
+            print('车主用户已登录')
+            sleep(0.5)
+        else:
+            print('车主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+            sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(1)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+        sleep(4)
+        driver.execute_script("mobile: scroll", {"direction": "up"})
         sleep(2)
         for i in range(1):
             driver.execute_script("mobile: scroll", {"direction": "down"})
-            sleep(1)
         #driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':400,'toX':50,'toY':100,'duration':1.0})
         sleep(3)
-        #
-        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="一键维保"]')
-        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="一键维保"]').get_attribute('visible')
-        sleep(1.5)
-        if len(ch) != 0 and ch0 == 'true':
-            print('一键维保按钮找到')
-            sleep(2)
-            driver.find_element_by_accessibility_id('一键维保').click()
-            #driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[9]/XCUIElementTypeButton[2]').click()
-            sleep(2)
-            name0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"所在城市的线上预约服务正在筹备中")]')
-            if len(name0) != 0:
-                print('一键维保页面显示正常！')
-                sleep(0.5)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="事故救援"]')
+        if len(ch) != 0:
+            ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="事故救援"]').get_attribute('visible')
+            if ch0v == 'true':
+                print('事故救援按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('事故救援').click()
+                sleep(2)
+                name0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"4009996699")]')
+                if len(name0) != 0:
+                    print('蔚来服务热线弹窗显示正常,检查通过')
+                    sleep(0.5)
+                else:
+                    print('蔚来服务热线弹窗显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf0='../../test_report/ios/'+now+'_errRescue_R_stg_tc158.png'
+                    driver.get_screenshot_as_file(sf0)
+                sleep(1)
+                driver.find_element_by_accessibility_id('取消').click()
+                sleep(2)
             else:
-                print('一键维保页面显示不正常,请检查原因！')
-                sleep(0.5)
-                now=time.strftime('%Y%m%d_%H%M%S')
-                sf0='../../test_report/ios/'+now+'_errOnekeyMaintain_R_stg_tc141.png'
-                driver.get_screenshot_as_file(sf0)
+                print('事故救援按钮未找到,请检查原因')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_车主模式使用事故救援功能----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_othercityrecharge4onekeycarowner_tc159
+#Purpose:检查一键加电车主模式点击爱车下的一键加电按钮选择异地加电权益
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/11]
+#*********************************************************************************************************************************
+    def test_aiche_othercityrecharge4onekeycarowner_tc159(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:一键加电车主模式使用异地加电权益功能')
+        print('step1先退出原账号,再用一键加电车主账号登陆')
+        print('step2爱车页面找到一键加电按钮后点击进入,选择异地加电权益')
+        print('step3加电成功后,点右上角...按钮,选择取消服务,选择取消的原因,提交后检查服务详情页面显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_一键加电车主模式使用异地加电权益功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"一键加电")]')
+        if len(name) != 0:
+            print('一键加电车主用户已登录')
+            sleep(0.5)
+        else:
+            print('一键加电车主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
             sleep(1)
-            driver.find_element_by_accessibility_id('取消').click()
+            bp_normalloginmp_onekey(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(1)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('6').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('5').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('4').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':595})
+            sleep(0.3)
+        sleep(4)
+        for i in range(0):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        #
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]').get_attribute('visible')
+        sleep(2)
+        if ch0 == 'true':
+            print('一键加电按钮找到')
+            sleep(2)
+            driver.find_element_by_accessibility_id('一键加电').click()
+            sleep(2)
+            fine=driver.find_elements_by_accessibility_id('我知道了')
+            if len(fine) != 0:
+                driver.find_element_by_accessibility_id('我知道了').click()
+            sleep(4)
+            driver.find_element_by_accessibility_id('呼叫服务').click()
+            sleep(4)
+            #异地加电权益
+            other=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"异地加电权益")]')
+            if len(other) != 0:
+                print('异地加电权益找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"异地加电权益")]').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('authed vehicle cell check off').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(5)
+                print('异地加电成功')
+                sleep(2)
+                #取消
+                driver.find_element_by_accessibility_id('more icon').click()
+                sleep(2)
+                name0=driver.find_elements_by_accessibility_id('取消服务')
+                if len(name0) != 0:
+                    print('取消服务按钮存在！')
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('取消服务').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('取消服务').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('希望修改期望取车时间或地点').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('提交').click()
+                    sleep(3)
+                    t0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务已取消")]')
+                    if len(t0) != 0:
+                        print('服务详情页面显示正常')
+                        sleep(0.5)
+                    else:
+                        print('服务详情页面显示不正常,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf0='../../test_report/ios/'+now+'_errCanceled_R_stg_tc159.png'
+                        driver.get_screenshot_as_file(sf0)
+                    sleep(1)
+                    
+                else:
+                    print('取消服务按钮不存在/未找到,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errNoCancel_R_stg_tc159.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(1)
+                    driver.find_elements_by_accessibility_id('返回').click()
+                    sleep(2)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+            else:
+                print('异地加电权益未找到,请检查原因')
+                sleep(2)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errNoOthercity_R_stg_tc159.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(1)
+                driver.find_element_by_accessibility_id('取消').click()
+                sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
             sleep(2)
         else:
-            print('一键维保按钮未找到,请检查原因')
+            print('一键加电按钮未找到,请检查原因')
             sleep(2)
         now=time.strftime('%Y%m%d_%H%M%S')
-        print('TC_爱车_车主模式使用一键维保功能----结束:'+now)
+        print('TC_爱车_一键加电车主模式使用异地加电权益功能----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_energyfreeworry4onekeycarowner_tc160
+#Purpose:检查一键加电车主模式点击爱车下的一键加电按钮选择能量无忧套餐
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/11]
+#*********************************************************************************************************************************
+    def test_aiche_energyfreeworry4onekeycarowner_tc160(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:一键加电车主模式使用异地加电权益功能')
+        print('step1先退出原账号,再用一键加电车主账号登陆')
+        print('step2爱车页面找到一键加电按钮后点击进入,选择地址、地上车库等信息后确认')
+        print('step3点击呼叫服务,选择能量无忧套餐')
+        print('step4加电成功后,点右上角...按钮,选择取消服务,选择取消的原因,提交后检查服务详情页面显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_一键加电车主模式使用能量无忧套餐功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"一键加电")]')
+        if len(name) != 0:
+            print('一键加电车主用户已登录')
+            sleep(0.5)
+        else:
+            print('一键加电车主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_onekey(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(1)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('6').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('5').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('4').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':595})
+            sleep(0.3)
+        sleep(4)
+        for i in range(0):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        #
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]').get_attribute('visible')
+        sleep(2)
+        if ch0 == 'true':
+            print('一键加电按钮找到')
+            sleep(2)
+            driver.find_element_by_accessibility_id('一键加电').click()
+            sleep(2)
+            fine=driver.find_elements_by_accessibility_id('我知道了')
+            if len(fine) != 0:
+                driver.find_element_by_accessibility_id('我知道了').click()
+            sleep(4)
+            #选择地址
+            ###driver.find_element_by_('icon_more_right').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':323, 'y':594})
+            sleep(3)
+            ###driver.find_element_by_xpath('//XCUIElementTypeApplication[1]/XCUIElementTypeWindow[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeTable[1]/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]')
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':198, 'y':99})
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"绿洲雅宾利花园")]').click()
+            sleep(3)
+            ###driver.find_element_by_accessibility_id('选择车库类型').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':69, 'y':164})
+            sleep(2)
+            #确定
+            driver.find_element_by_accessibility_id('确定').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('确认').click()
+            sleep(2)
+            o=driver.find_elements_by_accessibility_id('确认')
+            if len(o) != 0:
+                driver.find_element_by_accessibility_id('确认').click()
+            sleep(3)
+            #
+            driver.find_element_by_accessibility_id('呼叫服务').click()
+            sleep(4)
+            #能量无忧套餐
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"能量无忧套餐")]').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('authed vehicle cell check off').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('确定').click()
+            sleep(5)
+            print('能量无忧套餐加电成功')
+            sleep(2)
+            #取消
+            driver.find_element_by_accessibility_id('more icon').click()
+            sleep(2)
+            name0=driver.find_elements_by_accessibility_id('取消服务')
+            if len(name0) != 0:
+                print('取消服务按钮存在')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('取消服务').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('取消服务').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('希望修改期望取车时间或地点').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('提交').click()
+                sleep(3)
+                t0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务已取消")]')
+                if len(t0) != 0:
+                    print('服务详情页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('服务详情页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf0='../../test_report/ios/'+now+'_errCanceled_R_stg_tc160.png'
+                    driver.get_screenshot_as_file(sf0)
+                sleep(1)
+            else:
+                print('取消服务按钮不存在/未找到,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errNoCancel_R_stg_tc160.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(1)
+                driver.find_elements_by_accessibility_id('返回').click()
+                sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+        else:
+            print('一键加电按钮未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_一键加电车主模式使用能量无忧套餐功能----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_jingxi_onlinesupport_tc161
+#Purpose:检查用户在商品详细页面里点击在线咨询按钮的功能测试
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/13]
+#***********************************************************************************************************************
+    def test_jingxi_onlinesupport_tc161(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:惊喜_惊喜页面用户点击在线咨询按钮的功能检查')
+        print('step1进入惊喜页面')
+        print('step2翻页找到所需兑换的商品；step3点击在线咨询按钮')
+        print('step4检查蔚来专员页面显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_惊喜页面用户商品详细页面里点击在线咨询按钮的预期检查----开始:'+now)
+        sleep(1)
+        #惊喜
+        driver.find_element_by_accessibility_id('惊喜').click()
+        sleep(6)
+        for i in range(8):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":650,"toX":50,"toY":100,"duration":1.0})
+        sleep(2)
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
+        if len(u1) != 0:
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要查找的商品存在，检查通过')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(7)
+                #机器人图标
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':34, 'y':701})
+                sleep(2)
+                #购物车图标
+                #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':76, 'y':701})
+                #sleep(2)
+                #在线小助手
+                chk=driver.find_elements_by_xpath('//XCUIElementTypeNavigationBar[@name="在线小助手"]')
+                sleep(2)
+                if len(chk) != 0:
+                    print('蔚来专员页面显示正常，检查通过')
+                    sleep(0.5)
+                else:
+                    print('蔚来专员页面显示不正常，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errOnlineService_R_stg_tc161.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+                #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':31, 'y':42})
+                driver.find_element_by_accessibility_id('chat back icon').click()
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':31, 'y':42})
+                sleep(2)
+        else:
+            print('需要查找的商品不存在，请重新挑选')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_惊喜页面用户商品详细页面里点击在线资讯按钮的预期检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_jingxi_rotatecastshare_tc162
+#Purpose:检查惊喜页面的合辑轮播的分享功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/13]
+#***********************************************************************************************************************
+    def test_jingxi_rotatecastshare_tc162(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:惊喜_惊喜页面的商品的分享功能----step1进入惊喜页面')
+        print('step2点击进入合辑轮播页面；step3点右上角的分享按钮（先检查是否存在)；step4检查分享微信功能是否正常')
+        print('step5检查分享朋友圈功能是否正常;step6检查分享微博功能是否正常;step7检查分享我的朋友功能是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_惊喜页面的合辑轮播的分享功能----开始:'+now)
+        sleep(1)
+        #惊喜#8#
+        driver.find_element_by_accessibility_id('惊喜').click()
+        sleep(8)
+        #合辑轮播
+        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':300})
+        sleep(5)
+        #分享图标
+        share=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "休闲的咖啡时光"')
+        sleep(1)
+        if len(share) != 0:
+            print('分享按钮存在,检查通过')
+            sleep(2)
+            #share
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
+            sleep(2)
+            #微信
+            wh=driver.find_elements_by_accessibility_id('微信')
+            if len(wh) != 0:
+                print('分享到微信好友按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('微信').click()
+                sleep(9)
+                driver.find_element_by_accessibility_id('王小龙').click()
+                sleep(3)
+                words=driver.find_elements_by_xpath('//XCUIElementTypeWindow[4]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView')
+                sleep(2)
+                if len(words) != 0:
+                    words[0].click()
+                    sleep(0.5)
+                    now0=time.strftime('%Y%m%d_%H%M%S')
+                    driver.find_element_by_xpath('//XCUIElementTypeWindow[3]/XCUIElementTypeImage[1]/XCUIElementTypeOther[5]/XCUIElementTypeTextView').send_keys('我用Python_Gift微信好友:'+now0)
+                    sleep(1)
+                #发送
+                driver.find_element_by_accessibility_id('发送').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('返回蔚来').click()
+                sleep(1.2)
+                #检查toast
+                save1=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save1) != 0:
+                    print('分享微信好友成功')
+                    sleep(1)
+                else:
+                    print('分享微信好友失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errGiftsharewechat_R_stg_tc162.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+            else:
+                print('分享到微信好友按钮不存在，请检查原因')
+            sleep(2)
+            #share
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
+            sleep(2)
+            #朋友圈
+            pyq=driver.find_elements_by_accessibility_id('朋友圈')
+            if len(pyq) != 0:
+                print('分享到朋友圈按钮存在，检查通过')
+                sleep(1)
+                driver.find_element_by_accessibility_id('朋友圈').click()
+                sleep(8)
+                word2=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeTable/XCUIElementTypeOther[1]/XCUIElementTypeTextView')
+                word2.click()
+                sleep(1)
+                now2=time.strftime('%Y%m%d_%H%M%S')
+                word2.send_keys('惊喜合辑轮播朋友圈:'+now2)
+                sleep(1)
+                driver.find_element_by_accessibility_id('表情').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="公开"]').click()
+                sleep(1)
+                #私密, 仅自己可见
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="私密"]').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成').click()
+                sleep(2)
+                #发表
+                driver.find_element_by_accessibility_id('发表').click()
+                sleep(1)
+                #检查toast
+                save2=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save2) != 0:
+                    print('分享朋友圈成功')
+                    sleep(0.5)
+                else:
+                    print('分享朋友圈失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errGiftsharewechatpyq_R_stg_tc162.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(1)
+            else:
+                print('分享到朋友圈按钮不存在，请检查原因')
+            sleep(2)
+            #share
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
+            sleep(2)
+            #微博
+            wb=driver.find_elements_by_accessibility_id('微博')
+            if len(wb) != 0:
+                print('分享到微博按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('微博').click()
+                sleep(7)
+                ad=driver.find_elements_by_accessibility_id('确定')
+                if len(ad) != 0:
+                    driver.find_element_by_accessibility_id('确定').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('发送到分组').click()
+                sleep(3)
+                #仅自己可见
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="仅自己可见"]').click()
+                sleep(2)
+                #发送
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="转发到微博"]').click()
+                sleep(1)
+                #检查toast
+                save3=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save3) != 0:
+                    print('分享微博成功')
+                    sleep(0.5)
+                else:
+                    print('分享微博失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errGiftsharewebo_R_stg_tc162.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(1)
+            else:
+                print('分享到新浪微博按钮不存在，请检查原因')
+            sleep(2)
+            #share
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':377, 'y':40})
+            sleep(2)
+            #朋友
+            mf=driver.find_elements_by_accessibility_id('朋友')
+            if len(mf) != 0:
+                print('分享到朋友按钮存在，检查通过')
+                sleep(1)
+                driver.find_element_by_accessibility_id('朋友').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('朋友').click()
+                sleep(3)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam8")]').click()
+                sleep(1)
+                #检查toast
+                save4=driver.find_elements_by_accessibility_id('分享成功')
+                if len(save4) != 0:
+                    print('分享朋友成功')
+                    sleep(0.5)
+                else:
+                    print('分享朋友失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errGiftsharemyfriend_R_stg_tc162.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(1)
+            else:
+                print('分享到朋友按钮不存在，请检查原因')
+                sleep(2)
+        else:
+            print('分享按钮不存在/未找到，请检查原因')
+            sleep(2)
+        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':41})
+        sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_惊喜页面的合辑轮播的分享功能----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_jingxi_buywithaddress_tc163
+#Purpose:已有地址用户添加商品到购物车并增加商品数量至20以上及下单的验证
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/13]
+#***********************************************************************************************************************
+    def test_jingxi_buywithaddress_tc163(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:惊喜_已有地址用户添加商品到购物车并增加商品数量至20以上的验证')
+        print('step1进入惊喜页面;step2翻页找到所需兑换的商品')
+        print('step3把商品加入购物车；step4增加商品数量为20')
+        print('step5点击增加数量+号键检查单品已达上限toast是否出现')
+        print('step6立即下单并提交检查订单是否提交成功')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_已有地址用户添加商品到购物车并增加商品数量至20以上及下单的验证----开始:'+now)
+        sleep(1)
+        #惊喜
+        driver.find_element_by_accessibility_id('惊喜').click()
+        sleep(6)
+        for i in range(8):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":650,"toX":50,"toY":100,"duration":1.0})
+        sleep(2)
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
+        if len(u1) != 0:
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品存在，检查通过')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(7)
+                #加入购物车
+                add2b=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]')
+                sleep(2)
+                if len(add2b) != 0:
+                    print('加入购物车按钮存在，检查通过')
+                    sleep(2)
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                    sleep(3)
+                    driver.execute_script("mobile: dragFromToForDuration",{"fromX":150,"fromY":600,"toX":150,"toY":300,"duration":1.0})
+                    sleep(3)
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                    sleep(3)
+                    #点击购买数量的+默认数量为1
+                    for i in range(19):
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                        sleep(1)
+                    sleep(2)
+                    #再点+号一次
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                    #检查toast
+                    over=driver.find_elements_by_accessibility_id('单品已达上限')
+                    if len(over) != 0:
+                        print('单品已达上限toast检查通过')
+                        sleep(0.5)
+                    else:
+                        print('单品已达上限toast检查通过失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf4='../../test_report/ios/'+now+'_errOver20_R_stg_tc163.png'
+                        driver.get_screenshot_as_file(sf4)
+                    sleep(4)
+                    driver.find_element_by_accessibility_id('立即购买').click()
+                    sleep(3)
+                    #改变收货地址
+                    """
+                    ###driver.find_element_by_xpath('//XCUIElementTypeOther[contains(@name,"赵子龙")]').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':374, 'y':160})
+                    sleep(2)
+                    #第二个地址
+                    driver.find_element_by_xpath('//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[2]').click()
+                    sleep(2)
+                    """
+                    driver.find_element_by_accessibility_id('立即下单').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('确定').click()
+                    sleep(4)
+                    chk=driver.find_elements_by_xpath('//*[contains(@name,"订单已提交")]')
+                    sleep(1)
+                    if len(chk) == 0:
+                        print('订单已提交检查失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errGiftOrder_R_stg_tc163.png'
+                        driver.get_screenshot_as_file(sf1)
+                        sleep(2)
+                    else:
+                        print('订单已提交检查通过')
+                        sleep(2)
+                        #查看订单
+                        driver.find_element_by_accessibility_id('查看订单').click()
+                        sleep(6)
+                        #检查商品状态
+                        chk1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"cake")]')
+                        chk2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"已付款")]')
+                        sleep(1)
+                        if len(chk1) != 0 and len(chk2) != 0:
+                            print('订单里商品状态检查通过')
+                            sleep(0.5)
+                        else:
+                            print('订单里商品状态检查失败，请检查原因')
+                            sleep(0.5)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf1='../../test_report/ios/'+now+'_errGiftStatus_R_stg_tc163.png'
+                            driver.get_screenshot_as_file(sf1)
+                        sleep(1)
+                else:
+                    print('加入购物车按钮不存在，请检查原因')
+                    sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':41})
+                sleep(1)
+        else:
+            print('需要兑换的商品不存在/未找到，请重新挑选')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_已有地址用户添加商品到购物车并增加商品数量至20以上及下单的验证----结束:'+now)
+
+#*********************************************************************************************
+#TC Name:test_jingxi_buyallincash_tc164
+#Purpose:已有地址用户购买纯金额商品的验证
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/14]
+#*********************************************************************************************
+    def test_jingxi_buyallincash_tc164(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:惊喜_已有地址用户购买纯金额商品的验证')
+        print('step1进入惊喜页面;step2翻页找到所需兑换的商品')
+        print('step3把商品加入购物车；step4增加商品数量为20')
+        print('step5点击增加数量+号键检查单品已达上限toast是否出现')
+        print('step6立即购买并选择纯金额付款方式下单,检查订单状态是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_已有地址用户购买纯金额商品的验证----开始:'+now)
+        sleep(1)
+        #惊喜
+        driver.find_element_by_accessibility_id('惊喜').click()
+        sleep(6)
+        for i in range(12):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
+        sleep(2)
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="1227车主专享价 100"]')
+        if len(u1) != 0:
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="1227车主专享价 100"]').get_attribute('visible')
+            if u1v == 'true':
+                print('需要兑换的商品存在，检查通过')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="1227车主专享价 100"]').click()
+                sleep(7)
+                #加入购物车
+                add2b=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]')
+                sleep(2)
+                if len(add2b) != 0:
+                    print('加入购物车按钮存在，检查通过')
+                    sleep(2)
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                    sleep(3)
+                    #driver.execute_script("mobile: dragFromToForDuration",{"fromX":150,"fromY":600,"toX":150,"toY":300,"duration":1.0})
+                    #sleep(3)
+                    #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                    #sleep(3)
+                    #点击购买数量的+默认数量为1
+                    for i in range(19):
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                        sleep(1)
+                    sleep(2)
+                    #再点+号一次
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                    #检查toast
+                    over=driver.find_elements_by_accessibility_id('单品已达上限')
+                    if len(over) != 0:
+                        print('单品已达上限toast检查通过')
+                        sleep(1)
+                    else:
+                        print('单品已达上限toast检查通过失败，请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf4='../../test_report/ios/'+now+'_errOver20_R_stg_tc164.png'
+                        driver.get_screenshot_as_file(sf4)
+                    sleep(4)
+                    driver.find_element_by_accessibility_id('立即购买').click()
+                    sleep(3)
+                    #支付方式>
+                    #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':376, 'y':508})
+                    #sleep(1)
+                    #Y200
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':200, 'y':541})
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('立即下单').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('确定').click()
+                    sleep(3)
+                    #微信支付
+                    chk=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                    sleep(1)
+                    if len(chk) == 0:
+                        print('微信支付不存在，请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errWechatPay_R_stg_tc164.png'
+                        driver.get_screenshot_as_file(sf1)
+                        sleep(2)
+                    else:
+                        print('微信支付存在,检查通过')
+                        sleep(2)
+                        #查看订单
+                        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':30, 'y':41})
+                        #driver.find_element_by_accessibility_id('确定').click()
+                        sleep(3)
+                        #检查商品状态
+                        chk1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"1227车主专享价")]')
+                        chk2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待付款")]')
+                        sleep(1)
+                        if len(chk1) != 0 and len(chk2) != 0:
+                            print('订单里商品状态检查通过')
+                            sleep(1)
+                        else:
+                            print('订单里商品状态检查失败，请检查原因')
+                            sleep(1)
+                            now=time.strftime('%Y%m%d_%H%M%S')
+                            sf1='../../test_report/ios/'+now+'_errGiftStatus_R_stg_tc164.png'
+                            driver.get_screenshot_as_file(sf1)
+                        sleep(2)
+                else:
+                    print('加入购物车按钮不存在，请检查原因')
+                    sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':41})
+                sleep(2)
+            else:
+                print('需要兑换的商品不存在/未找到，请重新挑选')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_已有地址用户购买纯金额商品的验证----结束:'+now)
+
+#*********************************************************************************************
+#TC Name:test_jingxi_buycouponpluscash4notenough_tc165
+#Purpose:积分不足用户购买积分+现金商品的验证
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/14]
+#*********************************************************************************************
+    def test_jingxi_buycouponpluscash4notenough_tc165(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:惊喜_积分不足用户购买积分+现金商品的验证')
+        print('step1进入惊喜页面;step2翻页找到所需兑换的商品')
+        print('step3把商品加入购物车；step4增加商品数量为20')
+        print('step5点击增加数量+号键检查单品已达上限toast是否出现')
+        print('step6立即购买并选择积分+现金付款方式下单,检查订单状态是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_积分不足用户购买积分+现金商品的验证----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6986")]')
+        if len(name) != 0:
+            print('积分不足用户已登录')
+            sleep(0.5)
+        else:
+            print('积分不足用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_notenoughscore(self)
+        sleep(1)
+        #惊喜
+        driver.find_element_by_accessibility_id('惊喜').click()
+        sleep(6)
+        for i in range(8):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":300,"toX":50,"toY":450,"duration":1.0})
+        sleep(3)
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="供应商发货商品 10000"]')
+        if len(u1) != 0:
+            print('需要兑换的商品存在，检查通过')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeOther[@name="供应商发货商品 10000"]').click()
+            sleep(7)
+            #加入购物车
+            add2b=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]')
+            sleep(2)
+            if len(add2b) != 0:
+                print('加入购物车按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                sleep(3)
+                #driver.execute_script("mobile: dragFromToForDuration",{"fromX":150,"fromY":600,"toX":150,"toY":300,"duration":1.0})
+                #sleep(3)
+                #driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="加入购物车"]').click()
+                #sleep(3)
+                #点击购买数量的+默认数量为1
+                for i in range(19):
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                    sleep(1)
+                sleep(2)
+                #再点+号一次
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':115, 'y':616})
+                #检查toast
+                over=driver.find_elements_by_accessibility_id('单品已达上限')
+                if len(over) != 0:
+                    print('单品已达上限toast检查通过')
+                    sleep(1)
+                else:
+                    print('单品已达上限toast检查通过失败，请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errorOver20_R_stg_tc165.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(4)
+                driver.find_element_by_accessibility_id('立即购买').click()
+                sleep(3)
+                #支付方式>
+                """
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':376, 'y':508})
+                sleep(1)
+                #Y10
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':182, 'y':524})
+                sleep(0.5)
+                #
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(1.5)
+                """
+                driver.find_element_by_accessibility_id('立即下单').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(3)
+                #微信支付
+                chk=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"微信支付")]')
+                sleep(1)
+                if len(chk) == 0:
+                    print('微信支付不存在，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errWechatPay_R_stg_tc165.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(2)
+                else:
+                    print('微信支付存在,检查通过')
+                    sleep(2)
+                    #返回
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':30, 'y':41})
+                    sleep(3)
+                    #检查商品状态
+                    chk1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"供应商发货商品")]')
+                    chk2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"待付款")]')
+                    sleep(1)
+                    if len(chk1) != 0 and len(chk2) != 0:
+                        print('订单里商品状态检查通过')
+                        sleep(0.5)
+                    else:
+                        print('订单里商品状态检查失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errGiftStatus_R_stg_tc165.png'
+                        driver.get_screenshot_as_file(sf1)
+                    sleep(2)
+            else:
+                print('加入购物车按钮不存在，请检查原因')
+                sleep(1)
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':41})
+            sleep(1)
+        else:
+            print('需要兑换的商品不存在，请重新挑选')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_积分不足用户购买积分+现金商品的验证----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_onetimefeege4onekeycarowner_tc166
+#Purpose:检查一键加电车主模式点击爱车下的一键加电按钮选择单次结算
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/15]
+#*********************************************************************************************************************************
+    def test_aiche_onetimefeege4onekeycarowner_tc166(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:一键加电车主模式使用单次结算功能')
+        print('step1先退出原账号,再用一键加电车主账号登陆')
+        print('step2爱车页面找到一键加电按钮后点击进入,选择单次结算')
+        print('step3加电成功后,点右上角...按钮,选择取消服务,选择取消的原因,提交后检查服务详情页面显示是否正常')
+        print('step4点右上角...按钮,选择历史记录,点击第一条历史记录,检查服务详情页面显示是否正常')
+        print('step5点击聊天/专员电话按钮,检查功能是否正常')
+        print('step6返回点右上角...按钮,点击取消')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_一键加电车主模式使用单次结算功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"一键加电")]')
+        if len(name) != 0:
+            print('一键加电车主用户已登录')
+            sleep(0.5)
+        else:
+            print('一键加电车主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_onekey(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(1)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('6').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('5').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('4').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':595})
+            sleep(0.3)
+        sleep(4)
+        for i in range(0):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        #
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]')
+        ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]').get_attribute('visible')
+        sleep(2)
+        if ch0 == 'true':
+            print('一键加电按钮找到')
+            sleep(2)
+            driver.find_element_by_accessibility_id('一键加电').click()
+            sleep(2)
+            fine=driver.find_elements_by_accessibility_id('我知道了')
+            if len(fine) != 0:
+                driver.find_element_by_accessibility_id('我知道了').click()
+            sleep(4)
+            driver.find_element_by_accessibility_id('呼叫服务').click()
+            sleep(4)
+            #单次结算
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"单次结算")]').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('authed vehicle cell check off').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('确定').click()
+            sleep(6)
+            print('异地加电成功')
+            sleep(2)
+            driver.find_element_by_accessibility_id('more icon').click()
+            sleep(2)
+            #取消服务
+            name0=driver.find_elements_by_accessibility_id('取消服务')
+            if len(name0) != 0:
+                print('取消服务按钮存在')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('取消服务').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('取消服务').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('希望修改期望取车时间或地点').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('提交').click()
+                sleep(3)
+                t0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务已取消")]')
+                if len(t0) != 0:
+                    print('服务详情页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('服务详情页面显示不正常,请检查原因！')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf0='../../test_report/ios/'+now+'_errCanceled_R_stg_tc166.png'
+                    driver.get_screenshot_as_file(sf0)
+                sleep(1)
+            else:
+                print('取消服务按钮不存在/未找到,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf0='../../test_report/ios/'+now+'_errNoCancel_R_stg_tc166.png'
+                driver.get_screenshot_as_file(sf0)
+                sleep(1)
+                driver.find_element_by_accessibility_id('取消').click()
+                sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('more icon').click()
+            sleep(2)
+            #历史记录
+            name1=driver.find_elements_by_accessibility_id('历史记录')
+            if len(name1) != 0:
+                print('历史记录按钮存在')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('历史记录').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('已取消').click()
+                sleep(3)
+                t1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"单次结算")]')
+                if len(t1) != 0:
+                    print('历史记录的服务详情页面显示正常')
+                    sleep(0.5)
+                    #聊天
+                    driver.find_element_by_accessibility_id('message leave icon').click()
+                    sleep(2)
+                    chat=driver.find_element_by_accessibility_id('chat_input_textView')
+                    chat.click()
+                    sleep(0.5)
+                    chat.clear()
+                    sleep(0.5)
+                    now2=time.strftime('%Y%m%d_%H%M%S')
+                    chat.send_keys('历史记录聊天:'+now2)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('Send').click()
+                    sleep(1)
+                    #driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':41})
+                    sleep(2)
+                    #专员电话
+                    driver.find_element_by_accessibility_id('call phone icon').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('取消').click()
+                    sleep(2)
+                    print('呼叫专员电话功能检查通过')
+                    sleep(2)
+                else:
+                    print('历史记录的服务详情页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf0='../../test_report/ios/'+now+'_errDetail_R_stg_tc166.png'
+                    driver.get_screenshot_as_file(sf0)
+                sleep(1)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('more icon').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('取消').click()
+                sleep(2)
+            else:
+                print('历史记录按钮不存在/未找到,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf0='../../test_report/ios/'+now+'_errNoHistory_R_stg_tc166.png'
+                driver.get_screenshot_as_file(sf0)
+                sleep(1)
+                driver.find_element_by_accessibility_id('取消').click()
+                sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+        else:
+            print('一键加电按钮未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_一键加电车主模式使用单次结算功能----结束:'+now)
+
+#*******************************************************************************************************************************************
+#TC Name:test_faxian_askhim_tc167
+#Purpose:发现页面体验tab活动详情页面点击我想提问的功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/15]
+#*******************************************************************************************************************************************
+    def test_faxian_askhim_tc167(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号发现——体验tab活动详情页面点击我想提问的功能')
+        print('step1发现页面里点击体验tab;step2地点找到普通活动111')
+        print('step3点击进入检查我想提问按钮是存在;step4点击我想提问进入')
+        print('step5点击输入栏,输入问题,提交,检查提问的文字是否存在')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验活动详情页面点击我想提问的功能----开始:'+now)
+        sleep(1)
+        #体验
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        for i in range(2):
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+        sleep(3)
+        ###driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name CONTAINS "更多同城活动"').click()
+        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':577})
+        sleep(3)
+        #driver.execute_script("mobile: scroll", {"direction": "down"})
+        #sleep(2)
+        #普通活动111
+        ch1=driver.find_elements_by_accessibility_id('普通活动111')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_accessibility_id('普通活动111').get_attribute('visible')
+            if ch1v == 'true':
+                print('普通活动111找到')
+                sleep(1)
+                driver.find_element_by_accessibility_id('普通活动111').click()
+                sleep(5)
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(3)
+                #我想提问
+                joins=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="我想提问"]')
+                sleep(1)
+                if len(joins) != 0:
+                    print('我想提问按钮存在,检查通过')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我想提问').click()
+                    sleep(5)
+                    #我也来说
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@value,"我也来说~")]').click()
+                    sleep(2)
+                    edit=driver.find_element_by_xpath('//XCUIElementTypeApplication[1]/XCUIElementTypeWindow[1]/XCUIElementTypeOther[2]/XCUIElementTypeOther[1]/XCUIElementTypeOther[2]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeTextView[1]')
+                    edit.click()
+                    sleep(0.5)
+                    now0=time.strftime('%H%M%S')
+                    sleep(0.5)
+                    edit.send_keys('我想提问:'+now0)
+                    t0='我想提问:'+now0
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('Send').click()
+                    sleep(2)
+                    title=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,t0)]')
+                    if len(title) != 0:
+                        print('提问的文字检查通过')
+                        sleep(1)
+                    else:
+                        print('提问的文字检查失败，请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errComment_R_stg_tc167.png'
+                        driver.get_screenshot_as_file(sf1)
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(2)
+                else:
+                    print('我想提问按钮不存在，请检查原因')
+                    sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+            else:
+                print('普通活动111未找到,请检查原因')
+                sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验活动详情页面点击我想提问的功能----结束:'+now)
+
+#*******************************************************************************************************************************************
+#TC Name:test_faxian_expeswipepicsave_tc168
+#Purpose:发现页面体验活动详情页面头图的滑动和保存的功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/15]
+#*******************************************************************************************************************************************
+    def test_faxian_expeswipepicsave_tc168(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号发现——体验活动详情页面头图的滑动和保存的功能')
+        print('step1发现页面里点击体验tab;step2地点找到普通活动111')
+        print('step3点击进入向左滑动头图;step4向右滑动头图')
+        print('step5点击头图,再点击保存,检查保存是否成功')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验活动详情页面头图的滑动和保存的功能----开始:'+now)
+        sleep(1)
+        #体验
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        for i in range(2):
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+        sleep(3)
+        ###driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name CONTAINS "更多同城活动"').click()
+        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':577})
+        sleep(3)
+        #driver.execute_script("mobile: scroll", {"direction": "down"})
+        #sleep(2)
+        #普通活动111
+        ch1=driver.find_elements_by_accessibility_id('普通活动111')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_accessibility_id('普通活动111').get_attribute('visible')
+            if ch1v == 'true':
+                print('普通活动111找到')
+                sleep(1)
+                driver.find_element_by_accessibility_id('普通活动111').click()
+                sleep(5)
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':390,'fromY':200,'toX':50,'toY':200,'duration':0.5})
+                sleep(2)
+                print('向左滑动头图成功')
+                sleep(1.5)
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':390,'toY':200,'duration':0.5})
+                sleep(2)
+                print('向右滑动头图成功')
+                sleep(1.5)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':200})
+                sleep(1.5)
+                #保存
+                save=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="保存"]')
+                sleep(1)
+                if len(save) != 0:
+                    print('保存按钮存在,检查通过')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('保存').click()
+                    sleep(0.05)
+                    save_ok=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,"保存成功")]')
+                    sleep(0.5)
+                    if len(save_ok) != 0:
+                        print('头图保存成功')
+                        sleep(1)
+                    else:
+                        print('头图保存失败，请检查原因')
+                        sleep(1)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errSave_R_stg_tc168.png'
+                        driver.get_screenshot_as_file(sf1)
+                    sleep(2)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                    sleep(1)
+                else:
+                    print('我想提问按钮不存在，请检查原因')
+                    sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(1)
+            else:
+                print('普通活动111未找到,请检查原因')
+                sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验活动详情页面头图的滑动和保存的功能----结束:'+now)
+
+#**************************************************************************************************************************
+#TC Name:test_faxian_livecastpauseplay_tc169
+#Purpose:检查发现页面资讯tab下的直播的暂停播放/继续播放功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/18]
+#**************************************************************************************************************************
+    def test_faxian_livecastpauseplay_tc169(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_发现页面资讯tab下的直播的暂停播放/继续播放功能')
+        print('step1进入发现页面资讯tab;step2检查直播是否存在')
+        print('step3进入直播详细页面点视频一下,再点击视频暂停播放按钮')
+        print('step4点视频一下,再点击视频继续播放按钮')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab下的直播的暂停播放/继续播放功能----开始:'+now)
+        sleep(1)
+        #此刻
+        driver.find_element_by_accessibility_id('资讯').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('main global search icon').click()
+        sleep(2)
+        #search
+        sear=driver.find_element_by_class_name('XCUIElementTypeTextField')
+        sear.click()
+        sleep(0.5)
+        sear.set_value('自动化专题')
+        sleep(1)
+        #search
+        driver.find_element_by_accessibility_id('Search').click()  
+        sleep(2)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
+        sleep(1)
+        if len(ch) != 0:
+            print('自动化专题存在/已找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
+            sleep(6)
+            self.driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            u=driver.find_elements_by_accessibility_id('大叔自动化直播')
+            if len(u) != 0:
+                print('直播存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('大叔自动化直播').click()
+                sleep(10)
+                #
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':390, 'y':136})
+                sleep(1)
+                #pause
+                pa=driver.find_elements_by_accessibility_id('details page video pause icon')
+                if len(pa) != 0:
+                    driver.find_element_by_accessibility_id('details page video pause icon').click()
+                    #207,136
+                    sleep(2)
+                    print('视频暂停播放成功')
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':390, 'y':136})
+                sleep(1)
+                #play
+                pl=driver.find_elements_by_accessibility_id('paly icon')
+                if len(pl) != 0:
+                    driver.find_element_by_accessibility_id('paly icon').click()
+                    sleep(2)
+                    print('视频继续播放成功')
+                sleep(2)
+                #返回
+                driver.find_element_by_accessibility_id('all page back black icon').click()
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(1)
+                #x(37,42)
+                driver.find_element_by_accessibility_id('evaluate close').click()
+                sleep(1)
+        else:
+            print('自动化专题不存在/未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab下的直播的暂停播放/继续播放功能----结束:'+now)
+
+#**************************************************************************************************************************
+#TC Name:test_faxian_livecastfullscreen_tc170
+#Purpose:检查发现页面资讯tab下的直播的全屏播放/非全屏播放切换功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/18]
+#**************************************************************************************************************************
+    def test_faxian_livecastfullscreen_tc170(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_发现页面资讯tab下的直播的全屏播放/非全屏播放切换功能')
+        print('step1进入发现页面资讯tab;step2检查直播是否存在')
+        print('step3进入直播详细页面点视频一下,再点击视频全屏播放按钮')
+        print('step4点视频一下,再点击视频全屏播放返回按钮')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab下的直播的全屏播放/非全屏播放切换功能----开始:'+now)
+        sleep(1)
+        #此刻
+        driver.find_element_by_accessibility_id('资讯').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('main global search icon').click()
+        sleep(2)
+        #search
+        sear=driver.find_element_by_class_name('XCUIElementTypeTextField')
+        sear.click()
+        sleep(0.5)
+        sear.set_value('自动化专题')
+        sleep(1)
+        #search
+        driver.find_element_by_accessibility_id('Search').click()  
+        sleep(2)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
+        sleep(1)
+        if len(ch) != 0:
+            print('自动化专题存在/已找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
+            sleep(6)
+            self.driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            u=driver.find_elements_by_accessibility_id('大叔自动化直播')
+            if len(u) != 0:
+                print('直播存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('大叔自动化直播').click()
+                sleep(10)
+                #
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':390, 'y':136})
+                sleep(1)
+                #full screen
+                pa=driver.find_elements_by_accessibility_id('small screen full screen icon')
+                if len(pa) != 0:
+                    driver.find_element_by_accessibility_id('small screen full screen icon').click()
+                    #377,226
+                    sleep(2)
+                    print('视频全屏切换成功')
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':390, 'y':136})
+                sleep(1)
+                #back
+                pl=driver.find_elements_by_accessibility_id('full screen back icon')
+                if len(pl) != 0:
+                    driver.find_element_by_accessibility_id('full screen back icon').click()
+                    sleep(2)
+                    print('视频返回非全屏成功')
+                sleep(2)
+                #返回
+                driver.find_element_by_accessibility_id('all page back black icon').click()
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(1)
+                #x(37,42)
+                driver.find_element_by_accessibility_id('evaluate close').click()
+                sleep(1)
+        else:
+            print('自动化专题不存在/未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab下的直播的全屏播放/非全屏播放切换功能----结束:'+now)
+
+#**************************************************************************************************************************
+#TC Name:test_faxian_livecastcomment_tc171
+#Purpose:检查发现页面资讯tab下的评论功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/18]
+#**************************************************************************************************************************
+    def test_faxian_livecastcomment_tc171(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_发现页面资讯tab下的直播的评论功能')
+        print('step1进入发现页面资讯tab;step2检查直播是否存在')
+        print('step3进入直播详细页面点评论栏,输入文章后再点击发布')
+        print('step4检查发布文字是否存在(此例检查“该场直播已结束”是否出现)')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab下的直播的评论功能----开始:'+now)
+        sleep(1)
+        #此刻
+        driver.find_element_by_accessibility_id('资讯').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('main global search icon').click()
+        sleep(2)
+        #search
+        sear=driver.find_element_by_class_name('XCUIElementTypeTextField')
+        sear.click()
+        sleep(0.5)
+        sear.set_value('自动化专题')
+        sleep(1)
+        #search
+        driver.find_element_by_accessibility_id('Search').click()  
+        sleep(2)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
+        sleep(1)
+        if len(ch) != 0:
+            print('自动化专题存在/已找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
+            sleep(6)
+            self.driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            u=driver.find_elements_by_accessibility_id('大叔自动化直播')
+            if len(u) != 0:
+                print('直播存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('大叔自动化直播').click()
+                sleep(8)
+                #评论
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"你的观点")]').click()
+                sleep(2)
+                edit=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther[3]/XCUIElementTypeTextView')
+                edit.click()
+                sleep(0.5)
+                now0=time.strftime('%H%M%S')
+                edit.send_keys('Python评论直播:'+now0)
+                t0='Python评论直播:'+now0
+                sleep(1)
+                driver.find_element_by_accessibility_id('发布').click()
+                sleep(0.5)
+                #driver.execute_script("mobile: scroll", {"direction": "down"})
+                #sleep(1)
+                title=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,"该场直播已结束")]')
+                if len(title) != 0:
+                    print('评论发布检查通过')
+                    sleep(0.5)
+                else:
+                    print('评论发布检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errComment_R_stg_tc171.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                #返回
+                driver.find_element_by_accessibility_id('all page back black icon').click()
+                sleep(2)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(1)
+                #x(37,42)
+                driver.find_element_by_accessibility_id('evaluate close').click()
+                sleep(1)
+        else:
+            print('自动化专题不存在/未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab下的直播的评论功能----结束:'+now)
+
+#*******************************************************
+#TC Name:test_wode_notedel_tc172
+#Purpose:检查从我的发布列表页删除写笔记的校验
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/18]
+#*******************************************************
+    def test_wode_notedel_tc172(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:我的_从我的发布列表页删除写笔记的校验')
+        print('step1进入我的->发布;step2检查笔记是否存在')
+        print('step3进入笔记详细页面点右上角的...按钮；step4检查删除按钮是否存在')
+        print('step5检查删除笔记成功的toast是否弹出')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_从我的发布列表页删除写笔记的校验----开始:'+now)
+        sleep(1)
+        #我的
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        ###driver.find_element_by_accessibility_id('发布').click()
+        driver.execute_script('mobile: tap', {'touchCount':'1', 'x':83, 'y':201})
+        sleep(3)
+        my=driver.find_elements_by_xpath('//XCUIElementTypeTextView[contains(@value,"写笔记")]')
+        myv=driver.find_element_by_xpath('//XCUIElementTypeTextView[contains(@value,"写笔记")]').get_attribute('visible')
+        sleep(1)
+        if len(my) != 0 and myv == 'true':
+            print('笔记找到')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeTextView[contains(@value,"写笔记")]').click()
+            sleep(2)
+            #和分享按钮合并
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="icon share gray background new"]').click()
+            sleep(2)
+            #删除
+            d=driver.find_elements_by_accessibility_id('删除')
+            if len(d) != 0:
+                print('删除按钮存在，检查通过')
+                sleep(2)
+                driver.find_element_by_accessibility_id('删除').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确认').click()
+                sleep(1)
+                #检查toast
+                save1=driver.find_elements_by_accessibility_id('删除成功')
+                if len(save1) != 0:
+                    print('删除笔记成功')
+                    sleep(0.5)
+                else:
+                    print('删除笔记失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errDelNote_R_stg_tc172.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+            else:
+                print('删除按钮不存在，请检查原因')
+                sleep(2)
+        else:
+            print('笔记没找到/不存在,无法执行删除操作')
+        sleep(2)
+        driver.find_element_by_accessibility_id('all page back grey icon').click()
+        sleep(2)
         
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_从我的发布列表页删除写笔记的校验----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_wode_personalinfov_tc173
+#Purpose:认证用户我的个人信息页面上元素UI检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/18]
+#***********************************************************************************************************************
+    def test_wode_personalinfov_tc173(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:认证用户个人信息页面上元素UI检查')
+        print('step1进入我的->个人信息页面')
+        print('step2个人信息页面上元素UI检查')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的——认证用户个人信息页面上元素UI检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6988")]')
+        if len(name) != 0:
+            print('认证用户已登录')
+            sleep(0.5)
+        else:
+            print('认证用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+        sleep(1)
+        #我的
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="Sam6988"]').click()
+        sleep(2)
+        #编辑个人信息
+        driver.find_element_by_accessibility_id('编辑个人信息').click()
+        sleep(2)
+        #检查发布页面的各个元素是否存在
+        c1=fun_personalinfouiv_check(self)
+        sleep(2)
+        if c1 == True:
+            print('认证用户个人信息页面上各个被检查元素都检查完毕')
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            #30,32
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的——认证用户个人信息页面上元素UI检查----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_onekey4onekeycarowner_tc174
+#Purpose:检查一键加电车主模式点击点击的一键加电
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/11]
+#*********************************************************************************************************************************
+    def test_aiche_onekey4onekeycarowner_tc174(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:一键加电车主模式点击一键加电能')
+        print('step1先退出原账号,再用一键加电车主账号登陆')
+        print('step2爱车页面找到一键加电按钮后点击进入')
+        print('step3检查呼叫服务按钮是否存在,一键加电呼叫页面显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_点击一键加电能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value CONTAINS "一键加电"')
+        if len(name) != 0:
+            print('一键加电车主用户已登录')
+            sleep(0.5)
+        else:
+            print('一键加电车主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_onekey(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(1)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('6').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('5').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('4').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':595})
+            sleep(0.3)
+        sleep(2)
+        for i in range(0):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(1)
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        #
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]')
+        #ch0=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]').get_attribute('visible')
+        ch0=driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value == "一键加电"').get_attribute('visible')
+        sleep(2)
+        if ch0 == 'true':
+            print('一键加电按钮找到')
+            sleep(2)
+            driver.find_element_by_accessibility_id('一键加电').click()
+            sleep(2)
+            fine=driver.find_elements_by_accessibility_id('我知道了')
+            if len(fine) != 0:
+                driver.find_element_by_accessibility_id('我知道了').click()
+            sleep(4)
+            name0=driver.find_elements_by_accessibility_id('呼叫服务')
+            if len(name0) != 0:
+                print('呼叫服务按钮存在,一键加电呼叫页面显示正常！')
+                sleep(0.5)
+            else:
+                print('呼叫服务按钮不存在/未找到,一键加电呼叫页面显示不正常,请检查原因！')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errNoCancel_R_stg_tc174.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(1)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+        else:
+            print('一键加电按钮未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_点击一键加电----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_delchat_tc175
+#Purpose:朋友tab删除与朋友聊天对话框
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/19]
+#***********************************************************************************************************************
+    def test_pengyou_delchat_tc175(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号朋友_删除与朋友聊天对话框')
+        print('step1朋友页面点朋友按钮进入朋友列表页面；step2点击某个朋友再点聊天按钮,输入文字后返回')
+        print('step3在朋友tab页面左滑动刚才的聊天框,再点击删除按钮,检查聊天框是否存在')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_朋友_朋友tab删除与朋友聊天对话框----开始:'+now)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(4)
+        #朋友列表
+        driver.find_element_by_accessibility_id('friends go friendlist').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('Sam0698Stg').click()  
+        sleep(2)
+        driver.find_element_by_accessibility_id('聊天').click()  
+        sleep(3)
+        #点输入栏
+        edit=driver.find_element_by_accessibility_id('chat_input_textView')
+        edit.click()
+        sleep(0.5)
+        edit.set_value('删除聊天框')
+        sleep(1)
+        #Send
+        driver.find_element_by_accessibility_id('Send').click()  
+        sleep(2)
+        driver.find_element_by_accessibility_id('all page back grey icon').click()  
+        sleep(2)
+        driver.find_element_by_accessibility_id('full screen back icon').click()  
+        sleep(2)
+        driver.find_element_by_accessibility_id('all page back grey icon').click()  
+        sleep(2)
+        #左滑动
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':388,'fromY':272,'toX':250,'toY':272,'duration':1.0})
+        sleep(2)
+        ch1=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="删除"]')
+        if len(ch1) == 0:
+            print('删除按钮显示不正常,请检查原因')
+            sleep(2)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf1='../../test_report/ios/'+now+'_errNoDel_R_tc175.png'
+            driver.get_screenshot_as_file(sf1)
+            sleep(2)
+        else:
+            print('删除按钮显示正常,检查通过')
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeButton[@name="删除"]').click()
+            sleep(2)
+            tt=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value CONTAINS "Sam0698Stg,"')
+            if len(tt) == 0:
+                print('朋友聊天框删除成功')
+                sleep(0.5)
+            else:
+                print('朋友聊天框删除失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errDelChat_R_stg_tc175.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_朋友_朋友tab删除与朋友聊天对话框----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_openmultichataddbysearch_tc176
+#Purpose:朋友页面发起群聊在群聊增加成员使用搜索功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/19]
+#***********************************************************************************************************************
+    def test_pengyou_openmultichataddbysearch_tc176(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号朋友_发起群聊在群聊增加成员使用搜索功能')
+        print('step1检查朋友页面右上角+号是否存在')
+        print('step2检查点击+号后发起群聊按钮是否存在；step3发起群聊选择朋友A和B建立群组')
+        print('step4群组页面点右上角...按钮,再点+按钮,在朋友搜索栏输入要邀请的朋友C,确定后检查群组聊天框是否显示“你邀请xxx加入群组”')
+        print('step5解散并删除群组(为下次运行脚本必须做此步骤)')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_发起群聊在群聊增加成员使用搜索功能----开始:'+now)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #+
+        plus=driver.find_elements_by_accessibility_id('addPopMenu')
+        if len(plus) != 0:
+            print('朋友页面右上角+号存在')
+            sleep(2)
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(2)
+            #建群聊
+            mul=driver.find_elements_by_accessibility_id('建群聊')
+            if len(mul) != 0:
+                print('朋友页面点+号后建群聊按钮存在')
+                sleep(2)
+                driver.find_element_by_accessibility_id('建群聊').click()
+                sleep(3)
+                for i in range(2):
+                    driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "Sam"')[i].click()
+                sleep(1)
+                #确定    
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name BEGINSWITH "确定"').click()
+                sleep(6)
+                #...
+                driver.find_element_by_accessibility_id('im btn more').click()
+                sleep(2)
+                #+
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":355, "y":140})
+                sleep(1)
+                #search
+                msg=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                msg.click()
+                sleep(0.5)
+                msg.send_keys('Sam8837')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('Search').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeOther[2]/XCUIElementTypeTable[1]/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]').click()
+                sleep(1)
+                #确定    
+                driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"确定")]').click()
+                sleep(6)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #检查
+                tt=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value CONTAINS "你邀请 Sam8837Stg 加入了群组"')
+                sleep(2)
+                #print(len(t))
+                if len(tt) != 0:
+                    print('群组聊天框显示“你邀请xxx加入群组”存在,检查通过')
+                    sleep(0.5)
+                else:
+                    print('群组聊天框显示“你邀请xxx加入群组”不存在/未找到，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errNoinvited_R_stg_tc176.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                #...
+                driver.find_element_by_accessibility_id('im btn more').click()
+                sleep(2)
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                driver.find_element_by_accessibility_id('解散并删除').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(4)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_发起群聊在群聊增加成员使用搜索功能----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_openmultichatdelbysearch_tc177
+#Purpose:朋友页面发起群聊在群聊移除成员使用搜索功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/19]
+#***********************************************************************************************************************
+    def test_pengyou_openmultichatdelbysearch_tc177(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号朋友_发起群聊在群聊移除成员使用搜索功能')
+        print('step1检查朋友页面右上角+号是否存在')
+        print('step2检查点击+号后发起群聊按钮是否存在；step3发起群聊选择3个朋友建立群组')
+        print('step4群组页面点右上角...按钮,再点-按钮,在朋友搜索栏输入要剔出群组的朋友,确定后检查群组聊天框是否显示“xxxx被踢出群组”')
+        print('step5解散并删除群组(为下次运行脚本必须做此步骤)')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_发起群聊在群聊移除成员使用搜索功能----开始:'+now)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #+
+        plus=driver.find_elements_by_accessibility_id('addPopMenu')
+        if len(plus) != 0:
+            print('朋友页面右上角+号存在')
+            sleep(2)
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(2)
+            #建群聊
+            mul=driver.find_elements_by_accessibility_id('建群聊')
+            if len(mul) != 0:
+                print('朋友页面点+号后建群聊按钮存在')
+                sleep(2)
+                driver.find_element_by_accessibility_id('建群聊').click()
+                sleep(3)
+                for i in range(3):
+                    driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "Sam"')[i].click()
+                sleep(1)
+                #确定    
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name BEGINSWITH "确定"').click()
+                sleep(6)
+                #...
+                driver.find_element_by_accessibility_id('im btn more').click()
+                sleep(2)
+                #-
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":157, "y":240})
+                sleep(1)
+                #search
+                msg=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                msg.click()
+                sleep(0.5)
+                msg.send_keys('Sam0698')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('Search').click()
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeOther[2]/XCUIElementTypeTable[1]/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]').click()
+                sleep(1)
+                #确定    
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[contains(@name,"确定")]').click()
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name BEGINSWITH "确定"').click()
+                sleep(6)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                #检查
+                tt=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value CONTAINS "Sam0698被踢出群组"')
+                sleep(2)
+                #print(len(t))
+                if len(tt) != 0:
+                    print('群组聊天框显示“xxxx被踢出群组”存在,检查通过')
+                    sleep(0.5)
+                else:
+                    print('群组聊天框显示“xxxx被踢出群组”不存在/未找到，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errNodeleted_R_stg_tc177.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                #...
+                driver.find_element_by_accessibility_id('im btn more').click()
+                sleep(2)
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                driver.find_element_by_accessibility_id('解散并删除').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(4)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_发起群聊在群聊移除成员使用搜索功能----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_userexitmultichat_tc178
+#Purpose:朋友页面用户非群聊发起者退出群聊的检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/20]
+#***********************************************************************************************************************
+    def test_pengyou_userexitmultichat_tc178(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号朋友_用户非群聊发起者退出群聊的检查')
+        print('step1检查朋友页面右上角+号是否存在')
+        print('step2检查点击+号后发起群聊按钮是否存在；step3发起群聊选择3个朋友建立群组')
+        print('step4退出当前账号,以群聊成员之一非群聊发起者账号登录app,在朋友页面检查群组已创建是否存在')
+        print('step5点击群聊进入,再删除并退出该群聊,检查朋友页面群聊是否还存在')
+        sleep(0.5)
+        print('step6退出当前账号,以群聊发起者账号登录app,检查朋友页面群组聊天框显示“xxxx退出群组”存在')
+        print('step7点击群聊进入检查群聊成员里那个已退出群聊的用户是否还存在')
+        print('step8解散并删除群组(为下次运行脚本必须做此步骤)')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_用户非群聊发起者退出群聊的检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"SamSTG")]')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #+
+        plus=driver.find_elements_by_accessibility_id('addPopMenu')
+        if len(plus) != 0:
+            print('朋友页面右上角+号存在')
+            sleep(2)
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(2)
+            #建群聊
+            mul=driver.find_elements_by_accessibility_id('建群聊')
+            if len(mul) != 0:
+                print('朋友页面点+号后建群聊按钮存在')
+                sleep(2)
+                driver.find_element_by_accessibility_id('建群聊').click()
+                sleep(2)
+                for i in range(3):
+                    driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "Sam"')[i].click()
+                sleep(1)
+                #确定    
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name BEGINSWITH "确定"').click()
+                sleep(7)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+                bp_is_loggedin(self)
+                sleep(1)
+                #login by Sam6986
+                #driver.find_element_by_accessibility_id('注册/登录').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":169, "y":105})
+                sleep(2)
+                #登录页面
+                mobile_no=driver.find_elements_by_class_name('XCUIElementTypeTextField')[0]
+                mobile_no.click()
+                sleep(0.5)
+                mobile_no.send_keys('98762396986')
+                sleep(1)
+                code=driver.find_elements_by_class_name('XCUIElementTypeTextField')[1]
+                code.click()
+                sleep(0.5)
+                code.send_keys('418253')
+                sleep(0.5)
+                #driver.find_element_by_xpath('//XCUIElementTypeButton[@name="注册/登录"]').click()
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":390, "y":354})
+                sleep(6)
+                #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":250,"toX":50,"toY":550,"duration":1.0})
+                #driver.execute_script("mobile: scroll", {"direction": "up"})
+                #sleep(1)
+                name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "Sam6986"')
+                if len(name) != 0:
+                    print('用户Sam6986登录成功')
+                    sleep(0.5)
+                else:
+                    print('用户Sam6986登录失败')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf='../../test_report/ios/'+now+'_errnorLoginSam6986_R_stg_tc178.png'
+                    driver.get_screenshot_as_file(sf)
+                sleep(2)
+                driver.find_element_by_accessibility_id('朋友').click()
+                sleep(3)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "群组已创建"').click()
+                sleep(2)
+                #...
+                driver.find_element_by_accessibility_id('im btn more').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('删除并退出').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(4)
+                ch=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "群聊"')
+                if len(ch) != 0:
+                    print('用户退出群聊不成功,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errnorExitMultiChat_R_stg_tc178.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(1)
+                else:
+                    print('用户退出群聊已成功,群聊已不可见')
+                    sleep(0.5)
+                    bp_is_loggedin(self)
+                    sleep(1)
+                    bp_normalloginmp(self)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('朋友').click()
+                    sleep(3)
+                    #检查
+                    tt=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6986退出群组"')
+                    sleep(1)
+                    #print(len(t))
+                    if len(tt) != 0:
+                        print('群组聊天框显示“xxxx退出群组”存在,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('群组聊天框显示“xxxx退出群组”不存在/未找到，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errNodeleted_R_stg_tc178.png'
+                        driver.get_screenshot_as_file(sf2)
+                    sleep(2)
+                    driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value == "Sam6986退出群组"').click()
+                    sleep(2)
+                    #...
+                    driver.find_element_by_accessibility_id('im btn more').click()
+                    sleep(2)
+                    #检查
+                    ch2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value == "Sam6986"')
+                    sleep(1)
+                    if len(ch2) == 0:
+                        print('群组里用户Sam6986不存在,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('群组里用户Sam6986存在，检查失败,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errUserexsits_R_stg_tc178.png'
+                        driver.get_screenshot_as_file(sf2)
+                    sleep(2)
+                    driver.execute_script("mobile: scroll", {"direction": "down"})
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('解散并删除').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('确定').click()
+                    sleep(4)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_用户非群聊发起者退出群聊的检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_usertryes8sharebysharelink_tc179
+#Purpose:检查非车主用户用其他用户发给自己的邀请试驾es8的分享链接进行预约试驾的功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/20]
+#***********************************************************************************************************************
+    def test_pengyou_usertryes8sharebysharelink_tc179(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:朋友_非车主用户用其他用户发给自己的邀请试驾es8的分享链接进行预约试驾的功能')
+        print('step1检查发现首页右上角+号是否存在')
+        print('step2检查邀请试驾按钮是否存在；step3点击邀请试驾；step4点击es8立即邀请')
+        print('step5检查分享我的朋友功能是否正常,分享给一个非车主朋友')
+        sleep(0.5)
+        print('step6退出当前账号,以非车主朋友账号登录app')
+        print('step7朋友页面,点击分享链接进入,检查预约试车功能')
+        print('step8取消预约试车(为下次运行脚本必须做此步骤)')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_朋友_非车主用户用其他用户发给自己的邀请试驾es8的分享链接进行预约试驾的功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        c1=bp_is_plusexist(self)
+        if c1 == True:
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "addPopMenu"').click()
+            sleep(1)
+            #邀请试驾
+            ch2=driver.find_elements_by_accessibility_id('邀请试驾')
+            if len(ch2) != 0:
+                driver.find_element_by_accessibility_id('邀请试驾').click()
+                sleep(3)
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
+                sleep(2)
+                #es8
+                sh=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]/XCUIElementTypeOther[2]')
+                sh.click()
+                sleep(2)
+                #我的朋友
+                mf=driver.find_elements_by_accessibility_id('我的朋友')
+                if len(mf) != 0:
+                    print('分享到我的朋友按钮存在，检查通过')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我的朋友').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('朋友').click()
+                    sleep(3)
+                    driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6986"').click()
+                    sleep(1)
+                    #检查toast
+                    save4=driver.find_elements_by_accessibility_id('分享成功')
+                    if len(save4) != 0:
+                        print('分享我的朋友成功')
+                        sleep(0.5)
+                    else:
+                        print('分享我的朋友失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf4='../../test_report/ios/'+now+'_errsharemyfriend_R_stg_tc179.png'
+                        driver.get_screenshot_as_file(sf4)
+                    sleep(2)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(2)
+                    bp_is_loggedin(self)
+                    sleep(1)
+                    bp_normalloginmp_notenoughscore(self)
+                    sleep(1)
+                    #朋友
+                    driver.find_element_by_accessibility_id('朋友').click()
+                    sleep(2)
+                    ask=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "[分享]"')
+                    if len(ask) != 0:
+                        print('来自SamSTG的分享已找到,检查通过')
+                        sleep(2)
+                        driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "[分享]"').click()
+                        sleep(4)
+                        #邀请试驾
+                        chk2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG 邀请你试驾NIO ES8"')
+                        sleep(1)
+                        if len(chk2) != 0:
+                            t=len(chk2)-1
+                            driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG 邀请你试驾NIO ES8"')[t].click()
+                            sleep(7)
+                            #ios_predicate('type == "XCUIElementTypeButton" AND name == "好"')
+                            ok=driver.find_elements_by_accessibility_id('好')
+                            if len(ok) != 0:
+                                driver.find_element_by_accessibility_id('好').click()
+                                ###driver.switch_to_alert().accept()
+                            sleep(2)
+                            ch=driver.find_elements_by_accessibility_id('预约成功')
+                            if len(ch) == 0:
+                                print('未预约过,可以申请试驾')
+                                sleep(2)
+                                #试驾地点
+                                driver.find_elements_by_ios_predicate('type == "XCUIElementTypeTextField"')[0].click()
+                                sleep(3)
+                                #上海蔚来中心太古汇店
+                                driver.find_element_by_accessibility_id('上海蔚来中心太古汇店').click()
+                                sleep(1)
+                                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':200,'duration':1.0})
+                                sleep(2)
+                                #试驾时间
+                                driver.find_element_by_xpath('//*[@name="邀请试驾"]/XCUIElementTypeOther[4]').click()
+                                #354,647
+                                sleep(1)
+                                driver.find_element_by_accessibility_id('确认').click()
+                                sleep(1.5)
+                                name=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="邀请试驾"]/XCUIElementTypeOther[5]/XCUIElementTypeTextField')
+                                name.click()
+                                sleep(0.5)
+                                name.send_keys('Sam6986')
+                                sleep(0.5)
+                                driver.find_element_by_accessibility_id('完成').click()
+                                sleep(1)
+                                #预约
+                                driver.find_element_by_accessibility_id('立即预约').click()
+                                sleep(9)
+                                #alert
+                                ct1=driver.find_elements_by_accessibility_id('预约成功')
+                                if len(ct1) != 0:
+                                    print('预约信息alert出现，检查通过')
+                                    sleep(0.5)
+                                else:
+                                    print('预约信息alert未出现，请检查原因')
+                                    sleep(0.5)
+                                    now=time.strftime('%Y%m%d_%H%M%S')
+                                    sf4='../../test_report/ios/'+now+'_errRegisteTry1_R_stg_tc179.png'
+                                    driver.get_screenshot_as_file(sf4)
+                                sleep(2)
+                                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                                sleep(2)
+                                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                                sleep(2)
+                                driver.find_element_by_accessibility_id('发现').click()
+                                sleep(2)
+                                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "addPopMenu"').click()
+                                sleep(1)
+                                driver.find_element_by_accessibility_id('申请试驾').click()
+                                sleep(7)
+                                #checking
+                                ct2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "以下是你的预约信息"')
+                                if len(ct2) != 0:
+                                    print('申请试驾里的预约信息检查通过')
+                                    sleep(0.5)
+                                else:
+                                    print('申请试驾的预约信息检查失败，请检查原因')
+                                    sleep(0.5)
+                                    now=time.strftime('%Y%m%d_%H%M%S')
+                                    sf3='../../test_report/ios/'+now+'_errRegisteTry2_R_stg_tc179.png'
+                                    driver.get_screenshot_as_file(sf3)
+                                    sleep(2)
+                                driver.execute_script("mobile: scroll", {"direction": "down"})
+                                sleep(2)
+                                #取消预约
+                                driver.find_element_by_accessibility_id('取消预约').click()
+                                sleep(2)
+                                driver.find_element_by_accessibility_id('我不想试驾了').click()
+                                sleep(2)
+                                #确认
+                                driver.find_element_by_accessibility_id('确认').click()
+                                sleep(6)
+                                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                                sleep(2)
+                            else:
+                                print('已经预约成功,无需申请试驾')
+                                sleep(1)
+                                driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                                sleep(1)
+                        else:
+                            print('申请试驾按钮不存在，请检查原因')
+                            sleep(1)
+                else:
+                    print('分享到我的朋友按钮不存在，请检查原因')
+                    sleep(1)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+                    sleep(1)
+            else:
+                print('邀请试驾按钮不存在，请检查原因')
+                sleep(1)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            print('TC_朋友_非车主用户用其他用户发给自己的邀请试驾es8的分享链接进行预约试驾的功能----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_wode_follownumbercheck_tc180
+#Purpose:我的页面检查关注数正确性检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/21]
+#***********************************************************************************************************************
+    def test_wode_follownumbercheck_tc180(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号,我的_检查关注数正确性检查---')
+        print('step1我的页面点击个人头像进入个人主页,获取当前的关注数')
+        print('step2朋友页面点+号，检查添加朋友按钮是否存在；step3输入好友名称进行搜索')
+        print('step4点击搜索出的朋友打开他的个人主页；step5检查关注功能是否正常')
+        sleep(0.5)
+        print('step6返回我的页面点击个人头像进入个人主页,检查加关注后的关注数是否为原关注数+1')
+        print('step7朋友页面点+号,点加朋友按钮,输入前好友名称进入搜索')
+        print('step8点击搜索出的朋友打开他的个人主页；step9检查取消关注功能是否正常')
+        print('step10返回我的页面点击个人头像进入个人主页,检查取消关注后的关注数是否为前关注数-1')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_检查关注数正确性检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录！')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录！')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        #头像
+        driver.find_element_by_accessibility_id('SamSTG').click()
+        sleep(3)
+        #关注数
+        follow_num1=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[6]').get_attribute('name')
+        sleep(1)
+        print('原关注数:'+follow_num1)
+        sleep(1)
+        driver.find_element_by_accessibility_id('full screen back icon').click()
+        sleep(2)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #点+号
+        driver.find_element_by_accessibility_id('addPopMenu').click()
+        sleep(1)
+        add=driver.find_elements_by_accessibility_id('加朋友')
+        if len(add) != 0:
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('98762396987')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('Stg6987').click()
+            sleep(4)
+            #关注
+            t=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')
+            if len(t) == 2:
+                driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')[1].click()
+                sleep(3)
+                tt=driver.find_elements_by_accessibility_id('已关注')
+                if len(tt) != 0:
+                    print('好友已经关注成功')
+                    sleep(0.5)
+                else:
+                    print('好友没有关注成功，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errFollow_R_stg_tc180.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('我的').click()
+            sleep(3)
+            #头像
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(3)
+            follow_num2=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[6]').get_attribute('name')
+            sleep(1)
+            print('加关注后现在关注数:'+follow_num2)
+            sleep(1)
+            if follow_num2 == str(int(follow_num1)+1):
+                print('关注数+1检查通过')
+                sleep(0.5)
+            else:
+                print('关注数+1检查失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errFollowP1_R_stg_tc180.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            #朋友
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            #点+号
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('98762396987')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('Stg6987').click()
+            sleep(4)
+            #已关注
+            t2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="已关注"]')
+            if len(t2) != 0:
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="已关注"]').click()
+                sleep(1)
+                tt=driver.find_elements_by_accessibility_id('取消成功')
+                if len(tt) != 0:
+                    print('好友已经取消关注成功')
+                    sleep(0.5)
+                else:
+                    print('好友取消关注失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errUnFollow_R_stg_tc180.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('我的').click()
+            sleep(3)
+            #头像
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(3)
+            follow_num3=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[6]').get_attribute('name')
+            sleep(1)
+            print('取消关注后现在关注数:'+follow_num3)
+            sleep(1)
+            if follow_num3 == follow_num1:
+                print('关注数-1检查通过')
+                sleep(0.5)
+            else:
+                print('关注数-1检查失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errFollowD1_R_stg_tc180.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+        else:
+            print('没有添加朋友按钮，请检查原因')
+            sleep(1)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf3='../../test_report/ios/'+now+'_errorNoAddFriend_R_stg_tc180.png'
+            driver.get_screenshot_as_file(sf3)
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_检查关注数正确性检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_wode_fansumbercheck_tc181
+#Purpose:我的页面检查粉丝数正确性检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/21]
+#***********************************************************************************************************************
+    def test_wode_fansumbercheck_tc181(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号,我的_检查粉丝数正确性检查---')
+        print('step1我的页面点击个人头像进入个人主页,获取当前的粉丝数')
+        print('step2朋友页面点+号，检查添加朋友按钮是否存在；step3输入好友名称进行搜索')
+        print('step4点击搜索出的朋友打开他的个人主页；step5检查好友A关注B是否成功')
+        sleep(0.5)
+        print('step6退出A账号,以B账号登录app,朋友页面点+号,点加朋友按钮,输入好友A名称进入搜索')
+        print('step7点击搜索出的朋友打开他的个人主页；step8检查好友B关注A是否成功')
+        print('step9退出B账号,以A账号登录app,我的页面点击个人头像进入个人主页,获取当前的粉丝数否为原粉丝数+1')
+        print('step10朋友页面点+号,点加朋友按钮,输入好友B名称进入搜索')
+        sleep(0.5)
+        print('step11点击搜索出的朋友打开他的个人主页；step12检查好友A取消关注B是否成功')
+        print('step13退出A账号,以B账号登录app,朋友页面点+号,点加朋友按钮,输入好友A名称进入搜索')
+        print('step14点击搜索出的朋友打开他的个人主页；step15检查好友B取消关注A是否成功')
+        print('step16退出B账号,以A账号登录app,我的页面点击个人头像进入个人主页,获取当前的粉丝数否为AB互加关注后的粉丝数-1')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_检查粉丝数正确性检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        #头像
+        driver.find_element_by_accessibility_id('SamSTG').click()
+        sleep(3)
+        #粉丝数
+        fan_num1=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[8]').get_attribute('name')
+        sleep(1)
+        print('原粉丝数:'+fan_num1)
+        sleep(1)
+        driver.find_element_by_accessibility_id('full screen back icon').click()
+        sleep(2)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #点+号
+        driver.find_element_by_accessibility_id('addPopMenu').click()
+        sleep(1)
+        add=driver.find_elements_by_accessibility_id('加朋友')
+        if len(add) != 0:
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('98762396987')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('Stg6987').click()
+            sleep(4)
+            #关注
+            t=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')
+            if len(t) == 2:
+                driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')[1].click()
+                sleep(3)
+                tt=driver.find_elements_by_accessibility_id('已关注')
+                if len(tt) != 0:
+                    print('好友A已经关注B成功')
+                    sleep(0.5)
+                else:
+                    print('好友A关注B失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errFollowB_R_stg_tc181.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_testerb(self)
+            sleep(1)
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            #点+号
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('SamST')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(4)
+            #关注
+            t2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')
+            if len(t2) != 0:
+                driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')[1].click()
+                sleep(1)
+                tt=driver.find_elements_by_accessibility_id('关注成功')
+                if len(tt) != 0:
+                    print('好友B关注A成功')
+                    sleep(0.5)
+                else:
+                    print('好友B关注A失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errFollowA_R_stg_tc181.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+            sleep(1)
+            driver.find_element_by_accessibility_id('我的').click()
+            sleep(3)
+            #头像
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(3)
+            fan_num2=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[8]').get_attribute('name')
+            sleep(1)
+            print('用户AB互相关注后现在粉丝数:'+fan_num2)
+            sleep(1)
+            if fan_num2 == str(int(fan_num1)+1):
+                print('粉丝数+1检查通过')
+                sleep(0.5)
+            else:
+                print('粉丝数+1检查失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errFansP1_R_stg_tc181.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            #朋友
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            #点+号
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('98762396987')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('Stg6987').click()
+            sleep(4)
+            #...
+            driver.find_element_by_accessibility_id('icon more white').click()
+            sleep(1)
+            #取消关注
+            driver.find_element_by_accessibility_id('取消关注').click()
+            sleep(1)
+            tt=driver.find_elements_by_accessibility_id('取消成功')
+            if len(tt) != 0:
+                print('好友A取消关注B成功')
+                sleep(0.5)
+            else:
+                print('好友A取消关注B失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errUnFollowB_R_stg_tc181.png'
+                driver.get_screenshot_as_file(sf2)
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_testerb(self)
+            sleep(1)
+            #朋友
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            #点+号
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('SamST')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(5)
+            #...
+            driver.find_element_by_accessibility_id('icon more white').click()
+            sleep(1)
+            #取消关注
+            driver.find_element_by_accessibility_id('取消关注').click()
+            sleep(1)
+            tt=driver.find_elements_by_accessibility_id('取消成功')
+            if len(tt) != 0:
+                print('好友B取消关注A成功')
+                sleep(0.5)
+            else:
+                print('好友B取消关注A失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf3='../../test_report/ios/'+now+'_errUnFollowA_R_stg_tc181.png'
+                driver.get_screenshot_as_file(sf3)
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+            sleep(1)
+            driver.find_element_by_accessibility_id('我的').click()
+            sleep(3)
+            #头像
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(3)
+            fan_num3=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[8]').get_attribute('name')
+            sleep(1)
+            print('用户AB互相取消关注后现在粉丝数:'+fan_num3)
+            sleep(1)
+            if fan_num3 == fan_num1:
+                print('粉丝数-1检查通过')
+                sleep(0.5)
+            else:
+                print('粉丝数-1检查失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf4='../../test_report/ios/'+now+'_errFansD1_R_stg_tc181.png'
+                driver.get_screenshot_as_file(sf4)
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+        else:
+            print('没有添加朋友按钮，请检查原因')
+            sleep(1)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf3='../../test_report/ios/'+now+'_errorNoAddFriend_R_stg_tc181.png'
+            driver.get_screenshot_as_file(sf3)
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_检查粉丝数正确性检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_wode_givelikeumbercheck_tc182
+#Purpose:我的页面检查获赞数正确性检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/21]
+#***********************************************************************************************************************
+    def test_wode_givelikeumbercheck_tc182(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号,我的_检查获赞数正确性检查---')
+        print('step1我的页面点击个人头像进入个人主页,获取当前的获赞数')
+        print('step2退出A账号,以B账号登录app,朋友页面点+号,点加朋友按钮,输入好友A名称进入搜索')
+        print('step3点击搜索出的朋友打开他的个人主页；step4给A的一篇发布点赞')
+        print('step5退出B账号,以A账号登录app')
+        sleep(0.5)
+        print('step6我的页面点击个人头像进入个人主页,检查获赞后的获赞数是否为原获赞数+1')
+        print('step7退出A账号,以B账号登录app,朋友页面点+号,点加朋友按钮,输入好友A名称进入搜索')
+        print('step8点击搜索出的朋友打开他的个人主页；step9给A的一篇发布取消点赞')
+        print('step10退出B账号,以A账号登录app')
+        print('step11我的页面点击个人头像进入个人主页,检查取消点赞后的获赞数是否为前获赞数-1')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_检查获赞数正确性检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        #sleep(1)
+        #driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        #头像
+        driver.find_element_by_accessibility_id('SamSTG').click()
+        sleep(3)
+        #获赞数
+        givelike_num1=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[4]').get_attribute('name')
+        sleep(1)
+        print('原获赞数:'+givelike_num1)
+        sleep(1)
+        driver.find_element_by_accessibility_id('full screen back icon').click()
+        sleep(2)
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp_testerb(self)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #点+号
+        driver.find_element_by_accessibility_id('addPopMenu').click()
+        sleep(1)
+        driver.find_element_by_accessibility_id('加朋友').click()
+        sleep(2)
+        edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+        edit.click()
+        sleep(0.5)
+        driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('SamST')
+        sleep(0.5)
+        #search
+        driver.find_element_by_accessibility_id('Search').click()  
+        sleep(2)
+        driver.find_element_by_accessibility_id('SamSTG').click()
+        sleep(4)
+        #give a like
+        driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable[1]/XCUIElementTypeCell[2]/XCUIElementTypeButton[2]').click()
+        sleep(3)
+        print('已给SamSTG的一篇发布点赞')
+        sleep(1)
+        driver.find_element_by_accessibility_id('full screen back icon').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('all page back grey icon').click()
+        sleep(2)
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp(self)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        #头像
+        driver.find_element_by_accessibility_id('SamSTG').click()
+        sleep(3)
+        givelike_num2=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[4]').get_attribute('name')
+        sleep(1)
+        print('获赞后现在获赞数:'+givelike_num2)
+        sleep(1)
+        if givelike_num2 == str(int(givelike_num1)+1):
+            print('获赞数+1检查通过')
+            sleep(0.5)
+        else:
+            print('获赞数+1检查失败，请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf1='../../test_report/ios/'+now+'_errFollowP1_R_stg_tc182.png'
+            driver.get_screenshot_as_file(sf1)
+        sleep(2)
+        driver.find_element_by_accessibility_id('full screen back icon').click()
+        sleep(2)
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp_testerb(self)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #点+号
+        driver.find_element_by_accessibility_id('addPopMenu').click()
+        sleep(1)
+        driver.find_element_by_accessibility_id('加朋友').click()
+        sleep(2)
+        edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+        edit.click()
+        sleep(0.5)
+        driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('SamST')
+        sleep(0.5)
+        #search
+        driver.find_element_by_accessibility_id('Search').click()  
+        sleep(2)
+        driver.find_element_by_accessibility_id('SamSTG').click()
+        sleep(4)
+        #取消点赞
+        driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeTable[1]/XCUIElementTypeCell[2]/XCUIElementTypeButton[2]').click()
+        sleep(3)
+        print('已给SamSTG的一篇发布取消点赞')
+        sleep(1)
+        driver.find_element_by_accessibility_id('full screen back icon').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('all page back grey icon').click()
+        sleep(2)
+        bp_is_loggedin(self)
+        sleep(1)
+        bp_normalloginmp(self)
+        #sleep(1)
+        #driver.find_element_by_accessibility_id('我的').click()
+        sleep(3)
+        #头像
+        driver.find_element_by_accessibility_id('SamSTG').click()
+        sleep(3)
+        givelike_num3=driver.find_element_by_xpath('//XCUIElementTypeTable[1]/XCUIElementTypeOther[1]/XCUIElementTypeStaticText[4]').get_attribute('name')
+        sleep(1)
+        print('被B取消点赞后现在获赞数:'+givelike_num3)
+        sleep(1)
+        if givelike_num3 == givelike_num1:
+            print('获赞数-1检查通过')
+            sleep(0.5)
+        else:
+            print('获赞数-1检查失败，请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf1='../../test_report/ios/'+now+'_errFollowD1_R_stg_tc182.png'
+            driver.get_screenshot_as_file(sf1)
+        sleep(1)
+        driver.find_element_by_accessibility_id('full screen back icon').click()
+        sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_我的_检查获赞数正确性检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_imtextpicphotoredpocket_tc183
+#Purpose:检查朋友页面与好友聊天、发送图片、拍照、发红包
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/22]
+#***********************************************************************************************************************
+    def test_pengyou_imtextpicphotoredpocket_tc183(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:朋友_与好友聊天、发送图片、拍照、发红包')
+        print('step1朋友页面找到一个朋友发起聊天;step2发送一条文本消息')
+        print('step3发送一张手机内已有图片；step4通过拍照发送一张照片')
+        print('step5发送一个积分红包;step6退出A账号,以用户B账号登录')
+        print('step7朋友页面点击与A的聊天,检查文本文字是否正确,检查红包是否收到已经接收红包是否成功')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_朋友_与好友聊天、发送图片、拍照、发红包----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(4)
+        myf=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6986")]')
+        sleep(1)
+        if len(myf) != 0:
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6986")]').click()
+            sleep(2)
+            #和分享按钮合并
+            driver.find_element_by_accessibility_id('im btn more').click()
+            sleep(2)
+            #删除并退出
+            butt=driver.find_elements_by_accessibility_id('删除并退出')
+            if len(butt) != 0:
+                driver.find_element_by_accessibility_id('删除并退出').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(1)
+        sleep(3)
+        driver.find_element_by_accessibility_id('friends go friendlist').click()
+        sleep(3)
+        u=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6986")]')
+        if len(u) != 0:
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Sam6986")]').click()
+            sleep(4)
+            #聊天
+            driver.find_element_by_accessibility_id('聊天').click()
+            sleep(3)
+            #发送文本信息
+            word=driver.find_element_by_accessibility_id('chat_input_textView')
+            word.click()
+            sleep(0.5)
+            now0=time.strftime('%H%M%S')
+            word.send_keys('测试文本'+now0)
+            t0='测试文本'+now0
+            sleep(0.5)
+            #发送
+            driver.find_element_by_accessibility_id('Send').click()
+            sleep(1)
+            #+
+            driver.find_element_by_accessibility_id('chat setmode add btn normal').click()
+            sleep(1.5)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "actionbar picture icon"').click()
+            sleep(1.5)
+            driver.find_element_by_accessibility_id('compose guide check box defaul').click()
+            sleep(2)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name CONTAINS "完成"').click()
+            sleep(4)
+            print('一张手机内已有图片发送成功')
+            sleep(1.5)
+            #拍摄
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "actionbar camera icon"').click()
+            sleep(1.5)
+            front=driver.find_element_by_accessibility_id('FrontBackFacingCameraChooser').get_attribute('value')
+            sleep(1)
+            if front == '后置':
+                driver.find_element_by_accessibility_id('FrontBackFacingCameraChooser').click()
+                sleep(2)
+            driver.find_element_by_accessibility_id('PhotoCapture').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('使用照片').click()
+            sleep(4)
+            print('通过拍照发送一张照片成功')
+            sleep(1.5)
+            #积分红包
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "redpacketIcon"').click()
+            sleep(1.5)
+            edit=driver.find_element_by_class_name('XCUIElementTypeTextField')
+            edit.click()
+            driver.find_element_by_accessibility_id('1').click()
+            sleep(0.5)
+            #确认发红包
+            driver.find_element_by_accessibility_id('确认发红包').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('确定').click()
+            sleep(4)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_testera(self)
+            sleep(1)
+            #朋友
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(4)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"').click()
+            sleep(4)
+            text=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,t0)]')
+            sleep(1.5)
+            if len(text) != 0:
+                print('用户A发送给用户B的文本文字检查通过')
+                sleep(0.5)
+            else:
+                print('用户A发送给用户B的文本文字检查失败,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errText_R_stg_tc183.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+            #
+            red=driver.find_elements_by_accessibility_id('redpacketMessageImg')
+            sleep(1)
+            if len(red) != 0:
+                print('用户A发送给用户B的红包检查通过')
+                sleep(2)
+                t=len(red)-1
+                ###driver.find_elements_by_accessibility_id('redpacketMessageImg')[t].click()
+                driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "领取红包"')[t].click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('open').click()
+                sleep(2)
+                tt=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "红包详情"')
+                if len(tt) != 0:
+                    print('红包详情页面显示正常')
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('back w').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(2)
+            else:
+                print('用户A发送给用户B的红包检查失败,请检查原因')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errRedPocket_R_stg_tc183.png'
+                driver.get_screenshot_as_file(sf2)
+            sleep(1)
+        else:
+            print('朋友不存在，无法执行聊天相关操作')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_朋友_与好友聊天、发送图片、拍照、发红包----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_friendlistcheck_tc184
+#Purpose:朋友页面查看好友列表里我的好友共同关系的一致性
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/25]
+#***********************************************************************************************************************
+    def test_pengyou_friendlistcheck_tc184(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号,朋友_查看好友列表里我的好友共同关系的一致性---')
+        print('step1朋友页面点+号，输入好友B名称进行搜索')
+        print('step2点击搜索出的朋友打开他的个人主页,点击关注；step3检查好友A关注B是否成功')
+        print('step4退出A账号,以B账号登录app,朋友页面点+号,点加朋友按钮,输入好友A名称进入搜索')
+        sleep(0.5)
+        print('step5点击搜索出的朋友打开他的个人主页,点击关注；step6检查好友B关注A是否成功')
+        print('step7点击朋友,点击朋友列表按钮,检查朋友列表页面好友A的昵称是否显示正常')
+        print('step8退出B账号,以A账号登录app,朋友页面点击朋友列表按钮,检查朋友列表页面好友B的昵称是否显示正常')
+        print('step9取消关注B,再退出A账号,以B账号登录app,取消关注A')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_朋友_查看好友列表里我的好友共同关系的一致性----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(2)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #点+号
+        driver.find_element_by_accessibility_id('addPopMenu').click()
+        sleep(1)
+        add=driver.find_elements_by_accessibility_id('加朋友')
+        if len(add) != 0:
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('98762396987')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('Stg6987').click()
+            sleep(4)
+            #关注
+            t=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')
+            if len(t) == 2:
+                driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')[1].click()
+                sleep(1)
+                tt=driver.find_elements_by_accessibility_id('关注成功')
+                if len(tt) != 0:
+                    print('好友A已经关注B成功')
+                    sleep(0.5)
+                else:
+                    print('好友A关注B失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errFollowB_R_stg_tc184.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_testerb(self)
+            sleep(1)
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            #点+号
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('SamST')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(4)
+            #关注
+            t2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')
+            if len(t2) != 0:
+                driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="关注"]')[1].click()
+                sleep(1)
+                tt=driver.find_elements_by_accessibility_id('关注成功')
+                if len(tt) != 0:
+                    print('好友B关注A成功')
+                    sleep(0.5)
+                else:
+                    print('好友B关注A失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errFollowA_R_stg_tc181.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(1)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            #
+            driver.find_element_by_accessibility_id('friends go friendlist').click()  
+            sleep(2)
+            #朋友列表
+            chk1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="SamSTG"]')
+            if len(chk1) != 0:
+                print('朋友列表页面好友A的昵称显示正常,检查通过')
+                sleep(0.5)
+            else:
+                print('朋友列表页面好友A的昵称显示不正常，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errFriendListB_R_stg_tc184.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(1)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+            sleep(1)
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            driver.find_element_by_accessibility_id('friends go friendlist').click()  
+            sleep(4)
+            chk2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="Stg6987"]')
+            if len(chk2) != 0:
+                print('朋友列表页面好友B的昵称显示正常,检查通过')
+                sleep(0.5)
+            else:
+                print('朋友列表页面好友B的昵称显示不正常，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errFriendListA_R_stg_tc184.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            #朋友
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            #点+号
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('98762396987')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('Stg6987').click()
+            sleep(4)
+            #...
+            driver.find_element_by_accessibility_id('icon more white').click()
+            sleep(1)
+            #取消关注
+            driver.find_element_by_accessibility_id('取消关注').click()
+            sleep(1)
+            tt=driver.find_elements_by_accessibility_id('取消成功')
+            if len(tt) != 0:
+                print('好友A取消关注B成功')
+                sleep(0.5)
+            else:
+                print('好友A取消关注B失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errUnFollowB_R_stg_tc184.png'
+                driver.get_screenshot_as_file(sf2)
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_testerb(self)
+            sleep(2)
+            #朋友
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            #点+号
+            driver.find_element_by_accessibility_id('addPopMenu').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('加朋友').click()
+            sleep(2)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]')
+            edit.click()
+            sleep(0.5)
+            driver.find_element_by_xpath('//XCUIElementTypeSearchField[@name="昵称/手机号"]').set_value('SamST')
+            sleep(0.5)
+            #search
+            driver.find_element_by_accessibility_id('Search').click()  
+            sleep(2)
+            driver.find_element_by_accessibility_id('SamSTG').click()
+            sleep(5)
+            #...
+            driver.find_element_by_accessibility_id('icon more white').click()
+            sleep(1)
+            #取消关注
+            driver.find_element_by_accessibility_id('取消关注').click()
+            sleep(1)
+            tt=driver.find_elements_by_accessibility_id('取消成功')
+            if len(tt) != 0:
+                print('好友B取消关注A成功')
+                sleep(0.5)
+            else:
+                print('好友B取消关注A失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf3='../../test_report/ios/'+now+'_errUnFollowA_R_stg_tc184.png'
+                driver.get_screenshot_as_file(sf3)
+            sleep(2)
+            driver.find_element_by_accessibility_id('full screen back icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_朋友_查看好友列表里我的好友共同关系的一致性----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_aiche_feedback4carowner_tc185
+#Purpose:检查车主从爱车页面反馈建议
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/25]
+#***********************************************************************************************************************
+    def test_aiche_feedback4carowner_tc185(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:爱车_车主反馈建议')
+        print('step1车主用户进入爱车页面')
+        print('step2点反馈建议按钮；step3检查推荐阅读里ES8购车页面显示是否正常')
+        print('step4点击点提反馈,点击提问题,输入文字,点+号,选择本地照片,选6张照片上传')
+        print('step5点击前往录制语音,录制10秒语音;step6点击提交,检查是否提交成功')
+        print('step7检查反馈的文字和状态是否正常,检查反馈内容的上传6张图片是否正常(数字6)')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_车主反馈建议----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6988"')
+        if len(name) != 0:
+            print('车主用户Sam6988已登录')
+            sleep(0.5)
+        else:
+            print('车主用户Sam6988未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(2)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+        sleep(4)
+        #fresh:previous bug here
+        #driver.execute_script("mobile: scroll", {"direction": "up"})
+        #sleep(2)
+        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":400,"toX":50,"toY":50,"duration":1.0})
+        for i in range(2):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        #反馈建议
+        ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"反馈建议")]')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"反馈建议")]').get_attribute('visible')
+            if ch1v == 'true':
+                print('反馈建议按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"反馈建议")]').click()
+                sleep(6)
+                #推荐阅读
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"ES8购车")]').click()
+                sleep(1)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"400电话（售后电话）")]').click()
+                sleep(2)
+                ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"ES8售后电话：400-999-6699")]')
+                sleep(1)
+                if len(ch2) != 0:
+                    print('推荐阅读里ES8购车页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('推荐阅读里ES8购车页面显示不正常，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errES8Buy_R_stg_tc185.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                driver.find_element_by_accessibility_id('提反馈').click()
+                sleep(2)
+                #提问题
+                driver.find_element_by_accessibility_id('提问题').click()
+                sleep(2)
+                allr=driver.find_elements_by_accessibility_id('好')
+                if len(allr) != 0:
+                    driver.find_element_by_accessibility_id('好').click()
+                sleep(1)
+                edit=driver.find_element_by_class_name('XCUIElementTypeTextView')
+                edit.click()
+                sleep(0.5)
+                now0=time.strftime('%Y%m%d_%H%M%S')
+                edit.send_keys('反馈建议'+now0)
+                t0='反馈建议'+now0
+                sleep(0.5)
+                #+
+                ###driver.find_element_by_accessibility_id('addphoto').click()
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':75, 'y':244})
+                sleep(1)
+                #选择本地照片
+                allow=driver.find_elements_by_accessibility_id('选择本地照片')
+                if len(allow) != 0:
+                    driver.find_element_by_accessibility_id('选择本地照片').click()
+                sleep(2)
+                for i in range(6):
+                    driver.find_elements_by_ios_predicate('name=="compose guide check box defaul"')[i].click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成(6/6)').click()
+                sleep(3)
+                #hide keyboard
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':400, 'y':434})
+                sleep(1)
+                #前往录制语音
+                driver.find_element_by_accessibility_id('前往录制语音').click()
+                sleep(1)
+                #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':653})
+                dd=driver.find_element_by_xpath('//XCUIElementTypeWindow[1]/XCUIElementTypeOther[2]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeButton[1]')
+                sleep(1)
+                driver.execute_script('mobile: touchAndHold',{'element':dd,'duration':10.0})
+                sleep(8)
+                driver.find_element_by_accessibility_id('提交').click()
+                sleep(8)
+                ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"反馈成功")]')
+                sleep(1)
+                if len(ch2) != 0:
+                    print('反馈建议成功')
+                    sleep(0.5)
+                else:
+                    print('反馈建议失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errFeedbackSent_R_stg_tc185.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(1)
+                driver.find_element_by_accessibility_id('好的').click()
+                sleep(5)
+                number=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="6"]')
+                if len(number) != 0:
+                    print('反馈内容的上传6张图片检查通过')
+                    sleep(0.5)
+                else:
+                    print('反馈内容的上传6张图片检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errPic6_R_stg_tc185.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                stat=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="已受理"]')
+                if len(stat) != 0:
+                    print('反馈的状态检查通过')
+                    sleep(0.5)
+                else:
+                    print('反馈的状态检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errStatus_R_stg_tc185.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(2)
+                title=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@value,t0)]')
+                sleep(1)
+                if len(title) != 0:
+                    print('反馈的文字检查通过')
+                    sleep(0.5)
+                else:
+                    print('反馈的文字检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errText_R_stg_tc185.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                driver.find_element_by_accessibility_id('navigationbar btn back black').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('navigationbar btn back black').click()
+                sleep(2)
+            else:
+                print('反馈建议按钮没找到，请检查原因')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errNoFeedback_R_stg_tc185.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_车主反馈建议----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_aiche_mychargepole4carowner_tc186
+#Purpose:检查车主从爱车页面进入我的专属桩页面
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/25]
+#***********************************************************************************************************************
+    def test_aiche_mychargepole4carowner_tc186(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:爱车_我的专属桩')
+        print('step1车主用户进入爱车页面')
+        print('step2点我的专属桩按钮')
+        print('step3检查我的专属桩页面显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_我的专属桩----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6988"')
+        if len(name) != 0:
+            print('车主用户Sam6988已登录')
+            sleep(0.5)
+        else:
+            print('车主用户Sam6988未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(2)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+        sleep(4)
+        #fresh
+        #driver.execute_script("mobile: scroll", {"direction": "up"})
+        #sleep(2)
+        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":400,"toX":50,"toY":50,"duration":1.0})
+        for i in range(1):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        #我的专属桩
+        ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我的专属桩")]')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我的专属桩")]').get_attribute('visible')
+            sleep(1)
+            if ch1v == 'true':
+                print('我的专属桩按钮找到')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我的专属桩")]').click()
+                sleep(4)
+                ch2=driver.find_elements_by_class_name('XCUIElementTypeImage')
+                sleep(1)
+                if len(ch2) != 0:
+                    print('我的专属桩页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('我的专属桩页面显示不正常，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errNoimage_R_stg_tc186.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(2)
+            else:
+                print('我的专属桩按钮没找到，请检查原因')
+                sleep(1)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errNomychargepole_R_stg_tc186.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_我的专属桩----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_aiche_unlightensite4carowner_tc187
+#Purpose:检查车主未点亮地标详情页的校验
+#OS:iOSu
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/25]
+#***********************************************************************************************************************
+    def test_aiche_unlightensite4carowner_tc187(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:爱车_车主未点亮地标详情页的校验')
+        print('step1车主用户进入爱车页面')
+        print('step2点设置按钮进入车辆信息页面打开参与点亮中国开关')
+        print('step3返回爱车页面检查点亮中国入口文案')
+        print('step4点击点亮中国入口进入,检查未点亮地标是否存在')
+        print('step5点未点亮地标进入未点亮地标详细页面;step6对未点亮地标详细页面进行UI元素检查')
+        print('step7检查全部探索是否不显示')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_车主未点亮地标详情页的校验----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6988"')
+        if len(name) != 0:
+            print('车主用户Sam6988已登录')
+            sleep(0.5)
+        else:
+            print('车主用户Sam6988未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_carowner(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(2)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+        sleep(4)
+        #设置
+        driver.find_element_by_accessibility_id('vehicle setting icon').click()
+        sleep(5)
+        swi=driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="参与点亮中国"]')
+        c_swi=swi.get_attribute('value')
+        if c_swi == '1':
+            print('参与点亮中国开关已打开')
+            sleep(1)
+        else:
+            driver.find_element_by_xpath('//XCUIElementTypeSwitch[@name="参与点亮中国"]').click()
+            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':350, 'y':616})
+            sleep(1)
+            driver.find_element_by_accessibility_id('确定').click()
+            sleep(2)
+            print('参与点亮中国开关已手动打开')
+            sleep(1)
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":31, "y":42})
+        sleep(1)
+        #driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":400,"toX":50,"toY":50,"duration":1.0})
+        driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(2)
+        #已探索
+        #ch1=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "已探索"')
+        ch1v=driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "已探索"').get_attribute('visible')
+        sleep(2)
+        if ch1v == 'true':
+            print('点亮中国入口文案检查通过')
+            sleep(1)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "已探索"').click()
+            sleep(9)
+            #driver.execute_script("mobile: scroll", {"direction": "down"})
+            driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":650,"toX":50,"toY":400,"duration":1.0})
+            sleep(3)
+            ch2v=driver.find_element_by_ios_predicate('type == "XCUIElementTypeLink" AND name CONTAINS "此地标无人探索"').get_attribute('visible')
+            sleep(1)
+            if ch2v == 'true':
+                print('未点亮地标找到')
+                sleep(0.5)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeLink" AND name CONTAINS "此地标无人探索"').click()
+                sleep(9)
+                #driver.execute_script("mobile: scroll", {"direction": "down"})
+                #sleep(2)
+                #未点亮地标详情页
+                #UI checking
+                fun_notlightedui4carowner_check(self)
+                sleep(2)
+                ch3=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeLink" AND name == "全部探索"')
+                if len(ch3) == 0:
+                    print('全部探索不显示,检查通过')
+                    sleep(0.5)
+                else:
+                    print('全部探索显示,检查失败,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errAllExpe_R_stg_tc187.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(2)
+                #返回
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+            else:
+                print('未点亮地标未找到，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errNoUnLightenSite_R_stg_tc187.png'
+                driver.get_screenshot_as_file(sf2)
+            sleep(1)
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+            sleep(1)
+        else:
+            print('点亮中国入口文案检查通过失败，请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf1='../../test_report/ios/'+now+'_errorLightenChinaTextOn_R_stg_tc187.png'
+            driver.get_screenshot_as_file(sf1)
+        sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_车主未点亮地标详情页的校验----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_nearestshop_tc188
+#Purpose:检查开启地理位置权限时检查体验页面返回离客户端最近城市或门店
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/26]
+#***********************************************************************************************************************
+    def test_faxian_nearestshop_tc188(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_开启地理位置权限时检查体验页面返回离客户端最近城市或门店')
+        print('step1点击发现')
+        print('step2点击体验')
+        print('step3检查离客户端最近城市/门店:蔚来中心丨上海太古汇店是否显示')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_开启地理位置权限时检查体验页面返回离客户端最近城市或门店----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        sh=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+        sleep(1)
+        if len(sh) != 0:
+            print('体验页面返回离客户端最近城市/门店检查通过')
+            sleep(0.5)
+        else:
+            print('体验页面返回离客户端最近城市/门店检查失败,请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf1='../../test_report/ios/'+now+'_errShop_R_stg_tc188.png'
+            driver.get_screenshot_as_file(sf1)
+        sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_开启地理位置权限时检查体验页面返回离客户端最近城市或门店----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_expshopuicheck_tc189
+#Purpose:检查体验页面门店名称、营业时间、门店活动文字
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/26]
+#***********************************************************************************************************************
+    def test_faxian_expshopuicheck_tc189(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_体验页面门店名称、营业时间、门店活动文字检查')
+        print('step1点击发现;step2点击体验')
+        print('step3点击最近城市/门店:蔚来中心丨上海太古汇店, 点击蔚来中心 | 杭州西湖体验店进行切换')
+        print('step4检查体验页面门店名称、营业时间、门店活动文字显示是否正确')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面门店名称、营业时间、门店活动文字检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        sh=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+        if len(sh) != 0:
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
+            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':110})
+            sleep(3)
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心 | 杭州西湖体验店"').click()
+            sleep(4)
+            chk1=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "蔚来中心 | 杭州西湖体验店"')
+            chk2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "营业中 • 9:00-20:00"')
+            chk3=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "蔚来中心入驻杭州"')
+            sleep(2)
+            if len(chk1) != 0 and len(chk2) != 0 and len(chk3) != 0:
+                print('门店名称、营业时间、门店活动文字显示正确')
+                sleep(0.5)
+            else:
+                print('门店名称、营业时间、门店活动文字显示不正确,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errShopUICheck_R_stg_tc189.png'
+                driver.get_screenshot_as_file(sf2)
+            sleep(2)
+        else:
+            print('体验页面返回离客户端最近城市/门店检查失败,请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf1='../../test_report/ios/'+now+'_errShop_R_stg_tc189.png'
+            driver.get_screenshot_as_file(sf1)
+        sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面门店名称、营业时间、门店活动文字检查----结束:'+now)
+        
+#***********************************************************************************************************************
+#TC Name:test_faxian_experjoinstatuscheck_tc190
+#Purpose:发现页面体验tab活动预约状态及待消耗积分针对不同身份用户展示正确
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/26]
+#***********************************************************************************************************************
+    def test_faxian_experjoinstatuscheck_tc190(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号发现——体验tab活动活动预约状态及待消耗积分针对不同身份用户展示正确')
+        print('step1发现页面里点击体验tab')
+        print('step2找到活动:小龙自动化3（请勿报名）,点击进入；step3检查活动详情、温馨提示显示是否正确')
+        print('step4检查所需积分显示是否正常;step5检查立即报名按钮状态;step6退出当前账号,以零积分用户账号登录app')
+        print('step7体验页面找到活动:小龙自动化3（请勿报名）,点击进入；step8检查活动详情、温馨提示显示是否正确')
+        print('step9检查所需积分显示是否正常;step10检查立即报名/(积分不足)按钮状态')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验里活动预约状态及待消耗积分针对不同身份用户展示正确----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        for i in range(2):
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':150,'duration':1.0})
+        sleep(3)
+        #小龙自动化3
+        ch1=driver.find_elements_by_accessibility_id('小龙自动化3（请勿报名）')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').get_attribute('visible')
+            if ch1v == 'true':
+                driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
+                sleep(5)
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                chk1=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "活动详情"')
+                chk2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "温馨提示"')
+                sleep(2)
+                if len(chk1) != 0 and len(chk2) != 0:
+                    print('活动详情、温馨提示显示正确')
+                    sleep(0.5)
+                coin1=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[30]/XCUIElementTypeStaticText[1]').get_attribute('value')
+                sleep(1)
+                print('所需积分为:'+coin1)
+                sleep(0.5)
+                if coin1 == '20':
+                    print('所需积分显示正常,检查通过')
+                    sleep(0.5)
+                else:
+                    print('所需积分显示不正常,请检查原因')
+                sleep(0.5)
+                chk3=driver.find_element_by_ios_predicate('type == "XCUIElementTypeLink" AND name == "立即报名"').get_attribute('enabled')
+                if chk3 == 'true':
+                    print('立即报名按钮状态为可用,检查通过')
+                    sleep(0.5)
+                else:
+                    print('立即报名按钮状态为不可用,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errStatusA_R_stg_tc190.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(2)
+                bp_is_loggedin(self)
+                sleep(1)
+                bp_normalloginmp_zeroscore(self)
+                sleep(1)
+                #发现
+                driver.find_element_by_accessibility_id('发现').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('体验').click()
+                sleep(3)
+                for i in range(2):
+                    driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':150,'duration':1.0})
+                sleep(3)
+                #小龙自动化3
+                ch2=driver.find_elements_by_accessibility_id('小龙自动化3（请勿报名）')
+                ch2v=driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').get_attribute('visible')
+                sleep(1)
+                if len(ch2) != 0 and ch2v == 'true':
+                    driver.find_element_by_accessibility_id('小龙自动化3（请勿报名）').click()
+                    sleep(5)
+                    driver.execute_script("mobile: scroll", {"direction": "down"})
+                    sleep(2)
+                    chk1b=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "活动详情"')
+                    chk2b=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "温馨提示"')
+                    sleep(2)
+                    if len(chk1b) != 0 and len(chk2b) != 0:
+                        print('活动详情、温馨提示显示正确')
+                        sleep(0.5)
+                    coin2=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[30]/XCUIElementTypeStaticText[1]').get_attribute('value')
+                    sleep(1)
+                    print('零积分用户账号所需积分为:'+coin2)
+                    sleep(0.5)
+                    if coin2 == '10':
+                        print('零积分用户账号所需积分显示正常,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('零积分用户账号所需积分显示不正常,请检查原因')
+                    sleep(0.5)
+                    chk3b=driver.find_element_by_ios_predicate('type == "XCUIElementTypeLink" AND name == "积分不足"').get_attribute('visible')
+                    if chk3b == 'true':
+                        print('立即报名/(积分不足)按钮状态为不可用,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('立即报名/(积分不足)按钮状态为可用,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errStatusB_R_stg_tc0190.png'
+                        driver.get_screenshot_as_file(sf2)
+                        sleep(1)
+                    driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                    sleep(2)
+                else:
+                    print('零积分用户账号小龙自动化3未找到,请检查原因')
+                    sleep(1)
+            else:
+                print('小龙自动化3未找到,请检查原因')
+                sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验里活动预约状态及待消耗积分针对不同身份用户展示正确----结束:'+now)
+        
+#***********************************************************************************************************************
+#TC Name:test_faxian_expsharechecklink_tc191
+#Purpose:检查发现页面体验tab下的活动分享给我的朋友后该被分享人登录账号后点击分享链接进入活动详细页面
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/03/26]
+#***********************************************************************************************************************
+    def test_faxian_expsharechecklink_tc191(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_体验tab下的活动分享给我的朋友后该被分享人登录账号后点击分享链接进入活动详细页面')
+        print('step1进入发现页面体验tab;step2点左上角搜索按钮,输入小龙自动化3进行搜索')
+        print('step3点击搜素第一个结果进入活动页面,点右上角的分享按钮；step4检查分享我的朋友功能是否正常')
+        print('step5退出当前账号,以被分享人账号登录app;step6点朋友页面的分享')
+        print('step7找到被分享的活动链接,点击进入检查页面是否显示正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验tab下的活动分享给我的朋友后该被分享人登录账号后点击分享链接进入活动详细页面----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('main global search icon').click()
+        sleep(2)
+        #search
+        sear=driver.find_element_by_class_name('XCUIElementTypeTextField')
+        sear.click()
+        sleep(0.5)
+        sear.set_value('小龙自动化3')
+        sleep(1)
+        #search
+        driver.find_element_by_accessibility_id('Search').click()  
+        sleep(2)
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
+        sleep(1)
+        if len(ch) != 0:
+            print('体验活动:小龙自动化3存在/已找到')
+            sleep(1)
+            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
+            sleep(8)
+            #右上角按钮
+            sh=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[2]')
+            if len(sh) != 0:
+                print('分享按钮存在，检查通过')
+                sleep(2)
+                #share
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':382, 'y':42})
+                sleep(2)
+                #我的朋友
+                mf=driver.find_elements_by_accessibility_id('我的朋友')
+                if len(mf) != 0:
+                    print('分享到我的朋友按钮存在，检查通过')
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我的朋友').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('朋友').click()
+                    sleep(2)
+                    driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6986"').click()
+                    sleep(1)
+                    #检查toast
+                    save4=driver.find_elements_by_accessibility_id('分享成功')
+                    if len(save4) != 0:
+                        print('分享我的朋友成功')
+                        sleep(0.5)
+                    else:
+                        print('分享我的朋友失败，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf4='../../test_report/ios/'+now+'_errPGCsharemyfriend_R_stg_tc191.png'
+                        driver.get_screenshot_as_file(sf4)
+                    sleep(1)
+                else:
+                    print('分享到我的朋友按钮不存在，请检查原因')
+                    sleep(2)
+            else:
+                print('分享按钮不存在，请检查原因')
+                sleep(2)
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+            sleep(2)
+            driver.find_element_by_accessibility_id('evaluate close').click()
+            sleep(1)
+            bp_is_loggedin(self)
+            sleep(1)
+            #用户Sam6986
+            bp_normalloginmp_testera(self)
+            sleep(1)
+            driver.find_element_by_accessibility_id('朋友').click()
+            sleep(3)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"').click()
+            sleep(3)
+            u2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "小龙自动化3"')
+            sleep(1)
+            if len(u2) != 0:
+                t = len(u2) - 1
+                print('分享链接:小龙自动化3存在，检查通过')
+                sleep(2)
+                driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "小龙自动化3"')[t].click()
+                sleep(6)
+                chp=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "小龙自动化3（请勿报名）"')
+                if len(chp) != 0:
+                    print('被分享人点击分享链接可以进入该活动详细页面')
+                    sleep(0.5)
+                else:
+                    print('该活动详细页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errLinkPage_R_stg_tc191.png'
+                    driver.get_screenshot_as_file(sf2)
+                    sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                sleep(1)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(1)
+        else:
+            print('体验活动:小龙自动化3不存在，无法执行分享操作')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验tab下的活动分享给我的朋友后该被分享人登录账号后点击分享链接进入活动详细页面----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_exppilotdistance_tc192
+#Purpose:检查体验页面门店导航图标、距离位置和跳转门店列表
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/02]
+#***********************************************************************************************************************
+    def test_faxian_exppilotdistance_tc192(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_体验页面门店导航图标、距离位置和跳转门店列表')
+        print('step1点击发现;step2点击体验')
+        print('step3检查体验页面门店名称、营业时间显示、导航图标、距离位置显示是否正确')
+        print('step4点击运营位门店,检查跳转门店列表是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面门店导航图标、距离位置和跳转门店列表检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        sh=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+        chk2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "营业中 • 9:00-20:00"')
+        sleep(1)
+        if len(sh) != 0 and chk2 != 0:
+            print('门店名称、营业时间显示正确')
+            sleep(1)
+            chk1=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]')
+            chk3=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "26km"')
+            sleep(1)
+            if len(chk1) != 0 and len(chk3) != 0:
+                print('导航图标、距离位置显示正确,检查通过')
+                sleep(1)
+                driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
+                sleep(3)
+                chkc=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "杭州市"')
+                if len(chkc) != 0:
+                    print('门店列表显示正常,跳转正常')
+                    sleep(0.5)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(2)
+                else:
+                    print('门店列表显示不正确,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errShoplist_R_stg_tc192.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(2)
+            else:
+                print('导航图标、距离位置显示不正确,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errShop_R_stg_tc192.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(2)
+        else:
+            print('门店名称、营业时间、门店活动文字显示不正确,请检查原因')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面门店导航图标、距离位置和跳转门店列表检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_expcitynopilot_tc193
+#Purpose:检查体验页面运营位为城市时不显示导航图标
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/02]
+#***********************************************************************************************************************
+    def test_faxian_expcitynopilot_tc193(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_体验页面运营位为城市时不显示导航图标的检查')
+        print('step1点击发现;step2点击体验')
+        print('step3点击运营位门店,点击苏州市')
+        print('step4检查体验页面城市运营位信息显示是否正常')
+        print('step5检查城市运营位是否不显示导航图标')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面运营位为城市时不显示导航图标的检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
+        sleep(3)
+        driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "苏州市"').click()
+        sleep(3)
+        chk2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "苏州市"')
+        if len(chk2) != 0:
+            print('城市运营位信息显示正常,检查通过')
+        else:
+            print('城市运营位信息显示不正常,请检查原因')
+        sleep(1)
+        chk3=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]')
+        if len(chk3) == 0:
+            print('城市运营位不显示导航图标,检查通过')
+            sleep(0.5)
+        else:
+            print('城市运营位显示导航图标,请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf2='../../test_report/ios/'+now+'_errShopCity_R_stg_tc193.png'
+            driver.get_screenshot_as_file(sf2)
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面运营位为城市时不显示导航图标的检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_expshopcityswitch_tc194
+#Purpose:检查体验页面体验页面运营位城市与门店的切换跳转检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/02]
+#***********************************************************************************************************************
+    def test_faxian_expshopcityswitch_tc194(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_体验页面运营位城市与门店的切换跳转检查')
+        print('step1点击发现;step2点击体验')
+        print('step3点击运营位门店,在门店列表里点击苏州市')
+        print('step4切换成功后检查城市信息显示是否正常')
+        print('step5点击运营位城市,在门店列表里点击上海市门店')
+        print('step6切换成功后检查门店信息显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面运营位城市与门店的切换跳转检查----开始:'+now)
+        sleep(1)
+        """
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录！')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录！')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        """
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        sh=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+        if len(sh) != 0:
+            print('门店信息显示正常')
+            sleep(1)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
+            sleep(3)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "苏州市"').click()
+            sleep(3)
+            chk2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "苏州市"')
+            if len(chk2) != 0:
+                print('门店切换到城市显示正常,检查通过')
+                sleep(1)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "苏州市"').click()
+                sleep(3)
+                #蔚来中心丨上海太古汇店
+                driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+                sleep(3)
+                sh2=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+                if len(sh2) != 0:
+                    print('城市切换到门店显示正常,检查通过')
+                    sleep(0.5)
+                else:
+                    print('城市切换到门店显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errCity2Shop_R_stg_tc193.png'
+                    driver.get_screenshot_as_file(sf2)
+                    sleep(2)
+            else:
+                print('门店切换到城市显示不正常,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errShop2City_R_stg_tc193.png'
+                driver.get_screenshot_as_file(sf1)
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面运营位城市与门店的切换跳转检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_exppilot_tc195
+#Purpose:检查体验页面点击导航按钮选择导航的功能检
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/02]
+#***********************************************************************************************************************
+    def test_faxian_exppilot_tc195(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_体验页面点击导航按钮选择导航的功能检查')
+        print('step1点击发现;step2点击体验')
+        print('step3点击导航按钮,再点击导航,点击苹果地图->出发->结束->结束线路')
+        print('step4点击返回“蔚来Test”')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面点击导航按钮选择导航的功能检查----开始:'+now)
+        sleep(1)
+        """
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录！')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录！')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        """
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        chk1=driver.find_elements_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]')
+        if len(chk1) != 0:
+            print('导航按钮存在')
+            sleep(1)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[1]').click()
+            sleep(4)
+            #导航
+            driver.find_element_by_xpath('//XCUIElementTypeOther[1]/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeButton').click()
+            sleep(1)
+            chkc=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "苹果地图"')
+            if len(chkc) != 0:
+                print('苹果地图按钮弹出正常')
+                sleep(1)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "苹果地图"').click()
+                sleep(4)
+                #第一标题
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "出发"').click()
+                sleep(6)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "结束"').click()
+                sleep(1)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "结束路线"').click()
+                sleep(3)
+                #返回“蔚来Test”
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "breadcrumb"').click()
+                sleep(2)
+            else:
+                print('苹果地图按钮弹出不正常,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errNoApplemap_R_stg_tc195.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+        else:
+            print('导航按钮不存在,请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf3='../../test_report/ios/'+now+'_errNoPilot_R_stg_tc195.png'
+            driver.get_screenshot_as_file(sf3)
+            sleep(2)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "取消"').click()
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_体验页面点击导航按钮选择导航的功能检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_aiche_es6milecalculator_tc196
+#Purpose:检查爱车页面里ES6里程计算器
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/03]
+#***********************************************************************************************************************
+    def test_aiche_es6milecalculator_tc196(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:爱车_ES6里程计算器')
+        print('step1进入爱车页面;step2点击里程计算器')
+        print('step3点击ES6；step4改变车型版本:基准版')
+        print('step5改变电池容量;step6改变车外温度:40度')
+        print('step7打开空调检查里程计算是否正确')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_ES6里程计算器----开始:'+now)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(4)
+        #driver.execute_script("mobile: tap", {"touchCount":"1", "x":188, "y":613})
+        #sleep(2)
+        for i in range(3):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':200,'toX':50,'toY':400,'duration':1.0})
+        sleep(2)
+        cmap=driver.find_elements_by_accessibility_id('里程计算器')
+        if len(cmap) != 0:
+            cmapv=driver.find_element_by_accessibility_id('里程计算器').get_attribute('visible')
+            if cmapv == 'true':
+                print('里程计算器按钮找到')
+                sleep(2)
+                driver.find_element_by_accessibility_id('里程计算器').click()
+                sleep(7)
+                driver.find_element_by_accessibility_id('ES6').click()
+                sleep(3)
+                #改变车型版本
+                driver.find_element_by_accessibility_id('基准版').click()
+                sleep(1)
+                res1=driver.find_elements_by_accessibility_id('420')
+                if len(res1) != 0:
+                    print('改变车型版本后里程计算正确')
+                    sleep(0.5)
+                else:
+                    print('改变车型版本后里程计算不正确，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errMileV_R_tc196.png'
+                    driver.get_screenshot_as_file(sf1)
+                sleep(2)
+                #改变电池容量
+                driver.find_element_by_accessibility_id('84').click()
+                sleep(1)
+                res4=driver.find_elements_by_accessibility_id('490')
+                if len(res4) != 0:
+                    print('改变电池容量后里程计算正确')
+                    sleep(0.5)
+                else:
+                    print('改变电池容量后里程计算不正确，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errMileBettery_R_tc196.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(2)
+                #改变车外温度>
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':177, 'y':647})
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':177, 'y':647})
+                sleep(1)
+                res2=driver.find_elements_by_accessibility_id('464')
+                if len(res2) != 0:
+                    print('改变车外温度后里程计算正确')
+                    sleep(0.5)
+                else:
+                    print('改变车外温度后里程计算不正确，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errMileTemp_R_tc196.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(2)
+                #打开空调
+                driver.find_element_by_accessibility_id('AC ON').click()
+                sleep(1)
+                res3=driver.find_elements_by_accessibility_id('376')
+                if len(res3) != 0:
+                    print('打开空调后里程计算正确')
+                    sleep(0.5)
+                else:
+                    print('打开空调后里程计算不正确，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errMileAir_R_tc196.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(2)
+                driver.find_element_by_accessibility_id('nav back btn').click()
+                sleep(2)
+            else:
+                print('里程计算器按钮未找到/不存在，请检查原因')
+                sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_ES6里程计算器----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_expshopcityorder_tc197
+#Purpose:检查门店/城市列表按距离由近到远排序
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/04]
+#***********************************************************************************************************************
+    def test_faxian_expshopcityorder_tc197(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_门店/城市列表按距离由近到远排序的检查')
+        print('step1点击发现;step2点击体验')
+        print('step3点击最近城市/门店:蔚来中心丨上海太古汇店进入门店/城市列表页面')
+        print('step4检查门店/城市列表是否按距离由近到远排序')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_门店/城市列表按距离由近到远排序的检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        sh=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+        if len(sh) != 0:
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton[2]').click()
+            #driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':110})
+            sleep(5)
+            shop1name=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeStaticText[2]').get_attribute('value')
+            shop1dist=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeStaticText[1]').get_attribute('value')
+            city1=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther[3]').get_attribute('name')
+            sleep(2)
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
+            sleep(3)
+            shop2name=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeStaticText[2]').get_attribute('value')
+            shop2dist=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeStaticText[1]').get_attribute('value')
+            city2=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeOther[7]').get_attribute('name')
+            sleep(2.5)
+            print('门店1:'+shop1name)
+            print('门店1距离信息:'+shop1dist)
+            print('城市1:'+city1)
+            print('门店2:'+shop2name)
+            print('门店2距离信息:'+shop2dist)
+            print('城市2:'+city2)
+            sleep(1)
+            if ('距你26km' in shop1dist) and ('距你151km' in shop2dist) and ('苏州市' in city1) and ('南京市' in city2):
+                print('门店列表按距离由近到远排序检查通过')
+                print('城市列表按距离由近到远排序检查通过')
+                sleep(0.5)
+            else:
+                print('门店列表按距离由近到远排序检查失败,请检查原因')
+                print('城市列表按距离由近到远排序检查失败,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errShopCityorder_R_stg_tc197.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_门店/城市列表按距离由近到远排序的检查----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_faxian_infospeciallistlikecomment_tc198
+#Purpose:检查用户模式点击发现页面专题类型文章列表页的点赞和评论按钮的预期动作
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/04]
+#*********************************************************************************************************************************
+    def test_faxian_infospeciallistlikecomment_tc198(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:点击发现页面资讯tab专题类型文章列表页的点赞和评论功能')
+        print('step1点击发现->资讯页面')
+        print('step2搜索找到专题测试221,点击进入专题页面')
+        print('step3点击第一篇文章的评论按钮')
+        print('step4点击评论栏,输入评论内容点发送,检查评论文本是否正常')
+        print('step5点击点赞按钮,检查点赞数是否正确')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab专题类型文章列表页的点赞和评论功能----开始:'+now)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('资讯').click()
+        sleep(2)
+        driver.find_element_by_accessibility_id('main global search icon').click()
+        sleep(2)
+        #search
+        sear=driver.find_element_by_class_name('XCUIElementTypeTextField')
+        sear.click()
+        sleep(1)
+        sear.set_value('专题测试221')
+        sleep(1)
+        #search
+        driver.find_element_by_accessibility_id('Search').click()  
+        sleep(2)
+        #专题测试221
+        ch=driver.find_elements_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]')
+        sleep(1)
+        if len(ch) != 0:
+            print('资讯tab:专题测试221已找到')
+            sleep(1)
+            driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeTable/XCUIElementTypeCell[2]').click()
+            sleep(6)
+            #评论按钮
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":233, "y":668})
+            sleep(5)
+            #进入详细页面评论
+            ###driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[61]').click()
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "我也来说～"').click()
+            sleep(0.5)
+            edit=driver.find_element_by_xpath('//XCUIElementTypeOther/XCUIElementTypeTextView')
+            now0=time.strftime('%H%M%S')
+            edit.send_keys('Python评论专题:'+now0)
+            t0='Python评论专题:'+now0
+            sleep(1)
+            driver.find_element_by_accessibility_id('Send').click()
+            sleep(1)
+            #driver.execute_script("mobile: scroll", {"direction": "down"})
+            #sleep(1)
+            title=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS t0')
+            if len(title) != 0:
+                print('评论的文字检查通过')
+                sleep(0.5)
+            else:
+                print('评论的文字检查失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf1='../../test_report/ios/'+now+'_errComment_R_stg_tc131.png'
+                driver.get_screenshot_as_file(sf1)
+            sleep(2)
+            zan0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[70]/XCUIElementTypeStaticText').get_attribute('value')
+            sleep(1)
+            print('原点赞数:'+zan0)
+            sleep(0.5)
+            #点赞
+            #driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[69]').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":703})
+            sleep(1)
+            zan1=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="2019新年礼物安排上了，请签收"]/XCUIElementTypeOther[70]/XCUIElementTypeStaticText').get_attribute('value')
+            sleep(1)
+            print('现在点赞数:'+zan1)
+            sleep(0.5)
+            if zan1 == str(int(zan0)+1):
+                print('点赞数+1,检查正常')
+                sleep(0.5)
+            elif zan1 == str(int(zan0)-1):
+                print('点赞数-1,您已经点赞过')
+                sleep(0.5)
+            else:
+                print('点赞数检查失败，请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errLike_R_stg_tc198.png'
+                driver.get_screenshot_as_file(sf2)
+            sleep(1)
+            #返回
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+            sleep(1)
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+            sleep(1)
+        #x
+        driver.find_element_by_accessibility_id('evaluate close').click()
+        sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab专题类型文章详情页的点赞和评论功能----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_expsendedactivitycheckmorepic_tc199
+#Purpose:已结束活动用户晒图默认显示和点赞数量相同时根据时间降序检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/08]
+#***********************************************************************************************************************
+    def test_faxian_expsendedactivitycheckmorepic_tc199(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_已结束活动用户晒图默认显示和点赞数量相同时根据时间降序检查')
+        print('step1点击发现;step2点击体验')
+        print('step3点击最近城市/门店:蔚来中心丨上海太古汇店的图片进入活动详情页')
+        print('step4检查用户晒图默认显示三条')
+        print('step5检查点赞数量相同时根据时间降序')
+        print('step6检查全部晒图按钮是否存在,存在则点击进入')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_已结束活动用户晒图默认显示和点赞数量相同时根据时间降序检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        sh=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+        if len(sh) != 0:
+            #点第一张图片
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':280})
+            sleep(5)
+            for i in range(6):
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            pic3=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[58]/XCUIElementTypeStaticText').get_attribute('value')
+            zan3=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[61]/XCUIElementTypeStaticText').get_attribute('value')
+            pic2=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[50]/XCUIElementTypeStaticText').get_attribute('value')
+            zan2=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[53]/XCUIElementTypeStaticText').get_attribute('value')
+            sleep(2)
+            print('第二个晒图文章标题:'+pic2)
+            print('第三个晒图文章标题:'+pic3)
+            print('第二个嗮图文章的点赞数:'+zan2)
+            print('第三个嗮图文章的点赞数:'+zan3)
+            sleep(1)
+            if '人生苦短体验晒图:20190313_192659' in pic3:
+                print('用户晒图默认显示三条检查通过')
+                sleep(0.5)
+            else:
+                print('用户晒图默认显示三条检查失败,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errPic3_R_stg_tc199.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(2)
+            if zan2 == zan3:
+                print('点赞数量相同时根据时间降序检查通过')
+                sleep(0.5)
+            else:
+                print('点赞数量相同时根据时间降序检查失败,请检查原因')
+                sleep(0.5)
+            show=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "全部晒图"')
+            if len(show) != 0:
+                print('全部晒图按钮找到')
+                sleep(1)
+                driver.find_element_by_accessibility_id('全部晒图').click()
+                sleep(3)
+            else:
+                print('全部晒图按钮未找到/不存在,请检查原因')
+                sleep(1)
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_已结束活动用户晒图默认显示和点赞数量相同时根据时间降序检查----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_experjoinfull_tc200
+#Purpose:发现页面体验tab发现——体验tab报名活动名额已满的活动
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/08]
+#***********************************************************************************************************************
+    def test_faxian_experjoinfull_tc200(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录账号发现——体验tab报名活动名额已满的活动')
+        print('step1发现页面里点击体验tab;step2翻页找到更多同城活动按钮')
+        print('step3点击更多同城活动按钮进入,翻页找到自动化活动名额已满活动')
+        print('step4点击自动化活动名额已满进入活动详细页面,检查报名已满按钮是否存在')
+        print('step5点击报名已满按钮,检查是否无反应')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验tab报名活动名额已满的活动----开始:'+now)
+        sleep(1)
+        #体验
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(4)
+        for i in range(2):
+            driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':100,'duration':1.0})
+        sleep(3)
+        #更多同城活动
+        ch1=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "立即报名"')
+        if len(ch1) != 0:
+            ch1v=driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "立即报名"').get_attribute('visible')
+            if ch1v == 'true':
+                ###driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name CONTAINS "更多同城活动"').click()
+                print('更多同城活动按钮存在')
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':570})
+                sleep(5)
+                for i in range(2):
+                    driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                #自动化活动名额已满
+                fullv=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="自动化活动名额已满"]').get_attribute('visible')
+                if fullv == 'true':
+                    print('自动化活动名额已满活动存在,检查通过')
+                    sleep(1)
+                    driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="自动化活动名额已满"]').click()
+                    sleep(3)
+                    #checking
+                    ch=driver.find_elements_by_accessibility_id('报名已满')
+                    if len(ch) == 0:
+                        print('报名已满按钮不存在/未找到，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf1='../../test_report/ios/'+now+'_errJoinFull_R_stg_tc200.png'
+                        driver.get_screenshot_as_file(sf1)
+                        sleep(1)
+                    else:
+                        print('报名已满按钮存在,检查通过')
+                        sleep(0.5)
+                        driver.find_element_by_accessibility_id('报名已满').click()
+                        sleep(1)
+                        ch2=driver.find_elements_by_accessibility_id('左习村邹溪村')
+                        if len(ch2) != 0:
+                            print('点击报名已满按钮无反应,检查通过')
+                            sleep(1)
+                            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':42})
+                            sleep(1)
+                else:
+                    print('自动化活动名额已满活动不存在，请检查原因')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+            else:
+                print('更多同城活动按钮不存在/未找到,请检查原因')
+                sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现——体验tab报名活动名额已满的活动----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_faxian_shopcityswitchugccheck_tc201
+#Purpose:切换门店/城市后UGC同步更新的检查
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/08]
+#***********************************************************************************************************************
+    def test_faxian_shopcityswitchugccheck_tc201(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:发现_切换门店/城市后UGC同步更新的检查')
+        print('step1点击发现;step2点击体验')
+        print('step3检查当前最近城市/门店是否市蔚来中心丨上海太古汇店,是则翻页检查上海门店的第一个UGC显示是否正常')
+        print('step4点击最近城市/门店:蔚来中心丨上海太古汇店进入门店/城市列表页面,翻页找到南京市点击切换城市')
+        print('step5翻页检查检查南京市的第一个UGC显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_切换门店/城市后UGC同步更新的检查----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('体验').click()
+        sleep(3)
+        sh=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name CONTAINS "蔚来中心丨上海太古汇店"')
+        if len(sh) != 0:
+            print('上海门店:蔚来中心丨上海太古汇店存在')
+            sleep(1)
+            for i in range(2):
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':650,'toX':50,'toY':50,'duration':1.0})
+            sleep(3)
+            ugc1=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[5]/XCUIElementTypeTextView').get_attribute('value')
+            print('上海门店第一个UGC:'+ugc1)
+            sleep(1)
+            if '咯偷摸' in ugc1:
+                print('上海门店的第一个UGC显示正常,检查通过')
+                sleep(0.5)
+            else:
+                print('上海门店的第一个UGC显示不正常,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errShUgc1_R_stg_tc201.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(2)
+            for i in range(3):
+                driver.execute_script("mobile: scroll", {"direction": "up"})
+            sleep(2)
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':207, 'y':110})
+            sleep(5)
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            #南京市
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[4]').click()
+            sleep(3)
+            print('切换南京市成功')
+            sleep(1)
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            ugc2=driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[3]/XCUIElementTypeTextView').get_attribute('value')
+            print('南京市第一个UGC:'+ugc2)
+            sleep(1)
+            if '南京市同城活动晒图' in ugc2:
+                print('南京市的第一个UGC显示正常,检查通过')
+                sleep(0.5)
+            else:
+                print('南京市的第一个UGC显示不正常,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf2='../../test_report/ios/'+now+'_errNJUgc1_R_stg_tc201.png'
+                driver.get_screenshot_as_file(sf2)
+                sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_切换门店/城市后UGC同步更新的检查----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_faxian_infodetaillikecomment_tc202
+#Purpose:检查用户模式点击发现页面资讯tab纯文章详情页的点赞和评论功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/08]
+#*********************************************************************************************************************************
+    def test_faxian_infodetaillikecomment_tc202(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:发现_资讯tab纯文章详情页的点赞和评论功能')
+        print('step1检查用户是否已经登录;step2如果用户已经登录则退出原来账号；step3点击发现页面')
+        print('step4点击某纯文章标题进入详情页面;step5点击文章详细页面的评论按钮后再输入评论文字点发送')
+        print('step6检查评论的文字是否存在')
+        print('step7返回点击点赞按钮,检查点赞后的点赞数是否为原点赞数+1')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab纯文章详情页的点赞和评论功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "SamSTG"')
+        if len(name) != 0:
+            print('用户SamSTG已登录')
+            sleep(0.5)
+        else:
+            print('用户SamSTG未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp(self)
+        sleep(1)
+        #发现
+        driver.find_element_by_accessibility_id('发现').click()
+        sleep(3)
+        driver.find_element_by_accessibility_id('资讯').click()
+        sleep(3)
+        for i in range(0):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        sleep(3)
+        #看完 「斌哥给道服同事内部信」 不吐不快
+        #PGC-投票
+        driver.find_element_by_accessibility_id('PGC-投票').click()
+        sleep(4)
+        #评论按钮
+        ###driver.find_element_by_xpath('//XCUIElementTypeOther[@name="PGC-投票"]/XCUIElementTypeOther[63]').click()
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":341, "y":703})
+        sleep(3)
+        driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="我也来说～"]').click()
+        sleep(1)
+        edit=driver.find_element_by_class_name('XCUIElementTypeTextView')
+        #edit.click()
+        #sleep(0.5)
+        now0=time.strftime('%H%M%S')
+        edit.send_keys('Python评论资讯纯文章:'+now0)
+        t0='Python评论资讯纯文章:'+now0
+        sleep(1)
+        driver.find_element_by_accessibility_id('Send').click()
+        sleep(1)
+        #driver.execute_script("mobile: scroll", {"direction": "down"})
+        #sleep(1)
+        title=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,t0)]')
+        if len(title) != 0:
+            print('评论的文字检查通过')
+            sleep(0.5)
+        else:
+            print('评论的文字检查失败，请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf1='../../test_report/ios/'+now+'_errComment_R_stg_tc202.png'
+            driver.get_screenshot_as_file(sf1)
+        sleep(1)
+        driver.find_element_by_accessibility_id('all page back grey icon').click()
+        sleep(2)
+        zan0=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="PGC-投票"]/XCUIElementTypeOther[64]/XCUIElementTypeStaticText').get_attribute('value')
+        #点赞
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":382, "y":703})
+        sleep(2)
+        zan=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="PGC-投票"]/XCUIElementTypeOther[64]/XCUIElementTypeStaticText').get_attribute('value')
+        print('原点赞数:'+zan0)
+        print('现点赞数:'+zan)
+        #print(zan)
+        if zan == str(int(zan0)+1):
+            print('点赞数+1,检查成功')
+            sleep(0.5)
+        else:
+            print('点赞数检查失败，请检查原因')
+            sleep(0.5)
+            now=time.strftime('%Y%m%d_%H%M%S')
+            sf2='../../test_report/ios/'+now+'_errLike_R_stg_tc202.png'
+            driver.get_screenshot_as_file(sf2)
+        sleep(2)
+        driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+        sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_发现_资讯tab纯文章详情页的点赞和评论功能----结束:'+now)
+
+#*********************************************************************************************************************************
+#TC Name:test_aiche_book4onekeycarowner_tc203
+#Purpose:检查一键加电车主模式使用预约服务功能
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/08]
+#*********************************************************************************************************************************
+    def test_aiche_book4onekeycarowner_tc203(self):
+        driver=self.driver
+        print('TC_用户模式，检查点:一键加电车主模式使用预约服务功能')
+        print('step1先退出原账号,再用一键加电车主账号登陆')
+        print('step2爱车页面找到一键加电按钮后点击进入,点击预约')
+        print('step3点击默认的地址,再点击默认的城市:上海市,翻页选择吐鲁番市')
+        print('step4地址栏输入吐鲁番站,点搜索,选择第一个地址,然后点确认')
+        print('step5点击选择服务时间,翻页选择7天后的日期,然后点保存并使用')
+        print('step6点击预约服务,选择单次结算,勾选我同意然后点确定,检查是否预约成功')
+        print('step7预约服务成功后,点右上角...按钮,选择取消服务,选择取消的原因,提交后检查服务详情页面显示是否正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_一键加电车主模式使用预约服务功能----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"一键加电")]')
+        if len(name) != 0:
+            print('一键加电车主用户已登录')
+            sleep(0.5)
+        else:
+            print('一键加电车主用户未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            bp_normalloginmp_onekey(self)
+        sleep(1)
+        #爱车
+        driver.find_element_by_accessibility_id('爱车').click()
+        sleep(1)
+        #服务安全密码
+        pin=driver.find_elements_by_accessibility_id('请输入服务安全密码')
+        if len(pin) != 0:
+            #driver.find_element_by_accessibility_id('1').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('2').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('3').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':539})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('6').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':345, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('5').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':206, 'y':595})
+            sleep(0.3)
+            #driver.find_element_by_accessibility_id('4').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':67, 'y':595})
+            sleep(0.3)
+        sleep(4)
+        #fresh data
+        #driver.execute_script("mobile: scroll", {"direction": "up"})
+        #sleep(2)
+        for i in range(0):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script('mobile: dragFromToForDuration',{'fromX':50,'fromY':600,'toX':50,'toY':300,'duration':1.0})
+        sleep(3)
+        #ch=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]')
+        ch0v=driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="一键加电"]').get_attribute('visible')
+        sleep(2)
+        if ch0v == 'true':
+            print('一键加电按钮找到')
+            sleep(2)
+            driver.find_element_by_accessibility_id('一键加电').click()
+            sleep(2)
+            fine=driver.find_elements_by_accessibility_id('我知道了')
+            if len(fine) != 0:
+                driver.find_element_by_accessibility_id('我知道了').click()
+            sleep(4)
+            driver.find_element_by_accessibility_id('预约').click()
+            sleep(3)
+            #上海市-远方基础工程有限公司
+            driver.find_element_by_accessibility_id('上海市-远方基础工程有限公司').click()
+            sleep(2)
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeButton').click()
+            sleep(2)
+            ###driver.find_element_by_accessibility_id('上海市').click()
+            driver.execute_script('mobile: tap', {'touchCount':'1', 'x':73, 'y':52})
+            sleep(2)
+            #城市选择
+            for i in range(5):
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+            sleep(2)
+            driver.find_element_by_accessibility_id('吐鲁番市').click()
+            sleep(2)
+            edit=driver.find_element_by_class_name('XCUIElementTypeTextField')
+            edit.click()
+            sleep(0.5)
+            now0=time.strftime('%H%M%S')
+            edit.send_keys('吐鲁番站')
+            sleep(0.5)
+            driver.find_element_by_accessibility_id('Search').click()
+            sleep(1)
+            #第一个地址
+            driver.find_element_by_xpath('//XCUIElementTypeTable/XCUIElementTypeCell[1]').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('确认').click()
+            sleep(3)
+            #选择服务时间
+            driver.find_element_by_accessibility_id('选择服务时间').click()
+            sleep(1)
+            for i in range(3):
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':135,'fromY':551,'toX':135,'toY':500,'duration':1.0})
+            sleep(2)
+            driver.find_element_by_accessibility_id('保存并使用').click()
+            sleep(3)
+            #预约服务
+            driver.find_element_by_accessibility_id('预约服务').click()
+            sleep(3)
+            #单次结算
+            driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"单次结算")]').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('authed vehicle cell check off').click()
+            sleep(1)
+            driver.find_element_by_accessibility_id('确定').click()
+            sleep(5)
+            print('预约服务成功')
+            sleep(2)
+            driver.find_element_by_accessibility_id('more icon').click()
+            sleep(2)
+            #取消服务
+            name0=driver.find_elements_by_accessibility_id('取消服务')
+            if len(name0) != 0:
+                print('取消服务按钮存在')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('取消服务').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('取消服务').click()
+                sleep(2)
+                driver.find_element_by_accessibility_id('希望修改期望取车时间或地点').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('提交').click()
+                sleep(3)
+                t0=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"服务已取消")]')
+                if len(t0) != 0:
+                    print('服务详情页面显示正常')
+                    sleep(0.5)
+                else:
+                    print('服务详情页面显示不正常,请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf0='../../test_report/ios/'+now+'_errCanceled_R_stg_tc203.png'
+                    driver.get_screenshot_as_file(sf0)
+                sleep(1)
+            else:
+                print('取消服务按钮不存在/未找到,请检查原因')
+                sleep(0.5)
+                now=time.strftime('%Y%m%d_%H%M%S')
+                sf0='../../test_report/ios/'+now+'_errNoCancel_R_stg_tc203.png'
+                driver.get_screenshot_as_file(sf0)
+                sleep(1)
+                driver.find_element_by_accessibility_id('取消').click()
+                sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+            driver.find_element_by_accessibility_id('all page back grey icon').click()
+            sleep(2)
+        else:
+            print('一键加电按钮未找到,请检查原因')
+            sleep(2)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_爱车_一键加电车主模式使用预约服务功能----结束:'+now)
+
+#************************************************************************************************************
+#TC Name:test_jingxi_giftdetailcheck_tc204
+#Purpose:检查用户模式惊喜商品详细页面的检查
+#OS:android
+#Device:iPhone7 Plus
+#Pre-conditions:用户已正常登录app/未登录
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/12]
+#************************************************************************************************************
+    def test_jingxi_giftdetailcheck_tc204(self):
+        driver=self.driver
+        print('TC_用户模式进入惊喜页面，检查点:惊喜_惊喜商品详细页面的检查----step1用户模式进入惊喜页面')
+        print('step2翻页选择一款商品点击进入商品详细页面；step3对惊喜商品详细页面进入UI检查')
+        print('step4点击已选栏,弹出浮层，对浮层进行UI检查')
+        print('step5关闭后点击用户评价;step6返回后翻页点击规格参数,检查规格参数页面是否显示正常')
+        print('step7返回后点击售后服务，检查售后服务页面是否显示正常')
+        print('step8返回后点击在线咨询,检查在线咨询页面是否显示正常')
+        print('step9返回后点击购物车,检查购物车页面是否显示正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_惊喜商品详细页面的检查----开始:'+now)
+        sleep(1)
+        #惊喜
+        driver.find_element_by_accessibility_id('惊喜').click()
+        sleep(5)
+        for i in range(8):
+            driver.execute_script("mobile: scroll", {"direction": "down"})
+        driver.execute_script("mobile: dragFromToForDuration",{"fromX":50,"fromY":600,"toX":50,"toY":300,"duration":1.0})
+        sleep(2)
+        u1=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="cake 2"]')
+        sleep(0.5)
+        if len(u1) != 0:
+            u1v=driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').get_attribute('visible')
+            sleep(0.5)
+            if u1v == 'true':
+                print('需要查找的商品存在，检查通过')
+                sleep(2)
+                driver.find_element_by_xpath('//XCUIElementTypeOther[@name="cake 2"]').click()
+                sleep(7)
+                fun_giftdetailui_check(self)
+                sleep(1)
+                #已选栏
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':202, 'y':560})
+                sleep(2)
+                #检查弹出浮层
+                fun_giftdetailfloatui_check(self)
+                sleep(1)
+                #关闭
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':375, 'y':212})
+                sleep(1)
+                #点击用户评价
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[contains(@name,"用户评价")]').click()
+                sleep(1)
+                #fresh
+                driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                #返回
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':38, 'y':42})
+                sleep(1)
+                for i in range(15):
+                    driver.execute_script("mobile: scroll", {"direction": "down"})
+                sleep(2)
+                #点击规格参数
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="规格参数"]').click()
+                sleep(1)
+                ch1=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="666666"]')
+                if len(ch1) != 0:
+                    print('规格参数页面显示正常,检查成功')
+                    sleep(0.5)
+                else:
+                    print('规格参数页面显示不正常,检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1a='../../test_report/ios/'+now+'_errGiftDetailSpe_R_tc204.png'
+                    driver.get_screenshot_as_file(sf1a)
+                sleep(1)
+                #返回
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':29, 'y':40})
+                sleep(1)
+                #点击售后服务
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="售后服务"]').click()
+                sleep(1)
+                ch2=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="88888888888"]')
+                if len(ch2) != 0:
+                    print('售后服务页面显示正常,检查成功')
+                    sleep(0.5)
+                else:
+                    print('售后服务页面显示不正常,检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1b='../../test_report/ios/'+now+'_errGiftDetailAfterSale_R_tc204.png'
+                    driver.get_screenshot_as_file(sf1b)
+                sleep(1)
+                #返回
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':29, 'y':40})
+                sleep(1)
+                #点击在线咨询
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':32, 'y':701})
+                sleep(3)
+                ch3=driver.find_elements_by_xpath('//XCUIElementTypeOther[contains(@name,"在线小助手")]')
+                if len(ch3) != 0:
+                    print('在线咨询页面显示正常,检查成功')
+                    sleep(0.5)
+                else:
+                    print('在线咨询页面显示不正常,检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf3='../../test_report/ios/'+now+'_errGiftOnlineSer_R_tc204.png'
+                    driver.get_screenshot_as_file(sf3)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':42, 'y':42})
+                sleep(1)
+                #点击购物车
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':76, 'y':701})
+                sleep(2)
+                ch4=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"我的积分：")]')
+                if len(ch4) != 0:
+                    print('购物车页面显示正常,检查成功')
+                    sleep(0.5)
+                else:
+                    print('购物车页面显示不正常,检查失败，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf4='../../test_report/ios/'+now+'_errGiftCart_R_tc204.png'
+                    driver.get_screenshot_as_file(sf4)
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':37, 'y':42})
+                sleep(1)
+                driver.execute_script('mobile: tap', {'touchCount':'1', 'x':29, 'y':40})
+                sleep(1)
+            else:
+                print('需要查找的商品存在/未找到，请重新挑选')
+                sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('TC_惊喜_惊喜商品详细页面的检查---结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_clubcreateactivity_tc205
+#Purpose:朋友页面社群群主创建社群活动
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:社群群主用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/18]
+#***********************************************************************************************************************
+    def test_pengyou_clubcreateactivity_tc205(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录社群群主账号朋友_社群群主创建社群活动')
+        print('step1检查朋友页面社群是否存在')
+        print('step2点击社群进入后检查右上角...按钮是否存在；step3点击右上角...按钮,点击社群活动')
+        print('step4点+按钮,选择3张图片,再填写活动名称,选择报名结束时间、活动开始时间、活动结束时间,再选择活动类型,再点击下一步')
+        print('step5选择活动地点,输入活动人数,填写活动内容介绍,最后点击发布')
+        print('step6检查社群活动是否创建成功')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群群主创建社群活动----开始:'+now)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #社群活动
+        club=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"')
+        if len(club) != 0:
+            print('社群存在')
+            sleep(2)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"').click()
+            sleep(3)
+            #...
+            driver.find_element_by_accessibility_id('im btn more').click()
+            sleep(3)
+            #建群聊
+            mul=driver.find_elements_by_accessibility_id('社群活动')
+            if len(mul) != 0:
+                print('社群活动按钮存在')
+                sleep(2)
+                driver.find_element_by_accessibility_id('社群活动').click()
+                sleep(2)
+                #创建社群活动
+                driver.execute_script("mobile: tap", {"touchCount":"1", "x":207, "y":482})
+                sleep(1)
+                #+
+                driver.find_element_by_accessibility_id('create_activity_add').click()
+                sleep(1)
+                for i in range(3):
+                    driver.find_elements_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "compose guide check box defaul"')[i].click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('完成(3/3)').click()
+                sleep(1)
+                #活动名称
+                driver.find_element_by_accessibility_id('请填写（4-20个字）').click()
+                sleep(1)
+                name=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                now0=time.strftime('%Y%m%d%H%M')
+                name.send_keys('Python学习'+now0)
+                t0='Python学习'+now0
+                sleep(0.5)
+                #确定    
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "确定"').click()
+                sleep(1)
+                #报名结束时间
+                driver.find_elements_by_xpath('//XCUIElementTypeStaticText[@name="请选择"]')[0].click()
+                sleep(1)
+                #改日期:明天
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':128,'fromY':551,'toX':128,'toY':500,'duration':1.0})
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(1)
+                #活动开始时间
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="请选择"]').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(1)
+                #活动结束时间
+                driver.find_element_by_xpath('//XCUIElementTypeStaticText[@name="请选择"]').click()
+                sleep(1)
+                #改日期:明天
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':128,'fromY':551,'toX':128,'toY':500,'duration':1.0})
+                sleep(1)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(1)
+                driver.execute_script('mobile: dragFromToForDuration',{'fromX':128,'fromY':650,'toX':128,'toY':400,'duration':1.0})
+                sleep(1)
+                #活动类型
+                driver.find_element_by_accessibility_id('测试A').click()
+                sleep(1)
+                #下一步    
+                driver.find_element_by_xpath('//XCUIElementTypeButton[@name="下一步"]').click()
+                sleep(1)
+                #活动地点
+                driver.find_element_by_accessibility_id('活动地点').click()
+                sleep(3)
+                driver.find_element_by_accessibility_id('上海国际汽车城科技创新港').click()
+                sleep(1)
+                #活动人数
+                driver.find_element_by_accessibility_id('活动人数').click()
+                sleep(1)
+                number=driver.find_element_by_class_name('XCUIElementTypeTextField')
+                number.send_keys('2000')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('确定').click()
+                sleep(2)
+                #活动内容介绍
+                intro=driver.find_element_by_class_name('XCUIElementTypeTextView')
+                sleep(0.5)
+                intro.send_keys('Python爱好者和使用者学习和交流的活动')
+                sleep(0.5)
+                driver.find_element_by_accessibility_id('Toolbar Done Button').click()
+                sleep(0.5)
+                #发布
+                driver.find_element_by_accessibility_id('发布').click()
+                sleep(8)
+                #检查
+                tt=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,t0)]')
+                #print(len(t))
+                if len(tt) != 0:
+                    print('社群活动创建成功,检查通过')
+                    sleep(0.5)
+                else:
+                    print('社群活动创建不成功，请检查原因')
+                    sleep(0.5)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf2='../../test_report/ios/'+now+'_errNocratedactivity_R_stg_tc205.png'
+                    driver.get_screenshot_as_file(sf2)
+                sleep(1)
+                #返回
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(1)
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(1)
+                #社群页面
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(1)
+        else:
+            print('社群不存在,无法创建社群活动')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群群主创建社群活动----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_clubdeleteactivity_tc206
+#Purpose:朋友页面社群群主删除没有成员报名的社群活动
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:社群群主用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/18]
+#***********************************************************************************************************************
+    def test_pengyou_clubdeleteactivity_tc206(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录社群群主账号朋友_社群群主删除没有成员报名的社群活动')
+        print('step1检查朋友页面社群是否存在')
+        print('step2检查点击社群后检查社群活动是否存在；step3点击社群活动进入')
+        print('step4社群活动页面点右上角删除按钮,再点删除确认,在社群页面再点击该社区活动进入,检查是否显示“该活动已被取消”')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群群主删除没有成员报名的社群活动----开始:'+now)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #社群
+        club=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"')
+        if len(club) != 0:
+            print('社群存在')
+            sleep(2)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"').click()
+            sleep(3)
+            activ=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群活动"')
+            t=len(activ)
+            if t != 0:
+                print('社群活动存在')
+                sleep(1)
+                driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群活动"')[t-1].click()
+                sleep(6)
+                #右上角按钮
+                delb=driver.find_elements_by_xpath('//XCUIElementTypeOther[@name="蔚来"]/XCUIElementTypeOther[2]')
+                if len(delb) != 0:
+                    print('删除按钮找到')
+                    sleep(1)
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":377, "y":41})
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('删除').click()
+                    sleep(3)
+                    driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群活动"')[t-1].click()
+                    sleep(3)
+                    #检查
+                    tt=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"该活动已被取消")]')
+                    if len(tt) != 0:
+                        print('社群活动删除成功,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('社群活动删除不成功，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errAfterdeleteactivity_R_stg_tc206.png'
+                        driver.get_screenshot_as_file(sf2)
+                    sleep(1)
+                    #返回
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(1)
+                else:
+                    print('删除按钮未找到')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+                #返回
+                #社群页面
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(1)
+        else:
+            print('社群不存在,无法删除社群活动')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群群主删除没有成员报名的社群活动----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_clubmemberactivity_tc207
+#Purpose:朋友页面社群成员点击活动小卡片报名社群活动
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:社群群主用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/18]
+#***********************************************************************************************************************
+    def test_pengyou_clubmemberactivity_tc207(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录社群成员主用户朋友_社群群主删除没有成员报名的社群活动')
+        print('step1检查朋友页面社群是否存在')
+        print('step2检查点击社群后检查社群活动是否存在；step3点击社群活动进入')
+        print('step4社群活动页面点右立即报名按钮,再点查看行程,在活动订单页面点击取消报名,确认后检查取消成功页面是否显示正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群成员点击活动小卡片报名社群活动----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6986"')
+        if len(name) != 0:
+            print('社群成员主用户Sam6986已登录')
+            sleep(0.5)
+        else:
+            print('社群成员用户Sam6986未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            #Sam6986
+            bp_normalloginmp_testera(self)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #社群
+        club=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"')
+        if len(club) != 0:
+            print('社群存在')
+            sleep(2)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"').click()
+            sleep(3)
+            activ=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群活动"')
+            t=len(activ)
+            if t != 0:
+                print('社群活动存在')
+                sleep(1)
+                driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群活动"')[t-1].click()
+                sleep(6)
+                #立即报名按钮
+                delb=driver.find_elements_by_accessibility_id('立即报名')
+                if len(delb) != 0:
+                    print('立即报名按钮找到')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('立即报名').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('查看行程').click()
+                    sleep(6)
+                    driver.find_element_by_accessibility_id('取消报名').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('确认').click()
+                    sleep(2)
+                    #检查
+                    tt=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"取消成功")]')
+                    if len(tt) != 0:
+                        print('取消成功页面显示正常,检查通过')
+                        sleep(0.5)
+                    else:
+                        print('取消成功页面显示不正常，请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errCancelactivity_R_stg_tc207.png'
+                        driver.get_screenshot_as_file(sf2)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('完成').click()
+                    sleep(2)
+                    #返回
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(1)
+                else:
+                    print('立即报名未找到/不存在,请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errNojoinnow_R_stg_tc207.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+                #返回
+                #社群页面
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(1)
+        else:
+            print('社群不存在,无法删除社群活动')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群成员点击活动小卡片报名社群活动----结束:'+now)
+
+#***********************************************************************************************************************
+#TC Name:test_pengyou_clubmemberjoinactivity_tc208
+#Purpose:朋友页面社群成员点击活动小卡片报名社群活动
+#OS:iOS
+#Device:iPhone7 Plus
+#Pre-conditions:社群群主用户已正常登录app
+#Post-conditions:N/A
+#Modify History:created by Sam [2019/04/18]
+#***********************************************************************************************************************
+    def test_pengyou_clubmemberjoinactivity_tc208(self):
+        driver=self.driver
+        print('TC_检查手机号码登录APP，检查点:已登录社群成员主用户朋友_社群群主删除没有成员报名的社群活动')
+        print('step1检查朋友页面社群是否存在')
+        print('step2检查点击社群后检查社群活动是否存在；step3点击社群活动进入')
+        print('step4社群活动页面点右立即报名按钮,再点查看行程,在活动订单页面点击取消报名,确认后检查取消成功页面是否显示正常')
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群成员在群组信息页报名社群活动----开始:'+now)
+        sleep(1)
+        driver.find_element_by_accessibility_id('我的').click()
+        sleep(2)
+        name=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND name == "Sam6986"')
+        if len(name) != 0:
+            print('社群成员主用户Sam6986已登录')
+            sleep(0.5)
+        else:
+            print('社群成员用户Sam6986未登录')
+            sleep(0.5)
+            bp_is_loggedin(self)
+            sleep(1)
+            #Sam6986
+            bp_normalloginmp_testera(self)
+        sleep(1)
+        #朋友
+        driver.find_element_by_accessibility_id('朋友').click()
+        sleep(3)
+        #社群
+        club=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"')
+        if len(club) != 0:
+            print('社群存在')
+            sleep(2)
+            driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群"').click()
+            sleep(8)
+            #...
+            ###driver.find_element_by_ios_predicate('type == "XCUIElementTypeButton" AND name == "im btn more"').click()
+            driver.execute_script("mobile: tap", {"touchCount":"1", "x":380, "y":42})
+            sleep(2)
+            activ=driver.find_elements_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群活动"')
+            t=len(activ)
+            if t != 0:
+                print('社群活动存在')
+                sleep(2)
+                driver.find_element_by_ios_predicate('type == "XCUIElementTypeStaticText" AND value BEGINSWITH "社群活动"').click()
+                sleep(2)
+                #社群活动
+                driver.find_elements_by_class_name('XCUIElementTypeCell')[1].click()
+                sleep(3)
+                #立即报名按钮
+                delb=driver.find_elements_by_accessibility_id('立即报名')
+                if len(delb) != 0:
+                    print('立即报名按钮找到')
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('立即报名').click()
+                    sleep(2)
+                    #返回
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('我的').click()
+                    sleep(2)
+                    driver.find_element_by_accessibility_id('我的活动').click()
+                    sleep(2)
+                    #检查
+                    tt=driver.find_elements_by_xpath('//XCUIElementTypeStaticText[contains(@name,"Python学习")]')
+                    if len(tt) != 0:
+                        print('我的活动里社群活动存在,报名成功检查通过')
+                        sleep(0.5)
+                    else:
+                        print('我的活动里社群活动不存在，报名成功检查失败,请检查原因')
+                        sleep(0.5)
+                        now=time.strftime('%Y%m%d_%H%M%S')
+                        sf2='../../test_report/ios/'+now+'_errNomyactivity_R_stg_tc208.png'
+                        driver.get_screenshot_as_file(sf2)
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('完成').click()
+                    sleep(2)
+                    #返回
+                else:
+                    print('立即报名未找到/不存在,请检查原因')
+                    sleep(1)
+                    now=time.strftime('%Y%m%d_%H%M%S')
+                    sf1='../../test_report/ios/'+now+'_errNojoinnow_R_stg_tc208.png'
+                    driver.get_screenshot_as_file(sf1)
+                    sleep(1)
+                    #返回
+                    driver.execute_script("mobile: tap", {"touchCount":"1", "x":32, "y":42})
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+                    driver.find_element_by_accessibility_id('all page back grey icon').click()
+                    sleep(1)
+                #返回
+                #社群页面
+                driver.find_element_by_accessibility_id('all page back grey icon').click()
+                sleep(1)
+        else:
+            print('社群不存在,无法删除社群活动')
+            sleep(1)
+        now=time.strftime('%Y%m%d_%H%M%S')
+        print('朋友_社群成员在群组信息页报名社群活动----结束:'+now)
+
 if __name__ == '__main__':unittest.main()
