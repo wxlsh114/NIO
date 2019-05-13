@@ -52,7 +52,7 @@ def bp_is_plusexist(self):
     #发现
     #driver.find_element_by_accessibility_id('发现').click()
     #sleep(2)
-    plus=driver.find_elements_by_xpath('//XCUIElementTypeButton[@name="addPopMenu"]')
+    plus=driver.find_elements_by_accessibility_id('addPopMenu')
     if len(plus) == 0:
         now=time.strftime('%Y%m%d_%H%M%S')
         sf='../../test_report/ios/'+now+'_errNoPlus_R.png'
