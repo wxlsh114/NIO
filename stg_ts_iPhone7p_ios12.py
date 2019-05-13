@@ -28,7 +28,6 @@ class Weilai_test(unittest.TestCase):
         testunit = unittest.TestSuite()
         # 1st part
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_wode_fans_tc001'))
-        """
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_wode_watch_tc002'))
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_wode_publish_tc003'))
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_wode_deletepublished_tc007'))
@@ -131,6 +130,7 @@ class Weilai_test(unittest.TestCase):
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_aiche_rechargemaprechargepole_tc095'))
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_aiche_rechargemapsearchroute_tc096'))
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_aiche_rechargemaprouteplan_tc097'))
+        """
         # 3rd part
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_aiche_es8milecalculator_tc051'))
         testunit.addTest(stg_tc_iPhone7p_ios12.Weilai_test('test_aiche_es6milecalculator_tc196'))
@@ -243,7 +243,7 @@ class Weilai_test(unittest.TestCase):
         filename = '../../test_report/ios/'+now+'_stg_ts_iPhone7P_ios12.html'
         fp = open(filename, 'wb')
         runner = HTMLTestRunner(stream=fp, title='iPhone7Plus_iOS12.2真机\
-                              v3.6.0_build:3297_发现/朋友/爱车/惊喜/我的UI测试报告by Appium',\
+                              v3.6.5_build:3370_发现/朋友/爱车/惊喜/我的UI测试报告by Appium',\
                               description='自动化测试脚本集运行状态:')
         runner.run(testunit)
         fp.close()
